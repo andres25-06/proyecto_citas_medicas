@@ -10,6 +10,7 @@ import csv
 import json
 import os
 from typing import Any, Dict, List
+import Persistencia
 
 # Se define el orden de las columnas para los archivos.
 # Se añade 'tipo_documento' como nuevo campo.
@@ -22,11 +23,11 @@ def inicializar_archivo(filepath: str) -> None:
     Esta función es clave para evitar errores en la primera ejecución del programa.
 
     Args:
-        filepath (str): La ruta completa al archivo de datos (e.g., 'data/aprendices.csv').
+        filepath (str): La ruta completa al archivo de datos (e.g., 'data/.csv').
     """
     directorio = os.path.dirname(filepath)
-    if directorio and not os.path.exists(directorio):
-        os.makedirs(directorio)
+    if directorio and not os.path.exists(filepath):
+        os.makedirs(filepath)
 
     if not os.path.exists(filepath):
         if filepath.endswith('.csv'):
