@@ -1,3 +1,2 @@
-id_medico,nombre,especialidad
-m1,Dr. Ruiz,Cardiología
-m2,Dr. López,Medicina General
+id,tipo_documento,documento,nombres,apellidos,direccion,especialidad,telefono,estado,consultorio,hospital
+1,1,1,1,1,,1,1,Activo,1,1
