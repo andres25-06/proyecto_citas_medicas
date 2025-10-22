@@ -1,0 +1,4 @@
+[
+  {"id_cita":"c1","id_paciente":"p1","id_medico":"m1","fecha":"2025-10-22","hora":"09:00","motivo_consulta":"Control"},
+  {"id_cita":"c2","id_paciente":"p2","id_medico":"m2","fecha":"2025-10-25","hora":"10:30","motivo_consulta":"Dolor de cabeza"}
+]
