@@ -7,7 +7,7 @@ Este módulo utiliza 'gestor_datos' para la persistencia.
 """
 
 from typing import Any, Dict, List, Optional
-from Controlador import gestor_datos
+from Controlador import gestor_datos_citas
 
 
 def generar_id(citas: List[Dict[str, Any]]) -> int:
@@ -52,7 +52,7 @@ def crear_cita(
     Returns:
         Optional[Dict[str, Any]]: El diccionario de la cita creada o None si ya existía.
     """
-    citas = gestor_datos.cargar_datos(filepath)
+    citas = gestor_datos_citas.cargar_datos(filepath)
 
     # Validar si ya existe una cita para el mismo paciente, médico, fecha y hora
     for cita in citas:
@@ -76,7 +76,7 @@ def crear_cita(
     }
 
     citas.append(nueva_cita)
-    gestor_datos.guardar_datos(filepath, citas)
+    gestor_datos_citas.guardar_datos(filepath, citas)
     return nueva_cita
 
 
@@ -90,7 +90,7 @@ def leer_todas_las_citas(filepath: str) -> List[Dict[str, Any]]:
     Returns:
         List[Dict[str, Any]]: La lista de citas.
     """
-    return gestor_datos.cargar_datos(filepath)
+    return gestor_datos_citas.cargar_datos(filepath)
 
 
 def buscar_cita_por_id(filepath: str, id_cita: str) -> Optional[Dict[str, Any]]:
@@ -104,7 +104,7 @@ def buscar_cita_por_id(filepath: str, id_cita: str) -> Optional[Dict[str, Any]]:
     Returns:
         Optional[Dict[str, Any]]: El diccionario de la cita si se encuentra, de lo contrario None.
     """
-    citas = gestor_datos.cargar_datos(filepath)
+    citas = gestor_datos_citas.cargar_datos(filepath)
     for cita in citas:
         if cita.get('id') == id_cita:
             return cita
@@ -127,7 +127,7 @@ def actualizar_cita(
     Returns:
         Optional[Dict[str, Any]]: El diccionario de la cita actualizada, o None si no se encontró.
     """
-    citas = gestor_datos.cargar_datos(filepath)
+    citas = gestor_datos_citas.cargar_datos(filepath)
     cita_encontrada = None
     indice = -1
 
@@ -144,7 +144,7 @@ def actualizar_cita(
 
         cita_encontrada.update(datos_nuevos)
         citas[indice] = cita_encontrada
-        gestor_datos.guardar_datos(filepath, citas)
+        gestor_datos_citas.guardar_datos(filepath, citas)
         return cita_encontrada
 
     return None
@@ -161,7 +161,7 @@ def eliminar_cita(filepath: str, id_cita: str) -> bool:
     Returns:
         bool: True si la cita fue eliminada, False si no se encontró.
     """
-    citas = gestor_datos.cargar_datos(filepath)
+    citas = gestor_datos_citas.cargar_datos(filepath)
     cita_a_eliminar = None
 
     for cita in citas:
@@ -171,7 +171,7 @@ def eliminar_cita(filepath: str, id_cita: str) -> bool:
 
     if cita_a_eliminar:
         citas.remove(cita_a_eliminar)
-        gestor_datos.guardar_datos(filepath, citas)
+        gestor_datos_citas.guardar_datos(filepath, citas)
         return True
 
     return False
