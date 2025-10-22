@@ -167,4 +167,3 @@ def eliminar_paciente(filepath: str, documento: str) -> bool:
         return True
 
     return False
-

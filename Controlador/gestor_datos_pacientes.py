@@ -25,8 +25,8 @@ def inicializar_archivo(filepath: str) -> None:
         filepath (str): La ruta completa al archivo de datos (e.g., 'data/.csv').
     """
     directorio = os.path.dirname(filepath)
-    if directorio and not os.path.exists(filepath):
-        os.makedirs(filepath)
+    if directorio and not os.path.exists(directorio):
+        os.makedirs(directorio)
 
     if not os.path.exists(filepath):
         if filepath.endswith('.csv'):
@@ -77,4 +77,3 @@ def guardar_datos(filepath: str, datos: List[Dict[str, Any]]) -> None:
     elif filepath.endswith('.json'):
         with open(filepath, mode='w', encoding='utf-8') as json_file:
             json.dump(datos, json_file, indent=4)
-

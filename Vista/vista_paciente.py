@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -- coding: utf-8 --
 """
 Vista del Módulo de Pacientes.
 
@@ -59,7 +59,7 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
 
 def elegir_almacenamiento() -> str:
     """Pregunta al usuario qué formato de archivo desea usar y construye la ruta."""
-    console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]⚙ Configuración de Almacenamiento[/bold cyan]"))
     prompt_texto = (
         "¿Dónde desea almacenar los datos?\n"
         "[bold yellow]1[/bold yellow]. CSV (Archivo de texto plano)\n"
@@ -99,7 +99,7 @@ def menu_crear_paciente(filepath: str):
         ))
     else:
         console.print(Panel(
-            "⚠️ No se pudo registrar al paciente. Verifique los datos.",
+            "⚠ No se pudo registrar al paciente. Verifique los datos.",
             border_style="red", title="Error"
         ))
 
@@ -134,7 +134,7 @@ def menu_leer_pacientes(filepath: str):
 
 def menu_actualizar_paciente(filepath: str):
     """Actualizar los datos de un paciente."""
-    console.print(Panel.fit("[bold cyan]✏️ Actualizar Datos de Paciente[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]✏ Actualizar Datos de Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a actualizar")
 
     paciente_actual = paciente.buscar_paciente_por_documento(filepath, str(documento))
@@ -178,7 +178,7 @@ def menu_actualizar_paciente(filepath: str):
 
 def menu_eliminar_paciente(filepath: str):
     """Eliminar un paciente existente."""
-    console.print(Panel.fit("[bold cyan]🗑️ Eliminar Paciente[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]🗑 Eliminar Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a eliminar")
 
     paciente_encontrado = paciente.buscar_paciente_por_documento(filepath, str(documento))
@@ -233,5 +233,5 @@ def main_vista_pacientes():
         elif opcion == '4':
             menu_eliminar_paciente(archivo_seleccionado)
         elif opcion == '5':
-            console.print("\n[bold cyan]⬅️ Volviendo al menú principal...[/bold cyan]")
+            console.print("\n[bold cyan]⬅ Volviendo al menú principal...[/bold cyan]")
             break
