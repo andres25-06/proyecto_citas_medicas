@@ -10,6 +10,8 @@ from rich.prompt import Prompt
 
 # Importamos la vista actual (pacientes)
 from Vista import vista_paciente
+from Vista import vista_medico
+from Vista import vista_cita
 # En el futuro puedes agregar más vistas:
 # from Vista import vista_medicos, vista_citas
 
@@ -38,7 +40,7 @@ def main():
             vista_paciente.main_vista_pacientes()
 
         elif opcion == "2":
-            console.print("[yellow]🧑‍⚕️ El módulo de médicos está en desarrollo...[/yellow]")
+            vista_medico.main_vista_medicos()
 
         elif opcion == "3":
             console.print("[blue]📅 El módulo de citas estará disponible pronto...[/blue]")
