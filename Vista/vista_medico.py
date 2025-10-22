@@ -8,7 +8,7 @@ del módulo de médicos está aquí.
 
 import os
 
-from Controlador import gestor_datos
+from Controlador import gestor_datos_pacientes
 from Modelo import medico  # Importamos la lógica del modelo
 
 # --- Importaciones de la librería Rich ---
@@ -124,7 +124,7 @@ def menu_leer_medicos(filepath: str):
     console.print(tabla)
 
 def buscar_medico_por_documento(filepath, documento):
-    medicos = gestor_datos.cargar_datos(filepath)
+    medicos = gestor_datos_pacientes.cargar_datos(filepath)
     for m in medicos:
         if m.get('documento') == str(documento):
             return m
