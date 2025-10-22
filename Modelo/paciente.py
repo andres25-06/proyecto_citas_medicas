@@ -8,7 +8,7 @@ Este módulo utiliza 'gestor_datos' para la persistencia.
 
 from typing import Any, Dict, List, Optional
 
-from Controlador import gestor_datos
+from Controlador import gestor_datos_pacientes
 
 
 def generar_id(pacientes: List[Dict[str, Any]]) -> int:
@@ -52,7 +52,7 @@ def crear_paciente(
     Returns:
         Optional[Dict[str, Any]]: El diccionario del paciente creado o None si ya existía.
     """
-    pacientes = gestor_datos.cargar_datos(filepath)
+    pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     str_documento = str(documento)
 
     if any(ap.get('documento') == str_documento for ap in pacientes):
@@ -72,7 +72,7 @@ def crear_paciente(
     }
 
     pacientes.append(nuevo_paciente)
-    gestor_datos.guardar_datos(filepath, pacientes)
+    gestor_datos_pacientes.guardar_datos(filepath, pacientes)
     return nuevo_paciente
 
 def leer_todos_los_pacientes(filepath: str) -> List[Dict[str, Any]]:
@@ -85,7 +85,7 @@ def leer_todos_los_pacientes(filepath: str) -> List[Dict[str, Any]]:
     Returns:
         List[Dict[str, Any]]: La lista de pacientes.
     """
-    return gestor_datos.cargar_datos(filepath)
+    return gestor_datos_pacientes.cargar_datos(filepath)
 
 def buscar_paciente_por_documento(filepath: str, documento: str) -> Optional[Dict[str, Any]]:
     """
@@ -98,7 +98,7 @@ def buscar_paciente_por_documento(filepath: str, documento: str) -> Optional[Dic
     Returns:
         Optional[Dict[str, Any]]: El diccionario del paciente si se encuentra, de lo contrario None.
     """
-    pacientes = gestor_datos.cargar_datos(filepath)
+    pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     for paciente in pacientes:
         if paciente.get('documento') == documento:
             return paciente
@@ -120,7 +120,7 @@ def actualizar_paciente(
     Returns:
         Optional[Dict[str, Any]]: El diccionario del paciente actualizado, o None si no se encontró.
     """
-    pacientes = gestor_datos.cargar_datos(filepath)
+    pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     paciente_encontrado = None
     indice = -1
 
@@ -137,7 +137,7 @@ def actualizar_paciente(
 
         paciente_encontrado.update(datos_nuevos)
         pacientes[indice] = paciente_encontrado
-        gestor_datos.guardar_datos(filepath, pacientes)
+        gestor_datos_pacientes.guardar_datos(filepath, pacientes)
         return paciente_encontrado
 
     return None
@@ -153,7 +153,7 @@ def eliminar_paciente(filepath: str, documento: str) -> bool:
     Returns:
         bool: True si el pac fue eliminado, False si no se encontró.
     """
-    pacientes = gestor_datos.cargar_datos(filepath)
+    pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     aprendiz_a_eliminar = None
 
     for paciente in pacientes:
@@ -163,7 +163,7 @@ def eliminar_paciente(filepath: str, documento: str) -> bool:
 
     if paciente_a_eliminar:
         paciente.remove(aprendiz_a_eliminar)
-        gestor_datos.guardar_datos(filepath, pacientes)
+        gestor_datos_pacientes.guardar_datos(filepath, pacientes)
         return True
 
     return False
