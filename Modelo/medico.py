@@ -7,7 +7,7 @@ Este módulo utiliza 'gestor_datos' para la persistencia.
 """
 
 from typing import Any, Dict, List, Optional
-from Controlador import gestor_datos
+from Controlador import gestor_datos_medico
 
 
 def generar_id(medicos: List[Dict[str, Any]]) -> int:
@@ -56,7 +56,7 @@ def crear_medico(
     Returns:
         Optional[Dict[str, Any]]: El médico creado o None si ya existía.
     """
-    medicos = gestor_datos.cargar_datos(filepath)
+    medicos = gestor_datos_medico.cargar_datos(filepath)
     str_documento = str(documento)
 
     if any(m.get('documento') == str_documento for m in medicos):
@@ -79,7 +79,7 @@ def crear_medico(
     }
 
     medicos.append(nuevo_medico)
-    gestor_datos.guardar_datos(filepath, medicos)
+    gestor_datos_medico.guardar_datos(filepath, medicos)
     return nuevo_medico
 
 
@@ -93,7 +93,7 @@ def leer_todos_los_medicos(filepath: str) -> List[Dict[str, Any]]:
     Returns:
         List[Dict[str, Any]]: Lista de médicos.
     """
-    return gestor_datos.cargar_datos(filepath)
+    return gestor_datos_medico.cargar_datos(filepath)
 
 
 def buscar_medico_por_documento(filepath: str, documento: str) -> Optional[Dict[str, Any]]:
@@ -107,7 +107,7 @@ def buscar_medico_por_documento(filepath: str, documento: str) -> Optional[Dict[
     Returns:
         Optional[Dict[str, Any]]: El médico encontrado o None si no existe.
     """
-    medicos = gestor_datos.cargar_datos(filepath)
+    medicos = gestor_datos_medico.cargar_datos(filepath)
     for medico in medicos:
         if medico.get('documento') == documento:
             return medico
@@ -126,7 +126,7 @@ def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any
     Returns:
         Optional[Dict[str, Any]]: Médico actualizado o None si no se encontró.
     """
-    medicos = gestor_datos.cargar_datos(filepath)
+    medicos = gestor_datos_medico.cargar_datos(filepath)
     medico_encontrado = None
     indice = -1
 
@@ -141,7 +141,7 @@ def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any
             medico_encontrado[key] = str(value)
 
         medicos[indice] = medico_encontrado
-        gestor_datos.guardar_datos(filepath, medicos)
+        gestor_datos_medico.guardar_datos(filepath, medicos)
         return medico_encontrado
 
     return None
@@ -158,7 +158,7 @@ def eliminar_medico(filepath: str, documento: str) -> bool:
     Returns:
         bool: True si se eliminó, False si no se encontró.
     """
-    medicos = gestor_datos.cargar_datos(filepath)
+    medicos = gestor_datos_medico.cargar_datos(filepath)
     medico_a_eliminar = None
 
     for medico in medicos:
@@ -168,7 +168,7 @@ def eliminar_medico(filepath: str, documento: str) -> bool:
 
     if medico_a_eliminar:
         medicos.remove(medico_a_eliminar)
-        gestor_datos.guardar_datos(filepath, medicos)
+        gestor_datos_medico.guardar_datos(filepath, medicos)
         return True
 
     return False
