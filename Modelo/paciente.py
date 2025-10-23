@@ -124,9 +124,10 @@ def actualizar_paciente(
     paciente_encontrado = None
     indice = -1
 
-    for i, aprendiz in enumerate(pacientes):
-        if pacientes.get('documento') == documento:
-            paciente_encontrado = pacientes
+    # Buscar paciente por documento
+    for i, paciente in enumerate(pacientes):
+        if paciente.get('documento') == documento:  # ✅ corregido
+            paciente_encontrado = paciente
             indice = i
             break
 
@@ -135,12 +136,15 @@ def actualizar_paciente(
         for key, value in datos_nuevos.items():
             datos_nuevos[key] = str(value)
 
+        # Actualizamos los datos
         paciente_encontrado.update(datos_nuevos)
         pacientes[indice] = paciente_encontrado
+
         gestor_datos_pacientes.guardar_datos(filepath, pacientes)
         return paciente_encontrado
 
     return None
+
 
 def eliminar_paciente(filepath: str, documento: str) -> bool:
     """
@@ -148,21 +152,23 @@ def eliminar_paciente(filepath: str, documento: str) -> bool:
 
     Args:
         filepath (str): Ruta al archivo de datos.
-        documento (str): El documento del pac a eliminar.
+        documento (str): El documento del paciente a eliminar.
 
     Returns:
-        bool: True si el pac fue eliminado, False si no se encontró.
+        bool: True si el paciente fue eliminado, False si no se encontró.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
-    aprendiz_a_eliminar = None
+    paciente_a_eliminar = None
 
+    # Buscar el paciente
     for paciente in pacientes:
         if paciente.get('documento') == documento:
             paciente_a_eliminar = paciente
             break
 
+    # Eliminarlo si existe
     if paciente_a_eliminar:
-        paciente.remove(aprendiz_a_eliminar)
+        pacientes.remove(paciente_a_eliminar)  
         gestor_datos_pacientes.guardar_datos(filepath, pacientes)
         return True
 
