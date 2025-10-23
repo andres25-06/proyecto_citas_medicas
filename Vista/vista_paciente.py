@@ -249,3 +249,4 @@ def main_vista_pacientes():
 # =========================================================
 if __name__ == "__main__":
     main_vista_pacientes()
+    main_vista_pacientes()
