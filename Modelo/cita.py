@@ -152,25 +152,27 @@ def actualizar_cita(
 
 def eliminar_cita(filepath: str, id_cita: str) -> bool:
     """
-    (DELETE) Elimina una cita por su ID.
+    (DELETE) Elimina una cita de la agenda.
 
     Args:
         filepath (str): Ruta al archivo de datos.
-        id_cita (str): El ID de la cita a eliminar.
+        documento (str): El id de la cita a eliminar.
 
     Returns:
-        bool: True si la cita fue eliminada, False si no se encontró.
+        bool: True si la cita fue eliminado, False si no se encontró.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
     cita_a_eliminar = None
 
+    # Buscar el paciente
     for cita in citas:
         if cita.get('id') == id_cita:
-            cita_a_eliminar = cita
+            medico_a_eliminar = cita
             break
 
+    # Eliminarlo si existe
     if cita_a_eliminar:
-        citas.remove(cita_a_eliminar)
+        citas.remove(cita_a_eliminar)  
         gestor_datos_citas.guardar_datos(filepath, citas)
         return True
 
