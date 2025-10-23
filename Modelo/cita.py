@@ -93,27 +93,26 @@ def leer_todas_las_citas(filepath: str) -> List[Dict[str, Any]]:
     return gestor_datos_citas.cargar_datos(filepath)
 
 
-def buscar_cita_por_id(filepath: str, id_cita: str) -> Optional[Dict[str, Any]]:
+
+
+def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[Dict[str, Any]]:
     """
-    Busca una cita específica por su ID.
+    Busca una cita específica por su documento.
 
     Args:
         filepath (str): Ruta al archivo de datos.
-        id_cita (str): ID de la cita a buscar.
+        documento (str): documento de la cita a buscar.
 
     Returns:
         Optional[Dict[str, Any]]: El diccionario de la cita si se encuentra, de lo contrario None.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
-    for cita in citas:
-        if cita.get('id') == id_cita:
-            return cita
-    return None
+    return [c for c in citas if c.get('documento_paciente') == documento_paciente]
 
 
 def actualizar_cita(
         filepath: str,
-        id_cita: str,
+        documento: str,
         datos_nuevos: Dict[str, Any]
 ) -> Optional[Dict[str, Any]]:
     """
@@ -132,7 +131,7 @@ def actualizar_cita(
     indice = -1
 
     for i, cita in enumerate(citas):
-        if cita.get('id') == id_cita:
+        if cita.get('documento') == documento:
             cita_encontrada = cita
             indice = i
             break
@@ -150,28 +149,27 @@ def actualizar_cita(
     return None
 
 
-def eliminar_cita(filepath: str, id_cita: str) -> bool:
+def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     """
-    (DELETE) Elimina una cita por su ID.
-
+    Elimina todas las citas asociadas a un documento de paciente.
+    
     Args:
-        filepath (str): Ruta al archivo de datos.
-        id_cita (str): El ID de la cita a eliminar.
-
+        filepath (str): Ruta al archivo de citas
+        documento (str): Documento del paciente
+        
     Returns:
-        bool: True si la cita fue eliminada, False si no se encontró.
+        bool: True si se eliminaron citas, False en caso contrario
     """
+    # Cargar todas las citas
     citas = gestor_datos_citas.cargar_datos(filepath)
-    cita_a_eliminar = None
-
-    for cita in citas:
-        if cita.get('id') == id_cita:
-            cita_a_eliminar = cita
-            break
-
-    if cita_a_eliminar:
-        citas.remove(cita_a_eliminar)
-        gestor_datos_citas.guardar_datos(filepath, citas)
-        return True
-
-    return False
+    
+    # Filtrar las citas que NO corresponden al documento
+    citas_filtradas = [cita for cita in citas if cita.get('documento_paciente') != documento]
+    
+    # Verificar si se eliminó alguna cita
+    if len(citas) == len(citas_filtradas):
+        return False  # No se encontró ninguna cita con ese documento
+    
+    # Guardar las citas filtradas
+    gestor_datos_citas.guardar_datos(filepath, citas_filtradas)
+    return True
