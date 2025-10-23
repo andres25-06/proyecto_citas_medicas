@@ -1,26 +1,20 @@
+# -- coding: utf-8 --
 """
-Vista del Módulo de Médicos.
-
-Maneja la interacción con el usuario (menús, entradas, salidas)
-usando la librería Rich. Toda la lógica de presentación y flujo
-del módulo de médicos está aquí.
+Vista del Módulo de Médicos con selector interactivo (flechas ↑ ↓)
+y diseño mejorado con emojis para el CRUD.
 """
 
 import os
-
+import readchar
 from Controlador import gestor_datos_pacientes
-from Modelo import medico  # Importamos la lógica del modelo
-
-# --- Importaciones de la librería Rich ---
+from Modelo import medico
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.table import Table
 
-# --- Inicialización de la Consola de Rich ---
 console = Console()
 
-# --- Constantes de Configuración de Rutas ---
 DIRECTORIO_DATOS = 'data'
 NOMBRE_ARCHIVO_CSV = 'medicos.csv'
 NOMBRE_ARCHIVO_JSON = 'medicos.json'
@@ -29,29 +23,56 @@ NOMBRE_ARCHIVO_JSON = 'medicos.json'
 # =========================================================
 # 🔹 Funciones Auxiliares
 # =========================================================
+def limpiar():
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 def elegir_almacenamiento() -> str:
-    """Pregunta al usuario qué formato de archivo desea usar y construye la ruta."""
+    """Seleccionar tipo de almacenamiento (CSV o JSON)."""
     console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
-    prompt_texto = (
+    console.print(
         "¿Dónde desea almacenar los datos?\n"
         "[bold yellow]1[/bold yellow]. CSV (Archivo de texto plano)\n"
         "[bold yellow]2[/bold yellow]. JSON (Formato estructurado)"
     )
-    console.print(prompt_texto)
-
-    opcion = Prompt.ask("Opción", choices=["1", "2"], default="1", show_choices=False)
+    opcion = Prompt.ask("Opción", choices=["1", "2"], default="2", show_choices=False)
     if opcion == '1':
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_CSV)
-    else:
-        return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+    return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
 
 
 # =========================================================
-# 🔹 Funciones del Menú de Médicos
+# 🔹 Selector Interactivo
+# =========================================================
+def selector_interactivo(titulo, opciones):
+    """Permite navegar con flechas ↑ ↓ y seleccionar con Enter."""
+    seleccion = 0
+    while True:
+        limpiar()
+        console.print(Panel(f"[bold cyan]{titulo}[/bold cyan]"))
+        for i, opt in enumerate(opciones):
+            prefix = "👉 " if i == seleccion else "   "
+            # Verde para opciones normales, rojo si es “volver”
+            if "Volver" in opt:
+                estilo = "reverse bold red" if i == seleccion else "bold red"
+            else:
+                estilo = "reverse bold green" if i == seleccion else ""
+            console.print(prefix + opt, style=estilo)
+
+        tecla = readchar.readkey()
+        if tecla == readchar.key.UP:
+            seleccion = (seleccion - 1) % len(opciones)
+        elif tecla == readchar.key.DOWN:
+            seleccion = (seleccion + 1) % len(opciones)
+        elif tecla == readchar.key.ENTER:
+            return seleccion
+
+
+# =========================================================
+# 🔹 Funciones del Módulo de Médicos
 # =========================================================
 def menu_crear_medico(filepath: str):
-    """Registrar un nuevo médico."""
-    console.print(Panel.fit("[bold cyan]🩺 Registrar Nuevo Médico[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]➕🩺 Registrar Nuevo Médico[/bold cyan]"))
 
     tipo_documento = Prompt.ask("Tipo de Documento (CC, TI, CE, etc.)")
     documento = IntPrompt.ask("Número de Documento")
@@ -78,22 +99,21 @@ def menu_crear_medico(filepath: str):
 
     if medico_creado:
         console.print(Panel(
-            f"✅ ¡Médico registrado con éxito!\n   ID Asignado: [bold yellow]{medico_creado['id']}[/bold yellow]",
+            f"✅ ¡Médico registrado con éxito!\nID Asignado: [bold yellow]{medico_creado['id']}[/bold yellow]",
             border_style="green", title="Éxito"
         ))
     else:
-        console.print(Panel(
-            "⚠️ No se pudo registrar al médico. Verifique los datos.",
-            border_style="red", title="Error"
-        ))
+        console.print(Panel("⚠️ No se pudo registrar al médico.", border_style="red", title="Error"))
+    input("\nPresione Enter para continuar...")
+
 
 def menu_leer_medicos(filepath: str):
-    """Mostrar todos los médicos en una tabla."""
-    console.print(Panel.fit("[bold cyan]👨‍⚕️ Lista de Médicos[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]📄👨‍⚕️ Lista de Médicos[/bold cyan]"))
     medicos = medico.leer_todos_los_medicos(filepath)
 
     if not medicos:
         console.print("[yellow]No hay médicos registrados.[/yellow]")
+        input("\nPresione Enter para continuar...")
         return
 
     tabla = Table(
@@ -122,28 +142,23 @@ def menu_leer_medicos(filepath: str):
         )
 
     console.print(tabla)
+    input("\nPresione Enter para continuar...")
 
-def buscar_medico_por_documento(filepath, documento):
-    medicos = gestor_datos_pacientes.cargar_datos(filepath)
-    for m in medicos:
-        if m.get('documento') == str(documento):
-            return m
-    return None
 
 def menu_actualizar_medico(filepath: str):
-    """Actualizar los datos de un médico."""
-    console.print(Panel.fit("[bold cyan]✏️ Actualizar Datos de Médico[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]✏️🩺 Actualizar Datos de Médico[/bold cyan]"))
     id_medico = IntPrompt.ask("Ingrese el documento del médico a actualizar")
 
     medico_actual = medico.buscar_medico_por_documento(filepath, str(id_medico))
     if not medico_actual:
-        console.print("\n[bold red]❌ No se encontró ningún médico con ese ID.[/bold red]")
+        console.print("\n[bold red]❌ No se encontró ningún médico con ese documento.[/bold red]")
+        input("\nPresione Enter para continuar...")
         return
 
-    console.print("\nDatos actuales. Presione Enter para no modificar un campo.")
+    console.print("\nPresione Enter para no modificar un campo.")
     datos_nuevos = {}
 
-    nombres = Prompt.ask(f"Nombre ({medico_actual['nombres']})", default=medico_actual['nombres'])
+    nombres = Prompt.ask(f"Nombres ({medico_actual['nombres']})", default=medico_actual['nombres'])
     if nombres != medico_actual['nombres']:
         datos_nuevos['nombres'] = nombres
 
@@ -157,27 +172,29 @@ def menu_actualizar_medico(filepath: str):
 
     if not datos_nuevos:
         console.print("\n[yellow]No se modificó ningún dato.[/yellow]")
+        input("\nPresione Enter para continuar...")
         return
 
     medico_actualizado = medico.actualizar_medico(filepath, str(id_medico), datos_nuevos)
     if medico_actualizado:
         console.print(Panel("✅ ¡Datos del médico actualizados con éxito!", border_style="green", title="Éxito"))
     else:
-        console.print(Panel("❌ Ocurrió un error al actualizar.", border_style="red", title="Error"))
+        console.print(Panel("❌ Error al actualizar los datos.", border_style="red", title="Error"))
+    input("\nPresione Enter para continuar...")
 
 
 def menu_eliminar_medico(filepath: str):
-    """Eliminar un médico existente."""
-    console.print(Panel.fit("[bold cyan]🗑️ Eliminar Médico[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]🗑️❌ Eliminar Médico[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el documento del médico a eliminar")
 
     medico_encontrado = medico.buscar_medico_por_documento(filepath, str(documento))
     if not medico_encontrado:
-        console.print("\n[bold red]❌ No se encontró ningún médico con ese ID.[/bold red]")
+        console.print("\n[bold red]❌ No se encontró el médico.[/bold red]")
+        input("\nPresione Enter para continuar...")
         return
 
     confirmacion = Confirm.ask(
-        f"¿Está seguro de eliminar al Dr. [bold]{medico_encontrado['nombres']}[/bold]?",
+        f"¿Está seguro de eliminar al Dr. [bold]{medico_encontrado['nombres']} {medico_encontrado['apellidos']}[/bold]?",
         default=False
     )
 
@@ -185,43 +202,45 @@ def menu_eliminar_medico(filepath: str):
         if medico.eliminar_medico(filepath, str(documento)):
             console.print(Panel("✅ ¡Médico eliminado con éxito!", border_style="green", title="Éxito"))
         else:
-            console.print(Panel("❌ Ocurrió un error al eliminar.", border_style="red", title="Error"))
+            console.print(Panel("❌ Error al eliminar.", border_style="red", title="Error"))
     else:
         console.print("\n[yellow]Operación cancelada.[/yellow]")
-
-
-def mostrar_menu_medicos():
-    """Imprime el menú principal del módulo de médicos."""
-    menu_texto = (
-        "[bold yellow]1[/bold yellow]. Registrar un nuevo médico\n"
-        "[bold yellow]2[/bold yellow]. Ver todos los médicos\n"
-        "[bold yellow]3[/bold yellow]. Actualizar datos de un médico\n"
-        "[bold yellow]4[/bold yellow]. Eliminar un médico\n"
-        "[bold red]5[/bold red]. Volver al menú principal"
-    )
-    console.print(Panel(menu_texto, title="[bold]MÓDULO DE MÉDICOS[/bold]", border_style="green"))
+    input("\nPresione Enter para continuar...")
 
 
 # =========================================================
-# 🔹 Función principal del módulo (llamada desde main.py)
+# 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_medicos():
-    """Bucle principal del módulo de médicos."""
-    archivo_seleccionado = elegir_almacenamiento()
-    console.print(f"\n👍 Usando el archivo: [bold green]{archivo_seleccionado}[/bold green]")
+    archivo = elegir_almacenamiento()
+    console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")
+
+    opciones = [
+        "➕🩺 Registrar un nuevo médico",
+        "📄👨‍⚕️ Ver todos los médicos",
+        "✏️🩹 Actualizar datos de un médico",
+        "❌🗑️ Eliminar un médico",
+        "⬅️🔙 Volver al menú principal"
+    ]
 
     while True:
-        mostrar_menu_medicos()
-        opcion = Prompt.ask("Opción", choices=["1", "2", "3", "4", "5"], show_choices=False)
+        seleccion = selector_interactivo("MÓDULO DE MÉDICOS\nUsa ↑ ↓ y Enter para seleccionar", opciones)
 
-        if opcion == '1':
-            menu_crear_medico(archivo_seleccionado)
-        elif opcion == '2':
-            menu_leer_medicos(archivo_seleccionado)
-        elif opcion == '3':
-            menu_actualizar_medico(archivo_seleccionado)
-        elif opcion == '4':
-            menu_eliminar_medico(archivo_seleccionado)
-        elif opcion == '5':
-            console.print("\n[bold cyan]⬅️ Volviendo al menú principal...[/bold cyan]")
+        if seleccion == 0:
+            menu_crear_medico(archivo)
+        elif seleccion == 1:
+            menu_leer_medicos(archivo)
+        elif seleccion == 2:
+            menu_actualizar_medico(archivo)
+        elif seleccion == 3:
+            menu_eliminar_medico(archivo)
+        elif seleccion == 4:
+            console.print("\n[bold red]⬅ Volviendo al menú principal...[/bold red]")
             break
+
+
+# =========================================================
+# 🔹 Ejecución directa (para pruebas)
+# =========================================================
+if __name__ == "__main__":
+    main_vista_medicos()
