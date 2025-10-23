@@ -1,25 +1,18 @@
 # -- coding: utf-8 --
 """
-Vista del Módulo de Pacientes.
-
-Maneja la interacción con el usuario (menús, entradas, salidas)
-usando la librería Rich. Toda la lógica de presentación y flujo
-del módulo de pacientes está aquí.
+Vista del Módulo de Pacientes con selector interactivo (flechas ↑ ↓).
 """
 
 import os
-from Modelo import paciente  # Importamos la lógica del modelo
-
-# --- Importaciones de la librería Rich ---
+import readchar
+from Modelo import paciente
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.table import Table
+from rich.prompt import Prompt, IntPrompt, Confirm
 
-# --- Inicialización de la Consola de Rich ---
 console = Console()
 
-# --- Constantes de Configuración de Rutas ---
 DIRECTORIO_DATOS = 'data'
 NOMBRE_ARCHIVO_CSV = 'pacientes.csv'
 NOMBRE_ARCHIVO_JSON = 'pacientes.json'
@@ -29,7 +22,6 @@ NOMBRE_ARCHIVO_JSON = 'pacientes.json'
 # 🔹 Funciones Auxiliares
 # =========================================================
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
-    """Muestra un menú para que el usuario elija el tipo de documento."""
     console.print("\nSeleccione el tipo de documento:", style="cyan")
     tipos = {
         '1': 'C.C', '2': 'T.I', '3': 'R.C', '4': 'C.E', '5': 'Pasaporte', '6': 'PPT'
@@ -40,45 +32,65 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     }
 
     opciones = list(tipos.keys())
-    prompt_texto = ""
+    texto = ""
 
     if permitir_vacio:
-        prompt_texto += "[bold yellow]0[/bold yellow]. No cambiar\n"
+        texto += "[bold yellow]0[/bold yellow]. No cambiar\n"
         opciones.insert(0, '0')
 
-    for key, value in descripciones.items():
-        prompt_texto += f"[bold yellow]{key}[/bold yellow]. {value}\n"
+    for k, v in descripciones.items():
+        texto += f"[bold yellow]{k}[/bold yellow]. {v}\n"
 
-    console.print(prompt_texto)
+    console.print(texto)
     opcion = Prompt.ask("Opción", choices=opciones, show_choices=False)
-
     if permitir_vacio and opcion == '0':
         return None
     return tipos[opcion]
 
 
 def elegir_almacenamiento() -> str:
-    """Pregunta al usuario qué formato de archivo desea usar y construye la ruta."""
     console.print(Panel.fit("[bold cyan]⚙ Configuración de Almacenamiento[/bold cyan]"))
-    prompt_texto = (
+    console.print(
         "¿Dónde desea almacenar los datos?\n"
         "[bold yellow]1[/bold yellow]. CSV (Archivo de texto plano)\n"
         "[bold yellow]2[/bold yellow]. JSON (Formato estructurado)"
     )
-    console.print(prompt_texto)
 
     opcion = Prompt.ask("Opción", choices=["1", "2"], default="2", show_choices=False)
     if opcion == '1':
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_CSV)
-    else:
-        return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+    return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+
+
+def limpiar():
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 # =========================================================
-# 🔹 Funciones del Menú de Pacientes
+# 🔹 Selector Interactivo
+# =========================================================
+def selector_interactivo(titulo, opciones):
+    seleccion = 0
+    while True:
+        limpiar()
+        console.print(Panel(f"[bold cyan]{titulo}[/bold cyan]"))
+        for i, opt in enumerate(opciones):
+            prefix = "👉 " if i == seleccion else "   "
+            estilo = "reverse bold green" if i == seleccion else ""
+            console.print(prefix + opt, style=estilo)
+        tecla = readchar.readkey()
+        if tecla == readchar.key.UP:
+            seleccion = (seleccion - 1) % len(opciones)
+        elif tecla == readchar.key.DOWN:
+            seleccion = (seleccion + 1) % len(opciones)
+        elif tecla == readchar.key.ENTER:
+            return seleccion
+
+
+# =========================================================
+# 🔹 Funciones del Módulo de Pacientes
 # =========================================================
 def menu_crear_paciente(filepath: str):
-    """Registrar un nuevo paciente."""
     console.print(Panel.fit("[bold cyan]📝 Registrar Nuevo Paciente[/bold cyan]"))
 
     tipo_documento = solicitar_tipo_documento()
@@ -94,23 +106,21 @@ def menu_crear_paciente(filepath: str):
 
     if paciente_creado:
         console.print(Panel(
-            f"✅ ¡Paciente registrado con éxito!\n   ID Asignado: [bold yellow]{paciente_creado['id']}[/bold yellow]",
+            f"✅ ¡Paciente registrado con éxito!\nID Asignado: [bold yellow]{paciente_creado['id']}[/bold yellow]",
             border_style="green", title="Éxito"
         ))
     else:
-        console.print(Panel(
-            "⚠ No se pudo registrar al paciente. Verifique los datos.",
-            border_style="red", title="Error"
-        ))
+        console.print(Panel("⚠ No se pudo registrar el paciente.", border_style="red", title="Error"))
+    input("\nPresione Enter para continuar...")
 
 
 def menu_leer_pacientes(filepath: str):
-    """Mostrar todos los pacientes en una tabla."""
     console.print(Panel.fit("[bold cyan]👥 Lista de Pacientes[/bold cyan]"))
     pacientes = paciente.leer_todos_los_pacientes(filepath)
 
     if not pacientes:
         console.print("[yellow]No hay pacientes registrados.[/yellow]")
+        input("\nPresione Enter para continuar...")
         return
 
     tabla = Table(title="Pacientes Registrados", border_style="blue", show_header=True, header_style="bold magenta")
@@ -119,32 +129,30 @@ def menu_leer_pacientes(filepath: str):
     tabla.add_column("Documento", justify="center")
     tabla.add_column("Nombre Completo")
     tabla.add_column("Teléfono", justify="center")
-    tabla.add_column("Direccion", justify="center")
+    tabla.add_column("Dirección", justify="center")
 
     for p in pacientes:
         tabla.add_row(
-            p['id'],
-            p['tipo_documento'],
-            p['documento'],
+            p['id'], p['tipo_documento'], p['documento'],
             f"{p['nombres']} {p['apellidos']}",
-            p['telefono'],
-            p['direccion']
+            p['telefono'], p['direccion']
         )
 
     console.print(tabla)
+    input("\nPresione Enter para continuar...")
 
 
 def menu_actualizar_paciente(filepath: str):
-    """Actualizar los datos de un paciente."""
     console.print(Panel.fit("[bold cyan]✏ Actualizar Datos de Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a actualizar")
 
     paciente_actual = paciente.buscar_paciente_por_documento(filepath, str(documento))
     if not paciente_actual:
-        console.print("\n[bold red]❌ No se encontró ningún paciente con ese documento.[/bold red]")
+        console.print("\n[bold red]❌ No se encontró el paciente.[/bold red]")
+        input("\nPresione Enter para continuar...")
         return
 
-    console.print("\nDatos actuales. Presione Enter para no modificar un campo.")
+    console.print("\nPresione Enter para no modificar un campo.")
     datos_nuevos = {}
 
     nuevo_tipo_doc = solicitar_tipo_documento(permitir_vacio=True)
@@ -169,27 +177,29 @@ def menu_actualizar_paciente(filepath: str):
 
     if not datos_nuevos:
         console.print("\n[yellow]No se modificó ningún dato.[/yellow]")
+        input("\nPresione Enter para continuar...")
         return
 
     paciente_actualizado = paciente.actualizar_paciente(filepath, str(documento), datos_nuevos)
     if paciente_actualizado:
-        console.print(Panel("✅ ¡Datos del paciente actualizados con éxito!", border_style="green", title="Éxito"))
+        console.print(Panel("✅ ¡Datos actualizados con éxito!", border_style="green", title="Éxito"))
     else:
-        console.print(Panel("❌ Ocurrió un error al actualizar.", border_style="red", title="Error"))
+        console.print(Panel("❌ Error al actualizar.", border_style="red", title="Error"))
+    input("\nPresione Enter para continuar...")
 
 
 def menu_eliminar_paciente(filepath: str):
-    """Eliminar un paciente existente."""
     console.print(Panel.fit("[bold cyan]🗑 Eliminar Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a eliminar")
 
     paciente_encontrado = paciente.buscar_paciente_por_documento(filepath, str(documento))
     if not paciente_encontrado:
-        console.print("\n[bold red]❌ No se encontró ningún paciente con ese documento.[/bold red]")
+        console.print("\n[bold red]❌ No se encontró el paciente.[/bold red]")
+        input("\nPresione Enter para continuar...")
         return
 
     confirmacion = Confirm.ask(
-        f"¿Está seguro de eliminar a [bold]{paciente_encontrado['nombres']} {paciente_encontrado['apellidos']}[/bold]?",
+        f"¿Desea eliminar a [bold]{paciente_encontrado['nombres']} {paciente_encontrado['apellidos']}[/bold]?",
         default=False
     )
 
@@ -197,43 +207,45 @@ def menu_eliminar_paciente(filepath: str):
         if paciente.eliminar_paciente(filepath, str(documento)):
             console.print(Panel("✅ ¡Paciente eliminado con éxito!", border_style="green", title="Éxito"))
         else:
-            console.print(Panel("❌ Ocurrió un error al eliminar.", border_style="red", title="Error"))
+            console.print(Panel("❌ Error al eliminar.", border_style="red", title="Error"))
     else:
         console.print("\n[yellow]Operación cancelada.[/yellow]")
-
-
-def mostrar_menu_pacientes():
-    """Imprime el menú principal del módulo de pacientes."""
-    menu_texto = (
-        "[bold yellow]1[/bold yellow]. Registrar un nuevo paciente\n"
-        "[bold yellow]2[/bold yellow]. Ver todos los pacientes\n"
-        "[bold yellow]3[/bold yellow]. Actualizar datos de un paciente\n"
-        "[bold yellow]4[/bold yellow]. Eliminar un paciente\n"
-        "[bold red]5[/bold red]. Volver al menú principal"
-    )
-    console.print(Panel(menu_texto, title="[bold]MÓDULO DE PACIENTES[/bold]", border_style="green"))
+    input("\nPresione Enter para continuar...")
 
 
 # =========================================================
-# 🔹 Función principal del módulo (llamada desde main.py)
+# 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_pacientes():
-    """Bucle principal del módulo de pacientes."""
-    archivo_seleccionado = elegir_almacenamiento()
-    console.print(f"\n👍 Usando el archivo: [bold green]{archivo_seleccionado}[/bold green]")
+    archivo = elegir_almacenamiento()
+    console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")
+
+    opciones = [
+        "➕ Registrar un nuevo paciente",
+        "📄 Ver todos los pacientes",
+        "✏️ Actualizar datos de un paciente",
+        "❌ Eliminar un paciente",
+        "⬅️ Volver al menú principal"
+    ]
 
     while True:
-        mostrar_menu_pacientes()
-        opcion = Prompt.ask("Opción", choices=["1", "2", "3", "4", "5"], show_choices=False)
+        seleccion = selector_interactivo("MÓDULO DE PACIENTES\nUsa ↑ ↓ y Enter para seleccionar", opciones)
 
-        if opcion == '1':
-            menu_crear_paciente(archivo_seleccionado)
-        elif opcion == '2':
-            menu_leer_pacientes(archivo_seleccionado)
-        elif opcion == '3':
-            menu_actualizar_paciente(archivo_seleccionado)
-        elif opcion == '4':
-            menu_eliminar_paciente(archivo_seleccionado)
-        elif opcion == '5':
+        if seleccion == 0:
+            menu_crear_paciente(archivo)
+        elif seleccion == 1:
+            menu_leer_pacientes(archivo)
+        elif seleccion == 2:
+            menu_actualizar_paciente(archivo)
+        elif seleccion == 3:
+            menu_eliminar_paciente(archivo)
+        elif seleccion == 4:
             console.print("\n[bold cyan]⬅ Volviendo al menú principal...[/bold cyan]")
             break
+
+
+# =========================================================
+# 🔹 Ejecución directa (para pruebas)
+# =========================================================
+if __name__ == "__main__":
+    main_vista_pacientes()
