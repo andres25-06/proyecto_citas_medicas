@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from collections import Counter
 import re
 
+
 # Inicializa colorama para Windows
 init(autoreset=True)
 
@@ -255,20 +256,8 @@ def selector_interactivo(titulo, opciones):
             return seleccion
 
 # -------------------- VISTA PRINCIPAL (INTERFAZ) --------------------
-def titulo_app():
-    titulo = Text("🏥 SISTEMA DE CITAS MÉDICAS", style="bold cyan")
-    subtitulo = Text('"Consultorio Vida y Salud"', style="italic magenta")
-    panel = Panel(
-        Align.center(Text.assemble(titulo, "\n", subtitulo)),
-        border_style="bright_blue",
-        title="Bienvenido",
-        padding=(1, 4),
-    )
-    console.print(panel)
-
 def mostrar_menu_simple():
     limpiar()
-    titulo_app()
 
     opciones_tabla = Table(show_header=False, box=box.SIMPLE_HEAVY)
     opciones_tabla.add_row("[bold green][1][/bold green] 👤 Gestionar Pacientes")
@@ -297,7 +286,7 @@ def vista_principal():
     while True:
         # permitimos usar selector interactivo
         try:
-            indice = selector_interactivo("🏥 Menú Principal (usa ↑ ↓ + Enter)", opciones)
+            indice = selector_interactivo("BIENVENIDO AL SISTEMA DE CITAS MÉDICAS\n🏥 Menú Principal (usa ↑ ↓ + Enter \npara navegar dentro de las opciones)", opciones)
         except Exception:
             # si readchar da problema, fallback a menú simple por input
             opcion = mostrar_menu_simple()
@@ -317,22 +306,22 @@ def vista_principal():
             try:
                 from Vista.vista_paciente import main_vista_pacientes
                 main_vista_pacientes()
-            except Exception:
-                console.print("[yellow]Módulo de pacientes no encontrado. (Placeholder)[/yellow]")
+            except Exception as e:
+                console.print(f"[red]Error al cargar módulo de pacientes:[/red] {e}")
                 input("Enter para volver...")
         elif indice == 1:
             animacion_carga("Abriendo módulo de médicos...")
             try:
-                from Vista.vista_medico import menu_medicos
-                menu_medicos()
+                from Vista.vista_medico import main_vista_medicos
+                main_vista_medicos()
             except Exception:
                 console.print("[yellow]Módulo de médicos no encontrado. (Placeholder)[/yellow]")
                 input("Enter para volver...")
         elif indice == 2:
             animacion_carga("Abriendo módulo de citas...")
             try:
-                from Vista.vista_cita import menu_citas
-                menu_citas()
+                from Vista.vista_cita import main_vista_citas
+                main_vista_citas()
             except Exception:
                 console.print("[yellow]Módulo de citas no encontrado. (Placeholder)[/yellow]")
                 input("Enter para volver...")

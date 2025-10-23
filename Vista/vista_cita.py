@@ -14,7 +14,7 @@ from Modelo import cita
 # --- Librería Rich ---
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, IntPrompt, Prompt
+from rich.prompt import Prompt, IntPrompt, Confirm
 from rich.table import Table
 import os
 
@@ -23,15 +23,10 @@ console = Console()
 
 # --- Configuración de rutas ---
 DIRECTORIO_DATOS = 'data'
-NOMBRE_ARCHIVO_CSV = 'citas.csv'
 NOMBRE_ARCHIVO_JSON = 'citas.json'
 
 
-# =========================================================
-# 🔹 Funciones del Menú de Citas
-# =========================================================
 def menu_agendar_cita(filepath: str):
-    """Agendar una nueva cita médica."""
     console.print(Panel.fit("[bold cyan]🩺 Agendar Nueva Cita[/bold cyan]"))
 
     documento_paciente = Prompt.ask("Documento del Paciente")

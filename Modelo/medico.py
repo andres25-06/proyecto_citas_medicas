@@ -149,25 +149,27 @@ def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any
 
 def eliminar_medico(filepath: str, documento: str) -> bool:
     """
-    (DELETE) Elimina un médico por su documento.
+    (DELETE) Elimina un medico de la agenda.
 
     Args:
         filepath (str): Ruta al archivo de datos.
-        documento (str): Documento del médico a eliminar.
+        documento (str): El documento del medico a eliminar.
 
     Returns:
-        bool: True si se eliminó, False si no se encontró.
+        bool: True si el medico fue eliminado, False si no se encontró.
     """
     medicos = gestor_datos_medico.cargar_datos(filepath)
     medico_a_eliminar = None
 
+    # Buscar el paciente
     for medico in medicos:
         if medico.get('documento') == documento:
             medico_a_eliminar = medico
             break
 
+    # Eliminarlo si existe
     if medico_a_eliminar:
-        medicos.remove(medico_a_eliminar)
+        medicos.remove(medico_a_eliminar)  
         gestor_datos_medico.guardar_datos(filepath, medicos)
         return True
 

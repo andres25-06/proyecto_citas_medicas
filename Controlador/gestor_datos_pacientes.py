@@ -77,4 +77,3 @@ def guardar_datos(filepath: str, datos: List[Dict[str, Any]]) -> None:
     elif filepath.endswith('.json'):
         with open(filepath, mode='w', encoding='utf-8') as json_file:
             json.dump(datos, json_file, indent=4)
-
