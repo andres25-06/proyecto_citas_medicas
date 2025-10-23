@@ -116,9 +116,10 @@ def menu_leer_pacientes(filepath: str):
     tabla = Table(title="Pacientes Registrados", border_style="blue", show_header=True, header_style="bold magenta")
     tabla.add_column("ID", style="dim", width=5)
     tabla.add_column("Tipo Doc.", justify="center")
-    tabla.add_column("Documento", justify="right")
+    tabla.add_column("Documento", justify="center")
     tabla.add_column("Nombre Completo")
-    tabla.add_column("Teléfono", justify="right")
+    tabla.add_column("Teléfono", justify="center")
+    tabla.add_column("Direccion", justify="center")
 
     for p in pacientes:
         tabla.add_row(
@@ -126,7 +127,8 @@ def menu_leer_pacientes(filepath: str):
             p['tipo_documento'],
             p['documento'],
             f"{p['nombres']} {p['apellidos']}",
-            p['telefono']
+            p['telefono'],
+            p['direccion']
         )
 
     console.print(tabla)

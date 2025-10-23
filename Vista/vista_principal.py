@@ -312,8 +312,8 @@ def vista_principal():
         elif indice == 1:
             animacion_carga("Abriendo módulo de médicos...")
             try:
-                from Vista.vista_medico import menu_medicos
-                menu_medicos()
+                from Vista.vista_medico import main_vista_medicos
+                main_vista_medicos()
             except Exception:
                 console.print("[yellow]Módulo de médicos no encontrado. (Placeholder)[/yellow]")
                 input("Enter para volver...")
