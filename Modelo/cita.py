@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Módulo de Lógica de Negocio - Citas
+Módulo de Lógica de Negocio - Citas ssss
 
 Contiene todas las funciones para gestionar las citas (CRUD).
 Este módulo utiliza 'gestor_datos' para la persistencia.
