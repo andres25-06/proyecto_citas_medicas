@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Vista del Módulo de Cita.
+Vista del Módulo de Cita sss.
 
 Maneja la interacción con el usuario (menús, entradas, salidas)
 usando la librería Rich. Toda la lógica de presentación y flujo
