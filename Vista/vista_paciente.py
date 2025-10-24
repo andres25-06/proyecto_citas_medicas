@@ -22,7 +22,15 @@ NOMBRE_ARCHIVO_JSON = 'pacientes.json'
 
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     limpiar()
-    """Permite seleccionar el tipo de documento usando el selector interactivo, con opción de volver."""
+    """
+        Solicitar al usuario que seleccione un tipo de documento usando el selector interactivo.
+        
+        Args:
+            permitir_vacio (bool): Si es True, permite no cambiar el tipo de documento.
+        Returns:
+            str | None: El tipo de documento seleccionado o None si no se cambia.
+            
+    """
     tipos = {
         '1': 'C.C',
         '2': 'T.I',
@@ -72,6 +80,16 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
 
 
 def elegir_almacenamiento() -> str:
+    """
+        Esta función permite al usuario seleccionar el tipo de almacenamiento
+        para los datos de pacientes (CSV o JSON) mediante un selector interactivo.
+        
+        Args:
+            None
+        Returns:
+            str: Ruta del archivo seleccionado para almacenamiento.
+        
+    """
     limpiar()
     """Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo."""
     opciones = [
@@ -100,6 +118,15 @@ def elegir_almacenamiento() -> str:
 
 
 def limpiar():
+    """
+        Limpia la consola dependiendo del sistema operativo.
+        
+        Args:
+            None
+        Returns:
+            None
+            
+    """
     os.system("cls" if os.name == "nt" else "clear")
 
 
@@ -107,6 +134,16 @@ def limpiar():
 # 🔹 Selector Interactivo
 # =========================================================
 def selector_interactivo(titulo, opciones):
+    """
+        Muestra un menú interactivo en la consola donde el usuario puede
+        navegar usando las flechas ↑ ↓ y seleccionar una opción con Enter.
+        
+        Args:
+            titulo (str): Título del menú.
+            opciones (list): Lista de opciones para mostrar.
+        Returns:
+            int: Índice de la opción seleccionada.
+    """
     limpiar()
     """Permite navegar con flechas ↑ ↓ y seleccionar con Enter."""
     seleccion = 0
@@ -135,6 +172,15 @@ def selector_interactivo(titulo, opciones):
 # 🔹 Funciones del Módulo de Pacientes
 # =========================================================
 def menu_crear_paciente(filepath: str):
+    """
+        Entradas para registrar un nuevo paciente y guardar en el archivo.
+        
+        Args:
+            filepath (str): Ruta del archivo donde se guardarán los datos.
+        Returns:
+            None
+            
+    """
     limpiar()
     console.print(Panel.fit("[bold cyan]📝 Registrar Nuevo Paciente[/bold cyan]"))
 
@@ -160,6 +206,14 @@ def menu_crear_paciente(filepath: str):
 
 
 def menu_leer_pacientes(filepath: str):
+    """
+        Muestra una tabla con todos los pacientes registrados.
+        Args:
+            filepath (str): Ruta del archivo desde donde se leerán los datos.
+        Returns:
+            None
+    
+    """
     limpiar()
     console.print(Panel.fit("[bold cyan]👥 Lista de Pacientes[/bold cyan]"))
     pacientes = paciente.leer_todos_los_pacientes(filepath)
@@ -189,6 +243,16 @@ def menu_leer_pacientes(filepath: str):
 
 
 def menu_actualizar_paciente(filepath: str):
+    
+    """
+        Permite actualizar los datos de un paciente existente.
+        
+        Args:
+            filepath (str): Ruta del archivo donde se encuentran los datos.
+        Returns:
+            None
+            
+    """
     limpiar()
     console.print(Panel.fit("[bold cyan]✏ Actualizar Datos de Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a actualizar")
@@ -236,6 +300,16 @@ def menu_actualizar_paciente(filepath: str):
 
 
 def menu_eliminar_paciente(filepath: str):
+    
+    """
+        Permite eliminar un paciente existente.
+        
+        Args:
+            filepath (str): Ruta del archivo donde se encuentran los datos.
+        Returns:
+            None
+            
+    """
     limpiar()
     console.print(Panel.fit("[bold cyan]🗑 Eliminar Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a eliminar")
@@ -265,6 +339,17 @@ def menu_eliminar_paciente(filepath: str):
 # 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_pacientes():
+    """
+        Este es el menú principal del módulo de pacientes,
+        el cual utiliza un selector interactivo para navegar
+        entre las diferentes opciones disponibles.
+        
+        Args:
+            None
+        Returns:
+            None    
+            
+    """
     limpiar()
     archivo = elegir_almacenamiento()
     console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")

@@ -7,7 +7,6 @@ y diseño mejorado con emojis para el CRUD.
 import os
 import readchar
 import time
-from Controlador import gestor_datos_pacientes
 from Modelo import medico
 from rich.console import Console
 from rich.panel import Panel
@@ -27,19 +26,27 @@ NOMBRE_ARCHIVO_JSON = 'medicos.json'
 # =========================================================
 def limpiar():
     """
-    Limpia la consola según el sistema operativo.
-    
-    Args:
-        none
-    Returns:
-        none
+        Limpia la consola según el sistema operativo.
+        
+        Args:
+            none
+        Returns:
+            none
     """
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def elegir_almacenamiento() -> str:
     limpiar()
-    """Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo."""
+    """
+        Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo.
+        
+        Args:
+            none
+        Returns:    
+            str: Ruta del archivo seleccionado para almacenamiento.
+            
+    """
     opciones = [
         "📄 CSV (Archivo de texto plano)",
         "🧾 JSON (Formato estructurado)",
@@ -70,13 +77,13 @@ def elegir_almacenamiento() -> str:
 # =========================================================
 def selector_interactivo(titulo, opciones):
     """
-    Permite navegar con flechas ↑ ↓ y seleccionar con Enter.
-    
-    Args:
-        titulo (str): Título del menú.
-        opciones (List[str]): Lista de opciones para mostrar.
-    Returns:
-        int: Índice de la opción seleccionada.
+        Permite navegar con flechas ↑ ↓ y seleccionar con Enter.
+        
+        Args:
+            titulo (str): Título del menú.
+            opciones (List[str]): Lista de opciones para mostrar.
+        Returns:
+            int: Índice de la opción seleccionada.
     """
     
     seleccion = 0
@@ -107,7 +114,15 @@ def selector_interactivo(titulo, opciones):
 
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     limpiar()
-    """Permite seleccionar el tipo de documento usando el selector interactivo, con opción de volver."""
+    """
+        Permite seleccionar el tipo de documento usando el selector interactivo, con opción de volver.
+        
+        Args:
+            permitir_vacio (bool): Si es True, permite no cambiar el tipo de documento.
+        Returns:    
+            str | None: Tipo de documento seleccionado o None si no se cambia.
+            
+    """
     tipos = {
         '1': 'C.C',
         '2': 'T.I',
