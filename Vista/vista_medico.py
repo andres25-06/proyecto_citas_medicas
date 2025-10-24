@@ -6,6 +6,7 @@ y diseño mejorado con emojis para el CRUD.
 
 import os
 import readchar
+import time
 from Controlador import gestor_datos_pacientes
 from Modelo import medico
 from rich.console import Console
@@ -37,35 +38,30 @@ def limpiar():
 
 
 def elegir_almacenamiento() -> str:
-    """
-    Seleccionar tipo de almacenamiento (CSV o JSON).
-    
-    Args:
-        none
-    Returns:
-        str: Ruta al archivo seleccionado.
-    """
-    console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
-    console.print(
-        "¿Dónde desea almacenar los datos?\n"
-        "[bold yellow]1[/bold yellow]. 📄 CSV (Archivo de texto plano)\n"
-        "[bold yellow]2[/bold yellow]. 🧾 JSON (Formato estructurado)\n"
-        "[bold yellow]3[/bold yellow]. 🔙 Volver al menú principal"
-    )
+    limpiar()
+    """Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo."""
+    opciones = [
+        "📄 CSV (Archivo de texto plano)",
+        "🧾 JSON (Formato estructurado)",
+        "🔙 Volver al menú principal"
+    ]
 
-    opcion = Prompt.ask(
-        "Seleccione una opción",
-        choices=["1", "2", "3"],
-        show_choices=False
-    )
-    
-    if opcion == "1":
+    seleccion = selector_interactivo("⚙️ Configuración de Almacenamiento", opciones)
+
+    if seleccion == 0:
+        console.print("[bold green]✅ Modo de almacenamiento seleccionado: CSV[/bold green]")
+        time.sleep(1)
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_CSV)
-    elif opcion == "2":
+
+    elif seleccion == 1:
+        console.print("[bold green]✅ Modo de almacenamiento seleccionado: JSON[/bold green]")
+        time.sleep(1)
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
-    elif opcion == "3":
+
+    elif seleccion == 2:
         console.print("[bold red]↩ Regresando al menú principal...[/bold red]")
-        vista_principal() 
+        time.sleep(1)
+        vista_principal()
         return None
 
 
@@ -108,18 +104,62 @@ def selector_interactivo(titulo, opciones):
 # =========================================================
 # 🔹 Funciones del Módulo de Médicos
 # =========================================================
-def menu_crear_medico(filepath: str):
-    """
-    Menú para registrar un nuevo médico.
-    
-    Args:
-        filepath (str): La ruta al archivo donde se almacenan los médicos.
-    Returns:
-        none
-    """
-    console.print(Panel.fit("[bold cyan]➕🩺 Registrar Nuevo Médico[/bold cyan]"))
 
-    tipo_documento = Prompt.ask("Tipo de Documento (CC, TI, CE, etc.)")
+def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
+    limpiar()
+    """Permite seleccionar el tipo de documento usando el selector interactivo, con opción de volver."""
+    tipos = {
+        '1': 'C.C',
+        '2': 'T.I',
+        '3': 'R.C',
+        '4': 'C.E',
+        '5': 'Pasaporte',
+        '6': 'PPT'
+    }
+
+    descripciones = {
+        '1': '🆔 Cédula de Ciudadanía',
+        '2': '🎫 Tarjeta de Identidad',
+        '3': '📜 Registro Civil',
+        '4': '🌎 Cédula de Extranjería',
+        '5': '🧳 Pasaporte',
+        '6': '📄 Permiso de Permanencia Temporal'
+    }
+
+    opciones = [desc for desc in descripciones.values()]
+
+    if permitir_vacio:
+        opciones.insert(0, "🔸 No cambiar")
+
+    opciones.append("🔙 Volver al menú anterior")
+
+    seleccion = selector_interactivo("📑 Seleccione el tipo de documento", opciones)
+
+    if permitir_vacio and seleccion == 0:
+        console.print("[bold yellow]⚠ No se modificará el tipo de documento.[/bold yellow]")
+        time.sleep(1)
+        return None
+
+    # Si selecciona "Volver"
+    if seleccion == len(opciones) - 1:
+        console.print("[bold red]↩ Regresando al menú anterior...[/bold red]")
+        time.sleep(1)
+        return elegir_almacenamiento()
+
+    indice_real = seleccion if not permitir_vacio else seleccion - 1
+    codigo = str(indice_real + 1)
+    tipo = tipos[codigo]
+
+    console.print(f"[bold green]✅ Tipo seleccionado:[/bold green] {descripciones[codigo]}")
+    time.sleep(1)
+    return tipo
+
+
+
+def menu_crear_medico(filepath: str):
+    limpiar()
+    console.print(Panel.fit("[bold cyan]➕🩺 Registrar Nuevo Médico[/bold cyan]"))
+    solicitar_tipo_documento()
     documento = IntPrompt.ask("Número de Documento")
     nombres = Prompt.ask("Nombres")
     apellidos = Prompt.ask("Apellidos")
@@ -131,7 +171,6 @@ def menu_crear_medico(filepath: str):
 
     medico_creado = medico.crear_medico(
         filepath,
-        tipo_documento,
         documento,
         nombres,
         apellidos,
@@ -153,14 +192,7 @@ def menu_crear_medico(filepath: str):
 
 
 def menu_leer_medicos(filepath: str):
-    """
-    Menú para ver todos los médicos registrados.
-    
-    Args:
-        filepath (str): La ruta al archivo donde se almacenan los médicos.
-    Returns:
-        none        
-    """
+    limpiar()
     console.print(Panel.fit("[bold cyan]📄👨‍⚕️ Lista de Médicos[/bold cyan]"))
     medicos = medico.leer_todos_los_medicos(filepath)
 
@@ -282,15 +314,7 @@ def menu_eliminar_medico(filepath: str):
 # 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_medicos():
-    
-    """
-    Función principal para manejar el menú de médicos.
-    
-    Args:
-        none
-    Returns:
-        none
-    """
+    limpiar()
     archivo = elegir_almacenamiento()
     console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")
 
