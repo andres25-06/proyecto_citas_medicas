@@ -3,7 +3,8 @@
 Vista del Módulo de Citas Médicas con navegación por flechas ↑ ↓
 y estilo visual coherente con los demás módulos.
 """
-
+import json
+import csv
 import os
 import readchar
 from Modelo import medico, paciente, cita
@@ -11,6 +12,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt, IntPrompt, Confirm
 from rich.table import Table
+
 
 console = Console()
 
@@ -105,25 +107,37 @@ def menu_cancelar_cita(filepath: str):
     input("\nPresione Enter para continuar...")
 
 
-def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
-    """Devuelve el nombre completo de un paciente o médico según su documento."""
-    try:
-        if tipo == "paciente":
-            registros = paciente.leer_todos_los_pacientes(filepath)
-        else:
-            registros = medico.leer_todos_los_medicos(filepath)
+def leer_datos_archivo(filepath: str):
+    """Lee datos desde un archivo JSON o CSV y devuelve una lista de diccionarios."""
+    if filepath.endswith(".json"):
+        with open(filepath, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    elif filepath.endswith(".csv"):
+        with open(filepath, "r", encoding="utf-8") as f:
+            lector = csv.DictReader(f)
+            return list(lector)
+    else:
+        return []
 
-        for r in registros:
-            if r.get("documento") == documento:
-                return f"{r.get('nombres', '')} {r.get('apellidos', '')}".strip()
-        return f"{documento} (no encontrado)"
-    except Exception as e:
-        return f"Error: {e}"
+def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
+    """Devuelve el nombre completo de un paciente o médico según su documento (JSON o CSV)."""
+    registros = leer_datos_archivo(filepath)
+
+    for r in registros:
+        if r.get("documento") == documento:
+            return f"{r.get('nombres', '')} {r.get('apellidos', '')}".strip()
+
+    return f"{documento} (no encontrado)"
+
+# --- MENÚ DE CITAS ---
 
 def menu_ver_todas_citas(filepath: str):
     """Mostrar todas las citas médicas registradas."""
     console.print(Panel.fit("[bold cyan]📋 Lista de Todas las Citas[/bold cyan]"))
-    citas_registradas = cita.leer_todas_las_citas(filepath)
+    citas_registradas = leer_datos_archivo(filepath)
 
     if not citas_registradas:
         console.print("[yellow]No hay citas registradas.[/yellow]")

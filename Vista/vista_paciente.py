@@ -47,7 +47,8 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
 
 
 def elegir_almacenamiento() -> str:
-    console.print(Panel.fit("[bold cyan]⚙ Configuración de Almacenamiento[/bold cyan]"))
+    """Seleccionar tipo de almacenamiento (CSV o JSON)."""
+    console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
     console.print(
         "¿Dónde desea almacenar los datos?\n"
         "[bold yellow]1[/bold yellow]. 📄 CSV (Archivo de texto plano)\n"
@@ -68,7 +69,7 @@ def elegir_almacenamiento() -> str:
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
     elif opcion == "3":
         console.print("[bold red]↩ Regresando al menú principal...[/bold red]")
-        vista_principal()  # ✅ regresa directamente al menú principal
+        vista_principal() 
         return None
 
 
@@ -80,14 +81,20 @@ def limpiar():
 # 🔹 Selector Interactivo
 # =========================================================
 def selector_interactivo(titulo, opciones):
+    """Permite navegar con flechas ↑ ↓ y seleccionar con Enter."""
     seleccion = 0
     while True:
         limpiar()
         console.print(Panel(f"[bold cyan]{titulo}[/bold cyan]"))
         for i, opt in enumerate(opciones):
             prefix = "👉 " if i == seleccion else "   "
-            estilo = "reverse bold green" if i == seleccion else ""
+            # Verde para opciones normales, rojo si es “volver”
+            if "Volver" in opt:
+                estilo = "reverse bold red" if i == seleccion else "bold red"
+            else:
+                estilo = "reverse bold green" if i == seleccion else ""
             console.print(prefix + opt, style=estilo)
+
         tecla = readchar.readkey()
         if tecla == readchar.key.UP:
             seleccion = (seleccion - 1) % len(opciones)
@@ -250,7 +257,7 @@ def main_vista_pacientes():
         elif seleccion == 3:
             menu_eliminar_paciente(archivo)
         elif seleccion == 4:
-            console.print("\n[bold cyan]⬅ Volviendo al menú principal...[/bold cyan]")
+            console.print("\n[bold red]⬅ Volviendo al menú principal...[/bold red]")
             break
 
 
