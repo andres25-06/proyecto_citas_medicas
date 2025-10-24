@@ -5,6 +5,7 @@ Vista del Módulo de Pacientes con selector interactivo (flechas ↑ ↓).
 
 import os
 import readchar
+import time
 from Modelo import paciente
 from rich.console import Console
 from rich.panel import Panel
@@ -20,56 +21,81 @@ NOMBRE_ARCHIVO_JSON = 'pacientes.json'
 
 
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
-    console.print("\nSeleccione el tipo de documento:", style="cyan")
+    limpiar()
+    """Permite seleccionar el tipo de documento usando el selector interactivo, con opción de volver."""
     tipos = {
-        '1': 'C.C', '2': 'T.I', '3': 'R.C', '4': 'C.E', '5': 'Pasaporte', '6': 'PPT'
-    }
-    descripciones = {
-        '1': 'Cédula de Ciudadanía', '2': 'Tarjeta de Identidad', '3': 'Registro Civil',
-        '4': 'Cédula de Extranjería', '5': 'Pasaporte', '6': 'Permiso de Permanencia Temporal'
+        '1': 'C.C',
+        '2': 'T.I',
+        '3': 'R.C',
+        '4': 'C.E',
+        '5': 'Pasaporte',
+        '6': 'PPT'
     }
 
-    opciones = list(tipos.keys())
-    texto = ""
+    descripciones = {
+        '1': '🆔 Cédula de Ciudadanía',
+        '2': '🎫 Tarjeta de Identidad',
+        '3': '📜 Registro Civil',
+        '4': '🌎 Cédula de Extranjería',
+        '5': '🧳 Pasaporte',
+        '6': '📄 Permiso de Permanencia Temporal'
+    }
+
+    opciones = [desc for desc in descripciones.values()]
 
     if permitir_vacio:
-        texto += "[bold yellow]0[/bold yellow]. No cambiar\n"
-        opciones.insert(0, '0')
+        opciones.insert(0, "🔸 No cambiar")
 
-    for k, v in descripciones.items():
-        texto += f"[bold yellow]{k}[/bold yellow]. {v}\n"
+    opciones.append("🔙 Volver al menú anterior")
 
-    console.print(texto)
-    opcion = Prompt.ask("Opción", choices=opciones, show_choices=False)
-    if permitir_vacio and opcion == '0':
+    seleccion = selector_interactivo("📑 Seleccione el tipo de documento", opciones)
+
+    if permitir_vacio and seleccion == 0:
+        console.print("[bold yellow]⚠ No se modificará el tipo de documento.[/bold yellow]")
+        time.sleep(1)
         return None
-    return tipos[opcion]
+
+    # Si selecciona "Volver"
+    if seleccion == len(opciones) - 1:
+        console.print("[bold red]↩ Regresando al menú anterior...[/bold red]")
+        time.sleep(1)
+        return elegir_almacenamiento()
+
+    indice_real = seleccion if not permitir_vacio else seleccion - 1
+    codigo = str(indice_real + 1)
+    tipo = tipos[codigo]
+
+    console.print(f"[bold green]✅ Tipo seleccionado:[/bold green] {descripciones[codigo]}")
+    time.sleep(1)
+    return tipo
+
 
 
 def elegir_almacenamiento() -> str:
-    """Seleccionar tipo de almacenamiento (CSV o JSON)."""
-    console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
-    console.print(
-        "¿Dónde desea almacenar los datos?\n"
-        "[bold yellow]1[/bold yellow]. 📄 CSV (Archivo de texto plano)\n"
-        "[bold yellow]2[/bold yellow]. 🧾 JSON (Formato estructurado)\n"
-        "[bold yellow]3[/bold yellow]. 🔙 Volver al menú principal"
-    )
+    limpiar()
+    """Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo."""
+    opciones = [
+        "📄 CSV (Archivo de texto plano)",
+        "🧾 JSON (Formato estructurado)",
+        "🔙 Volver al menú principal"
+    ]
 
-    opcion = Prompt.ask(
-        "Seleccione una opción",
-        choices=["1", "2", "3"],
-        show_choices=False
-    )
-    
+    seleccion = selector_interactivo("⚙️ Configuración de Almacenamiento", opciones)
 
-    if opcion == "1":
+    if seleccion == 0:
+        console.print("[bold green]✅ Modo de almacenamiento seleccionado: CSV[/bold green]")
+        time.sleep(1)
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_CSV)
-    elif opcion == "2":
+
+    elif seleccion == 1:
+        console.print("[bold green]✅ Modo de almacenamiento seleccionado: JSON[/bold green]")
+        time.sleep(1)
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
-    elif opcion == "3":
+
+    elif seleccion == 2:
         console.print("[bold red]↩ Regresando al menú principal...[/bold red]")
-        vista_principal() 
+        time.sleep(1)
+        vista_principal()
         return None
 
 
@@ -81,6 +107,7 @@ def limpiar():
 # 🔹 Selector Interactivo
 # =========================================================
 def selector_interactivo(titulo, opciones):
+    limpiar()
     """Permite navegar con flechas ↑ ↓ y seleccionar con Enter."""
     seleccion = 0
     while True:
@@ -108,6 +135,7 @@ def selector_interactivo(titulo, opciones):
 # 🔹 Funciones del Módulo de Pacientes
 # =========================================================
 def menu_crear_paciente(filepath: str):
+    limpiar()
     console.print(Panel.fit("[bold cyan]📝 Registrar Nuevo Paciente[/bold cyan]"))
 
     tipo_documento = solicitar_tipo_documento()
@@ -132,6 +160,7 @@ def menu_crear_paciente(filepath: str):
 
 
 def menu_leer_pacientes(filepath: str):
+    limpiar()
     console.print(Panel.fit("[bold cyan]👥 Lista de Pacientes[/bold cyan]"))
     pacientes = paciente.leer_todos_los_pacientes(filepath)
 
@@ -160,6 +189,7 @@ def menu_leer_pacientes(filepath: str):
 
 
 def menu_actualizar_paciente(filepath: str):
+    limpiar()
     console.print(Panel.fit("[bold cyan]✏ Actualizar Datos de Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a actualizar")
 
@@ -206,6 +236,7 @@ def menu_actualizar_paciente(filepath: str):
 
 
 def menu_eliminar_paciente(filepath: str):
+    limpiar()
     console.print(Panel.fit("[bold cyan]🗑 Eliminar Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a eliminar")
 
@@ -234,6 +265,7 @@ def menu_eliminar_paciente(filepath: str):
 # 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_pacientes():
+    limpiar()
     archivo = elegir_almacenamiento()
     console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")
 
