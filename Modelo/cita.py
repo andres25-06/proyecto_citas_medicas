@@ -16,7 +16,7 @@ def generar_id(citas: List[Dict[str, Any]]) -> int:
 
     Args:
         citas (List[Dict[str, Any]]): La lista actual de las citas.
-
+        
     Returns:
         int: El nuevo ID a asignar.
     """

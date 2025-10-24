@@ -11,6 +11,15 @@ NOMBRE_ARCHIVO_JSON = 'citas.json'
 
 
 def menu_agendar_cita(filepath: str):
+    """
+    Menú para agendar una nueva cita médica.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan las citas.
+    
+    Returns:
+        none
+    """
     console.print(Panel.fit("[bold cyan]🩺 Agendar Nueva Cita[/bold cyan]"))
 
     doc_paciente = Prompt.ask("Documento del Paciente")
@@ -32,6 +41,15 @@ def menu_agendar_cita(filepath: str):
 
 
 def menu_cancelar_cita(filepath: str):
+    """
+    Menú para cancelar una cita médica existente.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan las citas.        
+        
+    Returns:
+        none    
+    """
     console.print(Panel.fit("[bold cyan]🗑️ Cancelar Cita[/bold cyan]"))
     id_cita = Prompt.ask("ID de la cita a cancelar")
 
@@ -45,6 +63,16 @@ def menu_cancelar_cita(filepath: str):
 
 
 def menu_ver_todas_citas(filepath: str):
+    
+    """
+    Muestra todas las citas médicas registradas.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan las citas.
+        
+    Returns:
+        none
+    """
     console.print(Panel.fit("[bold cyan]📋 Lista de Citas[/bold cyan]"))
     citas_registradas = cita.leer_todas_las_citas(filepath)
 
@@ -69,6 +97,15 @@ def menu_ver_todas_citas(filepath: str):
 
 
 def mostrar_menu_citas():
+    
+    """
+    Muestra el menú principal del módulo de citas.
+    
+    Args:
+        none
+    Returns:
+        none
+    """
     texto = (
         "[1] Agendar cita\n"
         "[2] Cancelar cita\n"
@@ -79,6 +116,14 @@ def mostrar_menu_citas():
 
 
 def main_vista_citas():
+    """
+    Función principal para manejar el menú de citas médicas.
+    
+    Args:
+        none
+    Returns:
+        none
+    """
     filepath = os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
 
     while True:
