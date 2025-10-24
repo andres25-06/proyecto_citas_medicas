@@ -25,11 +25,26 @@ NOMBRE_ARCHIVO_JSON = 'medicos.json'
 # 🔹 Funciones Auxiliares
 # =========================================================
 def limpiar():
+    """
+    Limpia la consola según el sistema operativo.
+    
+    Args:
+        none
+    Returns:
+        none
+    """
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def elegir_almacenamiento() -> str:
-    """Seleccionar tipo de almacenamiento (CSV o JSON)."""
+    """
+    Seleccionar tipo de almacenamiento (CSV o JSON).
+    
+    Args:
+        none
+    Returns:
+        str: Ruta al archivo seleccionado.
+    """
     console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
     console.print(
         "¿Dónde desea almacenar los datos?\n"
@@ -58,7 +73,16 @@ def elegir_almacenamiento() -> str:
 # 🔹 Selector Interactivo
 # =========================================================
 def selector_interactivo(titulo, opciones):
-    """Permite navegar con flechas ↑ ↓ y seleccionar con Enter."""
+    """
+    Permite navegar con flechas ↑ ↓ y seleccionar con Enter.
+    
+    Args:
+        titulo (str): Título del menú.
+        opciones (List[str]): Lista de opciones para mostrar.
+    Returns:
+        int: Índice de la opción seleccionada.
+    """
+    
     seleccion = 0
     while True:
         limpiar()
@@ -85,6 +109,14 @@ def selector_interactivo(titulo, opciones):
 # 🔹 Funciones del Módulo de Médicos
 # =========================================================
 def menu_crear_medico(filepath: str):
+    """
+    Menú para registrar un nuevo médico.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los médicos.
+    Returns:
+        none
+    """
     console.print(Panel.fit("[bold cyan]➕🩺 Registrar Nuevo Médico[/bold cyan]"))
 
     tipo_documento = Prompt.ask("Tipo de Documento (CC, TI, CE, etc.)")
@@ -121,6 +153,14 @@ def menu_crear_medico(filepath: str):
 
 
 def menu_leer_medicos(filepath: str):
+    """
+    Menú para ver todos los médicos registrados.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los médicos.
+    Returns:
+        none        
+    """
     console.print(Panel.fit("[bold cyan]📄👨‍⚕️ Lista de Médicos[/bold cyan]"))
     medicos = medico.leer_todos_los_medicos(filepath)
 
@@ -159,6 +199,15 @@ def menu_leer_medicos(filepath: str):
 
 
 def menu_actualizar_medico(filepath: str):
+    """
+    Está función permite actualizar los datos de un médico existente.   
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los médicos.
+    Returns:        
+        none
+    
+    """
     console.print(Panel.fit("[bold cyan]✏️🩺 Actualizar Datos de Médico[/bold cyan]"))
     id_medico = IntPrompt.ask("Ingrese el documento del médico a actualizar")
 
@@ -197,6 +246,14 @@ def menu_actualizar_medico(filepath: str):
 
 
 def menu_eliminar_medico(filepath: str):
+    """
+    Está función permite eliminar un médico existente.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los médicos.
+    Returns:        
+        none
+    """
     console.print(Panel.fit("[bold cyan]🗑️❌ Eliminar Médico[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el documento del médico a eliminar")
 
@@ -225,6 +282,15 @@ def menu_eliminar_medico(filepath: str):
 # 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_medicos():
+    
+    """
+    Función principal para manejar el menú de médicos.
+    
+    Args:
+        none
+    Returns:
+        none
+    """
     archivo = elegir_almacenamiento()
     console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")
 

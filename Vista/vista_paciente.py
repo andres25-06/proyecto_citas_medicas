@@ -20,6 +20,13 @@ NOMBRE_ARCHIVO_JSON = 'pacientes.json'
 
 
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
+    """
+    Solicita al usuario seleccionar un tipo de documento.
+    Args:
+        permitir_vacio (bool): Si es True, permite no seleccionar ningún tipo (retorna None).
+    Returns:
+        str | None: El tipo de documento seleccionado o None si se permite vacío y se elige esa opción.
+    """
     console.print("\nSeleccione el tipo de documento:", style="cyan")
     tipos = {
         '1': 'C.C', '2': 'T.I', '3': 'R.C', '4': 'C.E', '5': 'Pasaporte', '6': 'PPT'
@@ -47,8 +54,14 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
 
 
 def elegir_almacenamiento() -> str:
-    """Seleccionar tipo de almacenamiento (CSV o JSON)."""
-    console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
+    """
+    Elegir el tipo de almacenamiento (CSV o JSON) para los datos de pacientes.
+    Args:
+        none    
+    Returns:
+        str: Ruta al archivo seleccionado.
+    """
+    console.print(Panel.fit("[bold cyan]⚙ Configuración de Almacenamiento[/bold cyan]"))
     console.print(
         "¿Dónde desea almacenar los datos?\n"
         "[bold yellow]1[/bold yellow]. 📄 CSV (Archivo de texto plano)\n"
@@ -81,7 +94,15 @@ def limpiar():
 # 🔹 Selector Interactivo
 # =========================================================
 def selector_interactivo(titulo, opciones):
-    """Permite navegar con flechas ↑ ↓ y seleccionar con Enter."""
+    """"
+    Permite navegar con flechas ↑ ↓ y seleccionar con Enter.
+    
+    Args:
+        titulo (str): Título del menú.
+        opciones (List[str]): Lista de opciones para mostrar.
+    Returns:
+        int: Índice de la opción seleccionada.
+    """
     seleccion = 0
     while True:
         limpiar()
@@ -108,6 +129,15 @@ def selector_interactivo(titulo, opciones):
 # 🔹 Funciones del Módulo de Pacientes
 # =========================================================
 def menu_crear_paciente(filepath: str):
+    """
+    Esta función permite registrar un nuevo paciente.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los pacientes.
+    Returns:
+        none
+    
+    """
     console.print(Panel.fit("[bold cyan]📝 Registrar Nuevo Paciente[/bold cyan]"))
 
     tipo_documento = solicitar_tipo_documento()
@@ -132,6 +162,15 @@ def menu_crear_paciente(filepath: str):
 
 
 def menu_leer_pacientes(filepath: str):
+    
+    """
+    Menú para ver todos los pacientes registrados.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los pacientes.
+    Returns:
+        none
+    """
     console.print(Panel.fit("[bold cyan]👥 Lista de Pacientes[/bold cyan]"))
     pacientes = paciente.leer_todos_los_pacientes(filepath)
 
@@ -160,6 +199,14 @@ def menu_leer_pacientes(filepath: str):
 
 
 def menu_actualizar_paciente(filepath: str):
+    """
+    Está función permite actualizar los datos de un paciente existente.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los pacientes.
+    Returns:        
+        none
+    """
     console.print(Panel.fit("[bold cyan]✏ Actualizar Datos de Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a actualizar")
 
@@ -206,6 +253,14 @@ def menu_actualizar_paciente(filepath: str):
 
 
 def menu_eliminar_paciente(filepath: str):
+    """
+    Está función permite eliminar un médico existente.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan los médicos.
+    Returns:        
+        none
+    """
     console.print(Panel.fit("[bold cyan]🗑 Eliminar Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a eliminar")
 
@@ -234,6 +289,14 @@ def menu_eliminar_paciente(filepath: str):
 # 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_pacientes():
+    """
+    Función principal para manejar el menú de pacientes.
+    
+    Args:
+        none
+    Returns:
+        none
+    """
     archivo = elegir_almacenamiento()
     console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")
 
