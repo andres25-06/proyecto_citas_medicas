@@ -28,12 +28,27 @@ console = Console()
 # ---------------------------------
 
 def limpiar():
-    """Limpia la terminal (Windows / Unix)."""
+    """
+    Está función limpia la consola dependiendo del sistema operativo.
+    
+    Args:
+        none    
+    Returns:
+        none
+    """
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def animacion_carga(mensaje="Cargando..."):
-    """Animación simple de carga (compatible con terminales)."""
+    """
+    Pequeña animación (usa Rich progress internamente simple).
+    
+    Args:
+        mensaje (str): Mensaje a mostrar durante la animación.
+    Returns:
+        none
+    """
+    # una animación sencilla usando prints para compatibilidad
     limpiar()
     console.print(f"[cyan]{mensaje}[/cyan]")
     for _ in range(18):
@@ -43,7 +58,16 @@ def animacion_carga(mensaje="Cargando..."):
 
 
 def escribir_mensaje(texto, velocidad=0.01, color="magenta"):
-    """Efecto 'typing' usando Rich. Usa console.print con end='' para no crear saltos extra."""
+    """
+    Efecto typing sencillo.
+    
+    Args:
+        texto (str): Texto a mostrar con efecto typing.
+        velocidad (float): Tiempo de espera entre caracteres.
+        color (str): Color del texto.
+    Returns:        
+        none
+    """
     for c in texto:
         console.print(c, end="", style=f"bold {color}")
         try:
@@ -58,6 +82,14 @@ def escribir_mensaje(texto, velocidad=0.01, color="magenta"):
 # ---------------------------------
 
 def cargar_json(ruta):
+    """
+    Carga un archivo JSON y retorna su contenido.
+    
+    Args:
+        ruta (str): Ruta al archivo JSON.
+    Returns:
+        any: Contenido del archivo JSON.
+    """
     if not os.path.exists(ruta):
         return []
     try:
@@ -68,13 +100,29 @@ def cargar_json(ruta):
 
 
 def guardar_json(ruta, datos):
+    """
+    Escribe datos en un archivo JSON.
+    
+    Args:
+        ruta (str): Ruta al archivo JSON.
+        datos (any): Datos a escribir en el archivo.
+    Returns:
+        none
+    """
     with open(ruta, "w", encoding="utf-8") as f:
         json.dump(datos, f, ensure_ascii=False, indent=4)
 
 
 def cargar_csv_simple(ruta):
-    """Carga CSV simple asumiendo encabezado en la primera línea y comas como separador.
-    Devuelve una lista de diccionarios.
+    
+    """
+    Carga CSV simple asumiendo encabezado en la primera línea y comas como separador.
+    
+    Args:
+        ruta (str): Ruta al archivo CSV.
+    Returns:
+        List[Dict[str, str]]: Lista de diccionarios con los datos del CSV
+        
     """
     if not os.path.exists(ruta):
         return []
@@ -91,28 +139,49 @@ def cargar_csv_simple(ruta):
         filas.append(dict(zip(encabezado, valores)))
     return filas
 
+# -------------------- TABLAS VISUALES --------------------
+def mostrar_tabla_citas(citas, titulo="Citas"):
+    """
+    Estructura y muestra una tabla de citas médicas usando Rich.
+    
+    Args:
+        citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
+        titulo (str): Título de la tabla.
+    Returns:
+        none
+    """
+    tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE)
+    tabla.add_column("ID Cita", style="bold yellow")
+    tabla.add_column("Paciente", style="cyan")
+    tabla.add_column("Médico", style="magenta")
+    tabla.add_column("Fecha", justify="center")
+    tabla.add_column("Hora", justify="center")
+    tabla.add_column("Motivo")
+    for c in citas:
+        tabla.add_row(
+            c.get("id_cita", ""),
+            c.get("paciente_nombre", c.get("id_paciente", "")),
+            c.get("medico_nombre", c.get("id_medico", "")),
+            c.get("fecha", ""),
+            c.get("hora", ""),
+            c.get("motivo_consulta", "")
+        )
+    console.print(tabla)
 
-def cargar_datos(filepath):
-    """Carga datos desde JSON o CSV. Mantiene compatibilidad con otras vistas que lo usen."""
-    if not os.path.exists(filepath):
-        return []
-    try:
-        if filepath.endswith('.json'):
-            with open(filepath, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        elif filepath.endswith('.csv'):
-            with open(filepath, 'r', encoding='utf-8') as f:
-                return list(csv.DictReader(f))
-    except Exception as e:
-        console.print(f"[red]Error al cargar {filepath}: {e}[/red]")
-    return []
-
-# ---------------------------------
-# BÚSQUEDAS / UTILIDADES DE NOMBRE
-# ---------------------------------
-
-def obtener_nombre_por_documento(lista, documento):
-    """Busca nombre y apellidos en una lista de dicts por campo 'documento'."""
+def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
+    """
+    Estructura y muestra una tabla genérica usando Rich.
+    
+    Args:
+        lista (List[Dict[str, str]]): Lista de diccionarios con los datos
+        columnas (List[str]): Lista de nombres de columnas a mostrar.
+        titulo (str): Título de la tabla.
+    Returns:
+        none
+    """
+    tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE)
+    for col in columnas:
+        tabla.add_column(col, style="bold")
     for item in lista:
         if str(item.get("documento") or item.get("id") or "").strip() == str(documento).strip():
             nombre = item.get("nombres", "")
@@ -122,6 +191,18 @@ def obtener_nombre_por_documento(lista, documento):
 
 
 def buscador(lista, campo, termino):
+    """
+    Efectúa una búsqueda simple en una lista de diccionarios por un campo específico.
+    
+    Args:
+        lista (List[Dict[str, str]]): Lista de diccionarios donde buscar.
+        campo (str): Campo del diccionario donde buscar.
+        termino (str): Término a buscar (case insensitive).
+    Returns:
+        List[Dict[str, str]]: Sublista con los elementos que coinciden con el término.
+        
+    """
+    
     patron = re.compile(re.escape(termino), re.IGNORECASE)
     return [item for item in lista if patron.search(str(item.get(campo, "")))]
 
@@ -202,6 +283,17 @@ def mostrar_tabla_citas(
 # ---------------------------------
 
 def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="data/medicos.csv"):
+    """
+    Enriquece las citas añadiendo nombres de pacientes y médicos desde archivos CSV.
+    
+    Args:
+        citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
+        ruta_pacientes (str): Ruta al archivo CSV de pacientes.
+        ruta_medicos (str): Ruta al archivo CSV de médicos.
+    Returns:
+        List[Dict[str, str]]: Lista de citas enriquecidas con nombres.
+        
+    """
     pacientes = cargar_csv_simple(ruta_pacientes)
     medicos = cargar_csv_simple(ruta_medicos)
     map_p = {p.get("id_paciente") or p.get("id") or p.get("documento"): p.get("nombre") or p.get("nombres") for p in pacientes}
@@ -216,6 +308,15 @@ def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="d
 # ---------------------------------
 
 def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
+    """
+    Estructura y muestra un calendario interactivo de citas médicas.
+    
+    Args:
+        ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
+    Returns:
+        none
+        
+    """
     hoy = datetime.now()
     año, mes = hoy.year, hoy.month
 
@@ -321,6 +422,18 @@ def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
 # ---------------------------------
 
 def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
+    """
+    Estructura y muestra las citas de un día específico, permitiendo cancelar.
+    
+    Args:
+        año (int): Año de la fecha a mostrar.
+        mes (int): Mes de la fecha a mostrar.
+        dia (int): Día de la fecha a mostrar.
+        ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
+    Returns:
+        none
+        
+    """
     fecha = f"{año:04d}-{mes:02d}-{dia:02d}"
     citas = cargar_json(ruta_citas)
     citas_dia = [c for c in citas if c.get("fecha") == fecha]
@@ -353,7 +466,16 @@ def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
 # ---------------------------------
 
 def estadisticas_citas_por_medico(ruta_medicos="data/medicos.csv", ruta_citas="data/citas.json"):
-    limpiar()
+    """
+    Estructura y muestra estadísticas de citas por médico.
+    
+    Args:
+        ruta_medicos (str): Ruta al archivo CSV de médicos.
+        ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
+    Returns:
+        none
+        
+    """
     medicos = cargar_csv_simple(ruta_medicos)
     citas = cargar_json(ruta_citas)
 
@@ -398,8 +520,15 @@ def estadisticas_citas_por_medico(ruta_medicos="data/medicos.csv", ruta_citas="d
 # ---------------------------------
 
 def selector_interactivo(titulo, opciones):
-    """Permite navegar con flechas ↑ ↓ y seleccionar con Enter.
-    Devuelve el índice seleccionado.
+    """
+    Estructura un selector interactivo usando readchar.
+    
+    Args:
+        titulo (str): Título del menú.
+        opciones (List[str]): Lista de opciones a mostrar.
+    Returns:
+        int: Índice de la opción seleccionada.
+        
     """
     seleccion = 0
     while True:
@@ -426,6 +555,15 @@ def selector_interactivo(titulo, opciones):
 # ---------------------------------
 
 def mostrar_menu_simple():
+    """
+    Estructura y muestra un menú simple por consola.
+    
+    Args:   
+        none
+    Returns:
+        str: Opción seleccionada por el usuario.
+        
+    """
     limpiar()
 
     opciones_tabla = Table(show_header=False, box=box.SIMPLE_HEAVY)
@@ -444,6 +582,16 @@ def mostrar_menu_simple():
 
 
 def vista_principal():
+    """
+    Estructura y maneja el menú principal interactivo del sistema de citas médicas.
+    
+    Args:
+        none
+    Returns:
+        none
+        
+    """
+    # menú que soporta selector interactivo y entrada por número (compatible)
     opciones = [
         "👤 Gestionar Pacientes",
         "🩺 Gestionar Médicos",

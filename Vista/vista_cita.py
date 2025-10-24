@@ -55,7 +55,16 @@ def selector_interactivo(titulo, opciones):
 # 🔹 Funciones del módulo de Citas
 # =========================================================
 def menu_agendar_cita(filepath: str):
-    console.print(Panel.fit("[bold cyan]📅 Agendar Nueva Cita[/bold cyan]"))
+    """
+    Menú para agendar una nueva cita médica.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan las citas.
+    
+    Returns:
+        none
+    """
+    console.print(Panel.fit("[bold cyan]🩺 Agendar Nueva Cita[/bold cyan]"))
 
     documento_paciente = Prompt.ask("Documento del Paciente")
     documento_medico = Prompt.ask("Documento del Médico")
@@ -80,22 +89,17 @@ def menu_agendar_cita(filepath: str):
 
 
 def menu_cancelar_cita(filepath: str):
-    """Cancelar (eliminar) una cita médica por documento del paciente."""
-    console.print(Panel.fit("[bold cyan]❌ Cancelar Cita por Documento del Paciente[/bold cyan]"))
-
-    documento = Prompt.ask("Ingrese el documento del paciente para cancelar su cita")
-    citas_encontradas = cita.buscar_cita_por_documento(filepath, documento)
-
-    if not citas_encontradas:
-        console.print("[bold red]❌ No se encontró ninguna cita con ese documento.[/bold red]")
-        input("\nPresione Enter para continuar...")
-        return
-
-    console.print(f"\n[bold green]Se encontraron {len(citas_encontradas)} cita(s):[/bold green]")
-    for c in citas_encontradas:
-        console.print(
-            f"  • ID: {c.get('id')} | Fecha: {c.get('fecha')} | Médico: {c.get('documento_medico')} | Estado: {c.get('estado')}"
-        )
+    """
+    Menú para cancelar una cita médica existente.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan las citas.        
+        
+    Returns:
+        none    
+    """
+    console.print(Panel.fit("[bold cyan]🗑️ Cancelar Cita[/bold cyan]"))
+    id_cita = Prompt.ask("ID de la cita a cancelar")
 
     if Confirm.ask(f"¿Está seguro de cancelar todas las citas del paciente con documento {documento}?", default=False):
         if cita.eliminar_cita_por_documento(filepath, documento):
@@ -135,9 +139,18 @@ def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: s
 # --- MENÚ DE CITAS ---
 
 def menu_ver_todas_citas(filepath: str):
-    """Mostrar todas las citas médicas registradas."""
-    console.print(Panel.fit("[bold cyan]📋 Lista de Todas las Citas[/bold cyan]"))
-    citas_registradas = leer_datos_archivo(filepath)
+    
+    """
+    Muestra todas las citas médicas registradas.
+    
+    Args:
+        filepath (str): La ruta al archivo donde se almacenan las citas.
+        
+    Returns:
+        none
+    """
+    console.print(Panel.fit("[bold cyan]📋 Lista de Citas[/bold cyan]"))
+    citas_registradas = cita.leer_todas_las_citas(filepath)
 
     if not citas_registradas:
         console.print("[yellow]No hay citas registradas.[/yellow]")
@@ -188,11 +201,23 @@ def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: s
     except Exception as e:
         return f"Error: {e}"
 
-def menu_buscar_cita(filepath: str):
-    """Buscar una cita por documento (paciente o médico)."""
-    console.print(Panel.fit("[bold cyan]🔍 Buscar Cita por Documento[/bold cyan]"))
-    documento = Prompt.ask("Ingrese el documento del paciente o médico")
-    citas_encontradas = cita.buscar_cita_por_documento(filepath, documento)
+def mostrar_menu_citas():
+    
+    """
+    Muestra el menú principal del módulo de citas.
+    
+    Args:
+        none
+    Returns:
+        none
+    """
+    texto = (
+        "[1] Agendar cita\n"
+        "[2] Cancelar cita\n"
+        "[3] Ver todas las citas\n"
+        "[4] Volver al menú principal"
+    )
+    console.print(Panel(texto, title="[bold green]MÓDULO DE CITAS[/bold green]", border_style="cyan"))
 
     if citas_encontradas:
         for item in citas_encontradas:
@@ -220,19 +245,15 @@ def menu_buscar_cita(filepath: str):
 # 🔹 Menú principal interactivo
 # =========================================================
 def main_vista_citas():
-    """Bucle principal del módulo de citas con selector interactivo."""
-    archivo_citas = os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
-    console.print(f"\n📁 Usando archivo de datos: [bold green]{archivo_citas}[/bold green]")
+    """
+      Función principal para manejar el menú de citas médicas.
 
-    opciones = [
-        "🩺 Agendar una nueva cita",
-        "❌ Cancelar una cita",
-        "📋 Ver todas las citas",
-        "🔍 Buscar cita por documento",
-        "⬅️ Volver al menú principal"
-    ]
-
-    titulo = "📅 MÓDULO DE CITAS MÉDICAS\nUsa ↑ ↓ y Enter para seleccionar una opción"
+      Args:
+          none
+      Returns:
+          none
+    """
+    filepath = os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
 
     while True:
         seleccion = selector_interactivo(titulo, opciones)
