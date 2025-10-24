@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.prompt import Prompt, IntPrompt, Confirm
+from Vista.vista_principal import vista_principal 
 
 console = Console()
 
@@ -18,9 +19,6 @@ NOMBRE_ARCHIVO_CSV = 'pacientes.csv'
 NOMBRE_ARCHIVO_JSON = 'pacientes.json'
 
 
-# =========================================================
-# 🔹 Funciones Auxiliares
-# =========================================================
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     """
     Solicita al usuario seleccionar un tipo de documento.
@@ -66,14 +64,26 @@ def elegir_almacenamiento() -> str:
     console.print(Panel.fit("[bold cyan]⚙ Configuración de Almacenamiento[/bold cyan]"))
     console.print(
         "¿Dónde desea almacenar los datos?\n"
-        "[bold yellow]1[/bold yellow]. CSV (Archivo de texto plano)\n"
-        "[bold yellow]2[/bold yellow]. JSON (Formato estructurado)"
+        "[bold yellow]1[/bold yellow]. 📄 CSV (Archivo de texto plano)\n"
+        "[bold yellow]2[/bold yellow]. 🧾 JSON (Formato estructurado)\n"
+        "[bold yellow]3[/bold yellow]. 🔙 Volver al menú principal"
     )
 
-    opcion = Prompt.ask("Opción", choices=["1", "2"], default="2", show_choices=False)
-    if opcion == '1':
+    opcion = Prompt.ask(
+        "Seleccione una opción",
+        choices=["1", "2", "3"],
+        show_choices=False
+    )
+    
+
+    if opcion == "1":
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_CSV)
-    return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+    elif opcion == "2":
+        return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+    elif opcion == "3":
+        console.print("[bold red]↩ Regresando al menú principal...[/bold red]")
+        vista_principal() 
+        return None
 
 
 def limpiar():
@@ -99,8 +109,13 @@ def selector_interactivo(titulo, opciones):
         console.print(Panel(f"[bold cyan]{titulo}[/bold cyan]"))
         for i, opt in enumerate(opciones):
             prefix = "👉 " if i == seleccion else "   "
-            estilo = "reverse bold green" if i == seleccion else ""
+            # Verde para opciones normales, rojo si es “volver”
+            if "Volver" in opt:
+                estilo = "reverse bold red" if i == seleccion else "bold red"
+            else:
+                estilo = "reverse bold green" if i == seleccion else ""
             console.print(prefix + opt, style=estilo)
+
         tecla = readchar.readkey()
         if tecla == readchar.key.UP:
             seleccion = (seleccion - 1) % len(opciones)
@@ -305,7 +320,7 @@ def main_vista_pacientes():
         elif seleccion == 3:
             menu_eliminar_paciente(archivo)
         elif seleccion == 4:
-            console.print("\n[bold cyan]⬅ Volviendo al menú principal...[/bold cyan]")
+            console.print("\n[bold red]⬅ Volviendo al menú principal...[/bold red]")
             break
 
 
