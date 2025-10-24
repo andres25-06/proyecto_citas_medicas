@@ -12,6 +12,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.table import Table
+from Vista.vista_principal import vista_principal 
 
 console = Console()
 
@@ -32,13 +33,25 @@ def elegir_almacenamiento() -> str:
     console.print(Panel.fit("[bold cyan]⚙️ Configuración de Almacenamiento[/bold cyan]"))
     console.print(
         "¿Dónde desea almacenar los datos?\n"
-        "[bold yellow]1[/bold yellow]. CSV (Archivo de texto plano)\n"
-        "[bold yellow]2[/bold yellow]. JSON (Formato estructurado)"
+        "[bold yellow]1[/bold yellow]. 📄 CSV (Archivo de texto plano)\n"
+        "[bold yellow]2[/bold yellow]. 🧾 JSON (Formato estructurado)\n"
+        "[bold yellow]3[/bold yellow]. 🔙 Volver al menú principal"
     )
-    opcion = Prompt.ask("Opción", choices=["1", "2"], default="2", show_choices=False)
-    if opcion == '1':
+
+    opcion = Prompt.ask(
+        "Seleccione una opción",
+        choices=["1", "2", "3"],
+        show_choices=False
+    )
+    
+    if opcion == "1":
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_CSV)
-    return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+    elif opcion == "2":
+        return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+    elif opcion == "3":
+        console.print("[bold red]↩ Regresando al menú principal...[/bold red]")
+        vista_principal() 
+        return None
 
 
 # =========================================================
