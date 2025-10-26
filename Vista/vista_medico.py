@@ -172,6 +172,14 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
 
 
 def menu_crear_medico(filepath: str):
+    """
+        Está función permite crear un nuevo médico.
+        Args:
+            filepath (str): La ruta al archivo donde se almacenan los médicos.
+        Returns:
+            none
+            
+    """
     limpiar()
     console.print(Panel.fit("[bold cyan]➕🩺 Registrar Nuevo Médico[/bold cyan]"))
     solicitar_tipo_documento()
@@ -207,6 +215,15 @@ def menu_crear_medico(filepath: str):
 
 
 def menu_leer_medicos(filepath: str):
+    """
+        Esta función permite leer y mostrar todos los médicos registrados.
+        
+        Args:
+            filepath (str): La ruta al archivo donde se almacenan los médicos.
+        Returns:        
+            none    
+            
+    """
     limpiar()
     console.print(Panel.fit("[bold cyan]📄👨‍⚕️ Lista de Médicos[/bold cyan]"))
     medicos = medico.leer_todos_los_medicos(filepath)
@@ -247,12 +264,12 @@ def menu_leer_medicos(filepath: str):
 
 def menu_actualizar_medico(filepath: str):
     """
-    Está función permite actualizar los datos de un médico existente.   
-    
-    Args:
-        filepath (str): La ruta al archivo donde se almacenan los médicos.
-    Returns:        
-        none
+        Está función permite actualizar los datos de un médico existente.   
+        
+        Args:
+            filepath (str): La ruta al archivo donde se almacenan los médicos.
+        Returns:        
+            none
     
     """
     console.print(Panel.fit("[bold cyan]✏️🩺 Actualizar Datos de Médico[/bold cyan]"))
@@ -294,12 +311,12 @@ def menu_actualizar_medico(filepath: str):
 
 def menu_eliminar_medico(filepath: str):
     """
-    Está función permite eliminar un médico existente.
-    
-    Args:
-        filepath (str): La ruta al archivo donde se almacenan los médicos.
-    Returns:        
-        none
+        Está función permite eliminar un médico existente.
+        
+        Args:
+            filepath (str): La ruta al archivo donde se almacenan los médicos.
+        Returns:        
+            none
     """
     console.print(Panel.fit("[bold cyan]🗑️❌ Eliminar Médico[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el documento del médico a eliminar")
@@ -329,6 +346,15 @@ def menu_eliminar_medico(filepath: str):
 # 🔹 Menú Principal Interactivo
 # =========================================================
 def main_vista_medicos():
+    """
+        Es la función principal que maneja el menú interactivo del módulo de médicos.   
+        Args:
+            none
+        Returns:        
+            none
+            
+    """
+    
     limpiar()
     archivo = elegir_almacenamiento()
     console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")

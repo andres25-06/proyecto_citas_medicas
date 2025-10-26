@@ -16,16 +16,16 @@ CAMPOS = ['id', 'tipo_documento', 'documento', 'nombres', 'apellidos', 'direccio
 
 def inicializar_archivo(filepath: str) -> None:
     """
-    Verifica si un archivo de datos existe. Si no, lo crea con las cabeceras.
+        Verifica si un archivo de datos existe. Si no, lo crea con las cabeceras.
 
-    Esta función es clave para evitar errores en la primera ejecución del programa.
-    
-    Args:
-        filepath (str): La ruta completa al archivo de datos (e.g., 'data/.
-    csv').
+        Esta función es clave para evitar errores en la primera ejecución del programa.
+        
+        Args:
+            filepath (str): La ruta completa al archivo de datos (e.g., 'data/.
+        csv').
 
-    returns:
-        none
+        returns:
+            none
     """
     directorio = os.path.dirname(filepath)
     if directorio and not os.path.exists(directorio):
@@ -42,13 +42,13 @@ def inicializar_archivo(filepath: str) -> None:
 
 def cargar_datos(filepath: str) -> List[Dict[str, Any]]:
     """
-    Carga los datos desde un archivo (CSV o JSON) y los retorna como una lista de diccionarios.
+        Carga los datos desde un archivo (CSV o JSON) y los retorna como una lista de diccionarios.
 
-    Args:
-        filepath (str): La ruta al archivo de datos.
-        
-    Returns:
-        List[Dict[str, Any]]: Una lista de diccionarios con los datos de los médicos.
+        Args:
+            filepath (str): La ruta al archivo de datos.
+            
+        Returns:
+            List[Dict[str, Any]]: Una lista de diccionarios con los datos de los médicos.
     """
     inicializar_archivo(filepath)
     try:
@@ -65,13 +65,13 @@ def cargar_datos(filepath: str) -> List[Dict[str, Any]]:
 
 def guardar_datos(filepath: str, datos: List[Dict[str, Any]]) -> None:
     """
-    Guarda una lista de diccionarios en un archivo (CSV o JSON), sobrescribiendo el contenido.
-    
-    Args:
-        filepath (str): La ruta al archivo de datos.
-        datos (List[Dict[str, Any]]): La lista de diccionarios a guardar.
-    Returns:
-        none    
+        Guarda una lista de diccionarios en un archivo (CSV o JSON), sobrescribiendo el contenido.
+        
+        Args:
+            filepath (str): La ruta al archivo de datos.
+            datos (List[Dict[str, Any]]): La lista de diccionarios a guardar.
+        Returns:
+            none    
     """
     if filepath.endswith('.csv'):
         with open(filepath, mode='w', newline='', encoding='utf-8') as csv_file:

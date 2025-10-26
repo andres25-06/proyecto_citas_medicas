@@ -25,11 +25,29 @@ NOMBRE_ARCHIVO_JSON = 'citas.json'
 # 🔹 Funciones auxiliares
 # =========================================================
 def limpiar():
+    """
+        Está función limpia la consola para mejorar la legibilidad.
+        
+        Args:
+            none
+        Returns:
+            none
+        
+    """
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def selector_interactivo(titulo, opciones):
-    """Permite moverse con flechas ↑ ↓ y seleccionar con Enter."""
+    """ 
+        Permite moverse con flechas ↑ ↓ y seleccionar con Enter.
+
+        Args:
+            titulo (str): Título del menú.
+            opciones (List[str]): Lista de opciones del menú.
+        Returns:
+            int: Índice de la opción seleccionada.
+            
+    """
     seleccion = 0
     while True:
         limpiar()
@@ -56,13 +74,13 @@ def selector_interactivo(titulo, opciones):
 # =========================================================
 def menu_agendar_cita(filepath: str):
     """
-    Menú para agendar una nueva cita médica.
-    
-    Args:
-        filepath (str): La ruta al archivo donde se almacenan las citas.
-    
-    Returns:
-        none
+        Menú para agendar una nueva cita médica.
+        
+        Args:
+            filepath (str): La ruta al archivo donde se almacenan las citas.
+        
+        Returns:
+            none
     """
     console.print(Panel.fit("[bold cyan]🩺 Agendar Nueva Cita[/bold cyan]"))
 
@@ -101,18 +119,28 @@ def menu_cancelar_cita(filepath: str):
     console.print(Panel.fit("[bold cyan]🗑️ Cancelar Cita[/bold cyan]"))
     id_cita = Prompt.ask("ID de la cita a cancelar")
 
-    if Confirm.ask(f"¿Está seguro de cancelar todas las citas del paciente con documento {documento}?", default=False):
-        if cita.eliminar_cita_por_documento(filepath, documento):
-            console.print("[bold green]✅ Cita(s) cancelada(s) exitosamente.[/bold green]")
-        else:
-            console.print("[bold red]❌ Error al cancelar la(s) cita(s).[/bold red]")
-    else:
-        console.print("[yellow]Operación cancelada.[/yellow]")
+    # if Confirm.ask(f"¿Está seguro de cancelar todas las citas del paciente con documento {documento}?", default=False):
+    #     if cita.eliminar_cita_por_documento(filepath, documento):
+    #         console.print("[bold green]✅ Cita(s) cancelada(s) exitosamente.[/bold green]")
+    #     else:
+    #         console.print("[bold red]❌ Error al cancelar la(s) cita(s).[/bold red]")
+    # else:
+    #     console.print("[yellow]Operación cancelada.[/yellow]")
+    
+    # comento estas lieas por lo que no se cual es el documento que esta llamando y envia error 
+    """????????????????????????????????????????????????????????????????????????????????????????????????"""
     input("\nPresione Enter para continuar...")
 
 
 def leer_datos_archivo(filepath: str):
-    """Lee datos desde un archivo JSON o CSV y devuelve una lista de diccionarios."""
+    """
+        Lee datos desde un archivo JSON o CSV y devuelve una lista de diccionarios.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+        Returns:
+            List[Dict[str, Any]]: Lista de diccionarios con los datos.
+    
+    """
     if filepath.endswith(".json"):
         with open(filepath, "r", encoding="utf-8") as f:
             try:
@@ -185,7 +213,17 @@ def menu_ver_todas_citas(filepath: str):
 
 
 def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
-    """Devuelve el nombre completo de un paciente o médico según su documento."""
+    """
+        Devuelve el nombre completo de un paciente o médico según su documento.
+
+        Args:
+            filepath (str): Ruta al archivo de datos (JSON o CSV).
+            documento (str): Documento del paciente o médico.
+            tipo (str): "paciente" o "medico".
+        Returns:    
+            str: Nombre completo o mensaje de no encontrado.
+        
+    """
     try:
         if tipo == "paciente":
             registros = paciente.leer_todos_los_pacientes("data/pacientes.json")
@@ -204,12 +242,12 @@ def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: s
 def mostrar_menu_citas():
     
     """
-    Muestra el menú principal del módulo de citas.
-    
-    Args:
-        none
-    Returns:
-        none
+        Muestra el menú principal del módulo de citas.
+        
+        Args:
+            none
+        Returns:
+            none
     """
     texto = (
         "[1] Agendar cita\n"
@@ -246,12 +284,12 @@ def mostrar_menu_citas():
 # =========================================================
 def main_vista_citas():
     """
-      Función principal para manejar el menú de citas médicas.
+        Función principal para manejar el menú de citas médicas.
 
-      Args:
-          none
-      Returns:
-          none
+        Args:
+            none
+        Returns:
+            none
     """
     filepath = os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
 
