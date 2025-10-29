@@ -34,35 +34,35 @@ def crear_medico(
         apellidos: str,
         especialidad: str,
         telefono: int,
-        estado: bool,
+        estado: str,
         consultorio: str,
-        hospital: str
 ) -> Optional[Dict[str, Any]]:
     """
-        (CREATE) Agrega un nuevo médico.
+    (CREATE) Agrega un nuevo médico.
 
-        Args:
-            filepath (str): Ruta del archivo de datos.
-            tipo_documento (str): Tipo de documento (ej. 'C.C').
-            documento (int): Número de documento.
-            nombres (str): Nombres del médico.
-            apellidos (str): Apellidos del médico.
-            especialidad (str): Especialidad del médico.
-            telefono (int): Teléfono del médico.
-            estado (bool): Estado (activo/inactivo).
-            consultorio (str): Consultorio asignado.
-            hospital (str): Hospital asignado.
+    Args:
+        filepath (str): Ruta del archivo de datos.
+        tipo_documento (str): Tipo de documento (ej. 'C.C').
+        documento (int): Número de documento.
+        nombres (str): Nombres del médico.
+        apellidos (str): Apellidos del médico.
+        especialidad (str): Especialidad del médico.
+        telefono (int): Teléfono del médico.
+        estado (str): Estado ('Activo' o 'Inactivo').
+        consultorio (str): Consultorio asignado.
 
-        Returns:
-            Optional[Dict[str, Any]]: El médico creado o None si ya existía.
+    Returns:
+        Optional[Dict[str, Any]]: El médico creado o None si ya existía.
     """
     medicos = gestor_datos_medico.cargar_datos(filepath)
     str_documento = str(documento)
 
+    # --- Validar duplicado ---
     if any(m.get('documento') == str_documento for m in medicos):
-        print(f"\nError: El documento '{str_documento}' ya se encuentra registrado.")
+        print(f"\n[bold red]⚠ Error:[/bold red] El documento '{str_documento}' ya se encuentra registrado.")
         return None
 
+    # --- Generar nuevo ID ---
     nuevo_id = generar_id(medicos)
 
     nuevo_medico = {
@@ -75,13 +75,13 @@ def crear_medico(
         'telefono': str(telefono),
         'estado': estado,
         'consultorio': consultorio,
-        'hospital': hospital
     }
 
+    # --- Guardar datos ---
     medicos.append(nuevo_medico)
     gestor_datos_medico.guardar_datos(filepath, medicos)
-    return nuevo_medico
 
+    return nuevo_medico
 
 def leer_todos_los_medicos(filepath: str) -> List[Dict[str, Any]]:
     """

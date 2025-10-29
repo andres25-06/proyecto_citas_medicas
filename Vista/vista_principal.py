@@ -168,54 +168,65 @@ def mostrar_tabla_citas(citas, titulo="Citas"):
         )
     console.print(tabla)
 
+# ---------------------------------
+# MOSTRAR TABLA GENÉRICA
+# ---------------------------------
 def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
     """
-        Estructura y muestra una tabla genérica usando Rich.
-        
-        Args:
-            lista (List[Dict[str, str]]): Lista de diccionarios con los datos
-            columnas (List[str]): Lista de nombres de columnas a mostrar.
-            titulo (str): Título de la tabla.
-        Returns:
-            none
+    Muestra una tabla genérica con Rich.
+
+    Args:
+        lista (List[Dict[str, str]]): Datos a mostrar.
+        columnas (List[str]): Nombres de las columnas.
+        titulo (str): Título de la tabla.
     """
-    tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE)
+    if not lista:
+        console.print(Panel("[bold red]⚠ No hay datos para mostrar.[/bold red]", border_style="red"))
+        return
+
+    tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE_HEAVY, border_style="cyan")
     for col in columnas:
         tabla.add_column(col, style="bold")
+
     for item in lista:
-        if str(item.get("documento") or item.get("id") or "").strip() == str(documento).strip():
-            nombre = item.get("nombres", "")
-            apellidos = item.get("apellidos", "")
-            return f"{nombre} {apellidos}".strip() or "Sin nombre"
-    return "Desconocido"
+        fila = [str(item.get(col.lower(), "")) for col in columnas]
+        tabla.add_row(*fila)
+
+    console.print(tabla)
 
 
+# ---------------------------------
+# BUSCADOR GENÉRICO
+# ---------------------------------
 def buscador(lista, campo, termino):
     """
-        Efectúa una búsqueda simple en una lista de diccionarios por un campo específico.
-        
-        Args:
-            lista (List[Dict[str, str]]): Lista de diccionarios donde buscar.
-            campo (str): Campo del diccionario donde buscar.
-            termino (str): Término a buscar (case insensitive).
-        Returns:
-            List[Dict[str, str]]: Sublista con los elementos que coinciden con el término.
-            
+    Realiza una búsqueda simple (case insensitive).
+
+    Args:
+        lista (List[Dict[str, str]]): Lista de registros.
+        campo (str): Campo donde buscar.
+        termino (str): Texto a buscar.
+    Returns:
+        List[Dict[str, str]]: Coincidencias encontradas.
     """
-    
     patron = re.compile(re.escape(termino), re.IGNORECASE)
     return [item for item in lista if patron.search(str(item.get(campo, "")))]
+
 
 # ---------------------------------
 # MOSTRAR TABLA DE CITAS
 # ---------------------------------
-
 def mostrar_tabla_citas(
     citas,
     ruta_pacientes="data/pacientes.csv",
     ruta_medicos="data/medicos.csv",
     titulo="📋 Lista de Citas"
 ):
+    """
+    Muestra las citas médicas con formato visual enriquecido.
+    """
+    from Vista.vista_cita import cargar_datos, obtener_nombre_por_documento  # evita import circular
+
     pacientes = cargar_datos(ruta_pacientes)
     medicos = cargar_datos(ruta_medicos)
 
@@ -232,7 +243,7 @@ def mostrar_tabla_citas(
         border_style="bright_blue"
     )
 
-    tabla.add_column("🆔 ID", style="bold yellow", justify="center")
+    tabla.add_column("🆔 ID", justify="center", style="bold yellow")
     tabla.add_column("👤 Paciente", style="bright_cyan")
     tabla.add_column("🩺 Médico", style="bright_magenta")
     tabla.add_column("📅 Fecha", justify="center", style="bright_green")
@@ -250,7 +261,7 @@ def mostrar_tabla_citas(
         estado = str(c.get("estado", "Desconocido")).capitalize()
         if estado.lower() == "pendiente":
             color_estado = "[bold yellow]🕒 Pendiente[/bold yellow]"
-        elif estado.lower() in ("completada", "completado", "realizada"):
+        elif estado.lower() in ("completada", "realizada"):
             color_estado = "[bold green]✅ Completada[/bold green]"
         elif estado.lower() == "cancelada":
             color_estado = "[bold red]❌ Cancelada[/bold red]"
@@ -269,17 +280,15 @@ def mostrar_tabla_citas(
             color_estado
         )
 
-    panel = Panel(
-        tabla,
-        title="💠 [bold cyan]Agenda Médica[/bold cyan]",
-        subtitle="[green]💡 Usa ↑ ↓ para navegar y Enter para seleccionar[/green]",
-        border_style="bright_cyan",
-        padding=(1, 2)
+    console.print(
+        Panel(
+            tabla,
+            title="💠 [bold cyan]Agenda Médica[/bold cyan]",
+            subtitle="[green]💡 Usa ↑ ↓ para navegar y Enter para seleccionar[/green]",
+            border_style="bright_cyan",
+            padding=(1, 2)
+        )
     )
-    console.print(panel)
-
-# ---------------------------------
-# ENRIQUECER CITAS (añadir nombres si hay ids)
 # ---------------------------------
 
 def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="data/medicos.csv"):
@@ -638,8 +647,8 @@ def vista_principal():
         elif indice == 2:
             animacion_carga("Abriendo módulo de citas...")
             try:
-                from Vista.vista_cita import main_vista_citas
-                main_vista_citas()
+                from Vista import vista_cita
+                vista_cita.main_vista_citas()
             except Exception:
                 console.print("[yellow]Módulo de citas no encontrado. (Placeholder)[/yellow]")
                 console.input("Enter para volver...")
