@@ -33,13 +33,14 @@ def validar_documento_unico(documento: str, lista_registros: list, nombre_archiv
 
 def validar_datos_relacion_obligatorios(datos: dict, campos_obligatorios: list, nombre_relacion: str):
     """
-    Comprueba que los campos requeridos de una relación (como cliente o médico)
-    no estén vacíos o faltantes.
-
-    Parámetros:
-    - datos: diccionario del registro (ej: {"id":1,"nombre":"Juan"})
-    - campos_obligatorios: lista de campos que deben existir y tener valor
-    - nombre_relacion: texto descriptivo del módulo o relación
+        Comprueba que los campos requeridos de una relación (como cliente o médico)
+        no estén vacíos o faltantes.
+        Args:
+            datos (dict): Diccionario con los datos de la relación.
+            campos_obligatorios (list): Lista de nombres de campos que son obligatorios.
+            nombre_relacion (str): Nombre del tipo de relación (ej: 'Paciente', 'Médico').
+        Returns:
+            bool: True si todos los campos obligatorios están presentes, False si faltan.
     """
     faltantes = [campo for campo in campos_obligatorios if not datos.get(campo)]
 
