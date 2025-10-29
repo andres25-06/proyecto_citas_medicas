@@ -173,12 +173,14 @@ def mostrar_tabla_citas(citas, titulo="Citas"):
 # ---------------------------------
 def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
     """
-    Muestra una tabla genérica con Rich.
+        Muestra una tabla genérica con Rich.
 
-    Args:
-        lista (List[Dict[str, str]]): Datos a mostrar.
-        columnas (List[str]): Nombres de las columnas.
-        titulo (str): Título de la tabla.
+        Args:
+            lista (List[Dict[str, str]]): Datos a mostrar.
+            columnas (List[str]): Nombres de las columnas.
+            titulo (str): Título de la tabla.
+        Returns:
+            none
     """
     if not lista:
         console.print(Panel("[bold red]⚠ No hay datos para mostrar.[/bold red]", border_style="red"))

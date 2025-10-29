@@ -113,7 +113,14 @@ def selector_interactivo(titulo, opciones):
 
 def mostrar_calendario(anio, mes, dia_actual):
     """
-    Muestra el calendario del mes con el día seleccionado resaltado.
+        Muestra el calendario del mes con el día seleccionado resaltado.
+        
+        Args:
+            anio (int): Año del calendario.
+            mes (int): Mes del calendario.
+            dia_actual (int): Día a resaltar.
+        Returns:
+            none
     """
     tabla = Table(show_header=False, box=None, padding=(0, 1))
     tabla.add_row("L", "M", "X", "J", "V", "S", "D")
@@ -137,7 +144,12 @@ def mostrar_calendario(anio, mes, dia_actual):
 
 def seleccionar_fecha():
     """
-    Selector interactivo de fecha con movimiento entre días.
+        Selector interactivo de fecha con movimiento entre días.
+        
+        Args:
+            none
+        Returns:
+            str: Fecha seleccionada en formato 'YYYY-MM-DD'.
     """
     hoy = datetime.date.today()
     anio, mes = hoy.year, hoy.month
@@ -199,6 +211,14 @@ def seleccionar_fecha():
 
 
 def calendario():
+    """
+        Menú para seleccionar fecha y hora de la cita.
+        
+        Args:
+            none
+        Returns:
+            str: Fecha y hora seleccionadas en formato 'YYYY-MM-DD HH:MM'.
+    """
     limpiar()
     console.print(Panel.fit("[bold cyan]📅 Selecciona la fecha de la cita[/bold cyan]"))
     fecha = seleccionar_fecha()
@@ -264,12 +284,14 @@ def estado_cita(permitir_vacio: bool = False) -> str | None:
 # =========================================================
 def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list):
     """
-    Menú para agendar una nueva cita médica.
+        Menú para agendar una nueva cita médica.
 
-    Args:
-        filepath (str): Ruta del archivo donde se almacenan las citas.
-        lista_pacientes (list): Lista de pacientes registrados.
-        lista_medicos (list): Lista de médicos registrados.
+        Args:
+            filepath (str): Ruta del archivo donde se almacenan las citas.
+            lista_pacientes (list): Lista de pacientes registrados.
+            lista_medicos (list): Lista de médicos registrados.
+        Returns:
+            none
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]🩺 Agendar Nueva Cita[/bold cyan]"))
@@ -343,7 +365,11 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
 
 def menu_cancelar_cita(filepath: str):
     """
-    Menú para cancelar todas las citas de un paciente según su documento.
+        Menú para cancelar todas las citas de un paciente según su documento.
+        Args:
+            filepath (str): Ruta del archivo donde se almacenan las citas.
+        Returns:    
+            none
     """
 
     console.print(Panel.fit("[bold cyan]🗑️ Cancelar Cita por Documento[/bold cyan]"))
@@ -389,7 +415,17 @@ def leer_datos_archivo(filepath: str):
         return []
 
 def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
-    """Devuelve el nombre completo de un paciente o médico según su documento (JSON o CSV)."""
+    """
+        Devuelve el nombre completo de un paciente o médico según su documento (JSON o CSV).
+        
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento (str): Documento del paciente o médico.
+            tipo (str): "paciente" o "medico".
+        Returns:    
+            str: Nombre completo o mensaje de no encontrado.
+        
+    """
     registros = leer_datos_archivo(filepath)
 
     for r in registros:
@@ -403,13 +439,13 @@ def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: s
 def menu_ver_todas_citas(filepath: str):
     
     """
-    Muestra todas las citas médicas registradas.
-    
-    Args:
-        filepath (str): La ruta al archivo donde se almacenan las citas.
+        Muestra todas las citas médicas registradas.
         
-    Returns:
-        none
+        Args:
+            filepath (str): La ruta al archivo donde se almacenan las citas.
+            
+        Returns:
+            none
     """
     console.print(Panel.fit("[bold cyan]📋 Lista de Citas[/bold cyan]"))
     citas_registradas = cita.leer_todas_las_citas(filepath)
@@ -523,6 +559,12 @@ def mostrar_menu_citas():
 def main_vista_citas():
     """
         Función principal para manejar el menú de citas médicas.
+        
+        Args:
+            none
+        Returns:
+            none
+            
     """
     limpiar()
     archivo = elegir_almacenamiento()

@@ -178,12 +178,12 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
 
 def solicitar_especialidad_medica(permitir_vacio: bool = False) -> str | None:
     """
-    Permite seleccionar la especialidad médica de un médico usando un menú interactivo.
+        Permite seleccionar la especialidad médica de un médico usando un menú interactivo.
 
-    Args:
-        permitir_vacio (bool): Si es True, permite no cambiar la especialidad.
-    Returns:
-        str | None: Especialidad seleccionada o None si no se cambia.
+        Args:
+            permitir_vacio (bool): Si es True, permite no cambiar la especialidad.
+        Returns:
+            str | None: Especialidad seleccionada o None si no se cambia.
     """
     limpiar()
     especialidades = {
@@ -250,12 +250,12 @@ def solicitar_especialidad_medica(permitir_vacio: bool = False) -> str | None:
 
 def estado_medico(permitir_vacio: bool = False) -> str | None:
     """
-    Permite seleccionar el estado del médico (Activo o Inactivo) usando un selector interactivo.
+        Permite seleccionar el estado del médico (Activo o Inactivo) usando un selector interactivo.
 
-    Args:
-        permitir_vacio (bool): Si es True, permite no cambiar el estado actual.
-    Returns:    
-        str | None: Estado seleccionado o None si no se cambia.
+        Args:
+            permitir_vacio (bool): Si es True, permite no cambiar el estado actual.
+        Returns:    
+            str | None: Estado seleccionado o None si no se cambia.
     """
     tipos = {
         '1': 'Activo',
@@ -294,12 +294,12 @@ def estado_medico(permitir_vacio: bool = False) -> str | None:
 
 def menu_crear_medico(filepath: str):
     """
-    Permite registrar un nuevo médico en el sistema.
+        Permite registrar un nuevo médico en el sistema.
 
-    Args:
-        filepath (str): Ruta del archivo donde se almacenan los médicos.
-    Returns:
-        None
+        Args:
+            filepath (str): Ruta del archivo donde se almacenan los médicos.
+        Returns:
+            None
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]➕🩺 Registrar Nuevo Médico[/bold cyan]"))

@@ -176,12 +176,12 @@ def selector_interactivo(titulo, opciones):
 # =========================================================
 def menu_crear_paciente(filepath: str):
     """
-    Entradas para registrar un nuevo paciente y guardar en el archivo.
-    
-    Args:
-        filepath (str): Ruta del archivo donde se guardarán los datos.
-    Returns:
-        None
+        Entradas para registrar un nuevo paciente y guardar en el archivo.
+        
+        Args:
+            filepath (str): Ruta del archivo donde se guardarán los datos.
+        Returns:
+            None
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]📝 Registrar Nuevo Paciente[/bold cyan]"))
