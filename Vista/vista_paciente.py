@@ -12,6 +12,9 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.prompt import Prompt, IntPrompt, Confirm
 from Vista.vista_principal import vista_principal 
+from Validaciones import validar_campos
+from Validaciones import entrada_datos
+
 
 console = Console()
 
@@ -173,28 +176,47 @@ def selector_interactivo(titulo, opciones):
 # =========================================================
 def menu_crear_paciente(filepath: str):
     """
-        Entradas para registrar un nuevo paciente y guardar en el archivo.
-        
-        Args:
-            filepath (str): Ruta del archivo donde se guardarán los datos.
-        Returns:
-            None
-            
+    Entradas para registrar un nuevo paciente y guardar en el archivo.
+    
+    Args:
+        filepath (str): Ruta del archivo donde se guardarán los datos.
+    Returns:
+        None
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]📝 Registrar Nuevo Paciente[/bold cyan]"))
 
-    tipo_documento = solicitar_tipo_documento()
-    documento = IntPrompt.ask("Número de Documento")
-    nombres = Prompt.ask("Nombres")
-    apellidos = Prompt.ask("Apellidos")
-    direccion = Prompt.ask("Dirección")
-    telefono = IntPrompt.ask("Teléfono")
+    # --- Captura de datos con validaciones individuales ---
+    tipo_documento = solicitar_tipo_documento()    
+    documento = validar_campos.validar_cedula("Número de Documento", filepath)
+    nombres = validar_campos.validar_texto("Nombres")
+    apellidos = validar_campos.validar_texto("Apellidos")
+    direccion = validar_campos.validar_texto("Dirección")
+    telefono = validar_campos.validar_telefono("Teléfono")
 
+    # --- Crear diccionario temporal para validaciones posteriores ---
+    nuevo_paciente = {
+        "tipo_documento": tipo_documento,
+        "documento": documento,
+        "nombres": nombres,
+        "apellidos": apellidos,
+        "direccion": direccion,
+        "telefono": telefono
+    }
+
+    # --- Validar campos obligatorios ---
+    campos_obligatorios = ["tipo_documento", "documento", "nombres", "apellidos", "telefono"]
+    if not entrada_datos.validar_datos_relacion_obligatorios(nuevo_paciente, campos_obligatorios, "paciente"):
+        console.print(Panel("⚠ Faltan datos obligatorios.", border_style="red", title="Error"))
+        input("\nPresione Enter para continuar...")
+        return
+
+    # --- Crear el paciente ---
     paciente_creado = paciente.crear_paciente(
         filepath, tipo_documento, documento, nombres, apellidos, direccion, telefono
     )
 
+    # --- Confirmación ---
     if paciente_creado:
         console.print(Panel(
             f"✅ ¡Paciente registrado con éxito!\nID Asignado: [bold yellow]{paciente_creado['id']}[/bold yellow]",
@@ -202,6 +224,7 @@ def menu_crear_paciente(filepath: str):
         ))
     else:
         console.print(Panel("⚠ No se pudo registrar el paciente.", border_style="red", title="Error"))
+
     input("\nPresione Enter para continuar...")
 
 
