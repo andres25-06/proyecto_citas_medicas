@@ -5,6 +5,9 @@
 
 from rich.console import Console
 from rich.panel import Panel
+import csv
+import json
+import os
 
 console = Console()
 
@@ -53,8 +56,53 @@ def validar_datos_relacion_obligatorios(datos: dict, campos_obligatorios: list, 
     return True
 
 def validar_existencia_relacion(documento, lista, tipo):
-    for item in lista:
-        if item.get("documento") == documento:
-            return True
-    return False
+    """
+    Verifica si un paciente o médico existe en la lista, CSV o JSON.
+    """
+    print(f"\n[DEBUG] Buscando {tipo} con documento: {documento}")
+    print("test",documento, lista, tipo)
 
+    # --- Buscar en la lista en memoria ---
+    for item in lista:
+        print(f"[DEBUG] Revisando en lista: {item.get('documento')}")
+        if str(item.get("documento")) == str(documento):
+            print("[DEBUG] Encontrado en lista ✅")
+            return True
+
+    # --- Definir nombres de archivos según tipo ---
+    nombre_base = tipo.lower()
+    archivo_csv = f"Data/{nombre_base}.csv"
+    archivo_json = f"Data/{nombre_base}.json"
+
+    # --- Buscar en el CSV ---
+    if os.path.exists(archivo_csv):
+        print(f"[DEBUG] Buscando en {archivo_csv}...")
+        with open(archivo_csv, "r", encoding="utf-8") as f:
+            lector = csv.DictReader(f)
+            for fila in lector:
+                print(f"[DEBUG] Revisando CSV: {fila.get('documento')}")
+                if str(fila.get("documento")) == str(documento):
+                    print("[DEBUG] Encontrado en CSV ✅")
+                    return True
+    else:
+        print(f"[DEBUG] No existe el archivo {archivo_csv}")
+
+    # --- Buscar en el JSON ---
+    if os.path.exists(archivo_json):
+        print(f"[DEBUG] Buscando en {archivo_json}...")
+        with open(archivo_json, "r", encoding="utf-8") as f:
+            try:
+                datos = json.load(f)
+                for item in datos:
+                    print(f"[DEBUG] Revisando JSON: {item.get('documento')}")
+                    if str(item.get("documento")) == str(documento):
+                        print("[DEBUG] Encontrado en JSON ✅")
+                        return True
+            except json.JSONDecodeError:
+                print("[DEBUG] Error al leer el JSON (vacío o mal formado)")
+    else:
+        print(f"[DEBUG] No existe el archivo {archivo_json}")
+
+    print("[DEBUG] No se encontró en ningún lugar ❌")
+    
+    return False

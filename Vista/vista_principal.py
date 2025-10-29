@@ -651,7 +651,8 @@ def vista_principal():
             try:
                 from Vista import vista_cita
                 vista_cita.main_vista_citas()
-            except Exception:
+            except Exception as e:
+                console.log(e)
                 console.print("[yellow]Módulo de citas no encontrado. (Placeholder)[/yellow]")
                 console.input("Enter para volver...")
 
