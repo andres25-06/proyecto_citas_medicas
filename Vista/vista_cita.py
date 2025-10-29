@@ -10,8 +10,9 @@ import csv
 import os
 import readchar
 import time
-from Modelo import medico, paciente, cita
 from Modelo import cita
+from Modelo import paciente
+from Modelo import medico
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt, IntPrompt, Confirm
@@ -224,9 +225,9 @@ def calendario():
     fecha = seleccionar_fecha()
     if fecha:
         console.print(f"\nHas seleccionado la fecha: [bold green]{fecha}[/bold green]")
-        hora = console.input("[bold yellow]⏰ Ingresa la hora (HH:MM): [/bold yellow]")
-        console.print(f"\n✅ Cita agendada para el [bold cyan]{fecha}[/bold cyan] a las [bold cyan]{hora}[/bold cyan].")
-        return f"{fecha} {hora}"  # ✅ Retorna fecha + hora
+
+        console.print(f"\n✅ Cita agendada para el [bold cyan]{fecha}[/bold cyan] ")
+        return f"{fecha}  "  # ✅ Retorna fecha + hora
     else:
         console.print("[red]Operación cancelada.[/red]")
         return None
@@ -300,25 +301,29 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
     documento_paciente = validar_campos.validar_cedula("Documento del Paciente", filepath)
     documento_medico = validar_campos.validar_cedula("Documento del Médico", filepath)
     fecha = calendario()
+    hora = validar_campos.validar_hora("[bold yellow]⏰ Ingresa la hora (HH:MM): [/bold yellow]")   
     motivo = validar_campos.validar_texto("Motivo de la consulta")
     estado = estado_cita()
 
     # --- Validar existencia de relaciones ---
-    if not entrada_datos.validar_existencia_relacion(documento_paciente,    lista_pacientes, "paciente"):
+    if not entrada_datos.validar_existencia_relacion(documento_paciente,    lista_pacientes, "pacientes"):
         console.print(Panel("⚠ El paciente no existe en el sistema.", border_style="red", title="Error"))
         input("\nPresione Enter para continuar...")
+        print(lista_pacientes)
         return
 
-    if not entrada_datos.validar_existencia_relacion(documento_medico, lista_medicos, "médico"):
+    if not entrada_datos.validar_existencia_relacion(documento_medico, lista_medicos, "medicos"):
         console.print(Panel("⚠ El médico no existe en el sistema.", border_style="red", title="Error"))
         input("\nPresione Enter para continuar...")
+        
         return
 
     # --- Crear diccionario de la cita ---
     nueva_cita = {
         "documento_paciente": documento_paciente.strip(),
         "documento_medico": documento_medico.strip(),
-        "fecha": fecha.strip() if isinstance(fecha, str) else fecha,
+        "fecha": fecha.strip() ,
+        "hora": hora.strip(),
         "motivo": motivo.strip(),
         "estado": estado.strip(),
     }
@@ -337,6 +342,7 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
             documento_paciente,
             documento_medico,
             fecha,
+            hora,
             motivo,
             estado
         )
@@ -414,26 +420,6 @@ def leer_datos_archivo(filepath: str):
     else:
         return []
 
-def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
-    """
-        Devuelve el nombre completo de un paciente o médico según su documento (JSON o CSV).
-        
-        Args:
-            filepath (str): Ruta al archivo de datos.
-            documento (str): Documento del paciente o médico.
-            tipo (str): "paciente" o "medico".
-        Returns:    
-            str: Nombre completo o mensaje de no encontrado.
-        
-    """
-    registros = leer_datos_archivo(filepath)
-
-    for r in registros:
-        if r.get("documento") == documento:
-            return f"{r.get('nombres', '')} {r.get('apellidos', '')}".strip()
-
-    return f"{documento} (no encontrado)"
-
 # --- MENÚ DE CITAS ---
 
 def menu_ver_todas_citas(filepath: str):
@@ -447,29 +433,40 @@ def menu_ver_todas_citas(filepath: str):
         Returns:
             none
     """
+    console = Console()
     console.print(Panel.fit("[bold cyan]📋 Lista de Citas[/bold cyan]"))
-    citas_registradas = cita.leer_todas_las_citas(filepath)
 
+    # --- Leer citas ---
+    citas_registradas = cita.leer_todas_las_citas(filepath)
+    
     if not citas_registradas:
-        console.print("[yellow]No hay citas registradas.[/yellow]")
+        console.print("[yellow]⚠️ No hay citas registradas.[/yellow]")
         input("\nPresione Enter para continuar...")
         return
 
+    # --- Crear tabla ---
     tabla = Table(title="Citas Médicas Registradas", border_style="blue", header_style="bold magenta")
     tabla.add_column("ID", style="dim", width=6)
-    tabla.add_column("Paciente")
-    tabla.add_column("Médico")
-    tabla.add_column("Fecha", justify="center")
+    tabla.add_column("Paciente", justify="center")
+    tabla.add_column("Médico", justify="center")
+    tabla.add_column("Fecha ", justify="center")
     tabla.add_column("Hora", justify="center")
-    tabla.add_column("Motivo")
+    tabla.add_column("Motivo", justify="center")
     tabla.add_column("Estado", justify="center")
 
+    # --- Llenar tabla ---
     for c in citas_registradas:
-        paciente_nombre = obtener_nombre_completo_por_documento("data/pacientes.json", c["documento_paciente"], "paciente")
-        medico_nombre = obtener_nombre_completo_por_documento("data/medicos.json", c["documento_medico"], "medico")
+
+        paciente_nombre = obtener_nombre_completo_por_documento(
+        "data/pacientes.json", c["documento_paciente"], "paciente"
+    )
+        medico_nombre = obtener_nombre_completo_por_documento(
+            "data/medicos.json", c["documento_medico"], "medico"
+    )
+
 
         tabla.add_row(
-            c["id"],
+            str(c["id"]),
             paciente_nombre,
             medico_nombre,
             c["fecha"],
@@ -483,12 +480,13 @@ def menu_ver_todas_citas(filepath: str):
 
 
 def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
+    print("holi",filepath, documento, tipo)
     """
         Devuelve el nombre completo de un paciente o médico según su documento.
 
         Args:
             filepath (str): Ruta al archivo de datos (JSON o CSV).
-            documento (str): Documento del paciente o médico.
+            documento (str): Documento del paciente o médico.x
             tipo (str): "paciente" o "medico".
         Returns:    
             str: Nombre completo o mensaje de no encontrado.

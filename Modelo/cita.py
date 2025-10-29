@@ -45,7 +45,6 @@ def crear_cita(
             documento_paciente (str): Documento del paciente.
             documento_medico (str): Documento del médico.
             fecha (str): Fecha de la cita (YYYY-MM-DD).
-            hora (str): Hora de la cita (HH:MM).
             motivo (str): Motivo de la cita.
             estado (str): Estado actual de la cita (ej. 'Pendiente', 'Completada', 'Cancelada').
 
@@ -58,8 +57,8 @@ def crear_cita(
     for cita in citas:
         if (cita.get('documento_paciente') == documento_paciente and
             cita.get('documento_medico') == documento_medico and
-            cita.get('fecha') == fecha and
-            cita.get('hora') == hora):
+            cita.get('fecha') == fecha ):
+            cita.get('hora') == hora
             print(f"\n Error: Ya existe una cita registrada para ese paciente, médico, fecha y hora.")
             return None
 

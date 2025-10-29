@@ -175,3 +175,23 @@ def validar_cedula(etiqueta: str, filepath: str, min_digitos: int = 6, max_digit
 
         # Si todo está correcto
         return valor
+    
+def validar_hora(etiqueta: str) -> str:
+    """
+    Solicita y valida una hora en formato HH:MM (24 horas).
+    Repite hasta que el formato sea correcto.
+    
+    Args:
+        etiqueta (str): Texto que se muestra al solicitar la hora.
+    
+    Returns:
+        str: Hora validada en formato HH:MM.
+    """
+    while True:
+        hora = input(f"Ingrese {etiqueta} (HH:MM): ").strip()
+        try:
+            # Intenta convertir a formato de hora
+            datetime.strptime(hora, "%H:%M")
+            return hora
+        except ValueError:
+            print("⚠️  Formato de hora inválido. Use el formato HH:MM (ejemplo: 09:30).")
