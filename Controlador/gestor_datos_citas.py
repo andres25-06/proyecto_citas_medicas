@@ -13,7 +13,7 @@ from typing import Any, Dict, List
 
 # Se define el orden de las columnas para los archivos.
 # Se añade 'tipo_documento' como nuevo campo.
-CAMPOS = ['id', 'tipo_documento', 'documento', 'nombres', 'apellidos', 'direccion', 'telefono']
+CAMPOS = ['id', 'documento_paciente', 'documento_medico', 'fecha', 'motivo', 'estado']
 
 def inicializar_archivo(filepath: str) -> None:
     """
