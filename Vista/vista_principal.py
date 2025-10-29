@@ -29,24 +29,24 @@ console = Console()
 
 def limpiar():
     """
-    Está función limpia la consola dependiendo del sistema operativo.
-    
-    Args:
-        none    
-    Returns:
-        none
+        Está función limpia la consola dependiendo del sistema operativo.
+        
+        Args:
+            none    
+        Returns:
+            none
     """
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def animacion_carga(mensaje="Cargando..."):
     """
-    Pequeña animación (usa Rich progress internamente simple).
-    
-    Args:
-        mensaje (str): Mensaje a mostrar durante la animación.
-    Returns:
-        none
+        Pequeña animación (usa Rich progress internamente simple).
+        
+        Args:
+            mensaje (str): Mensaje a mostrar durante la animación.
+        Returns:
+            none
     """
     # una animación sencilla usando prints para compatibilidad
     limpiar()
@@ -59,14 +59,14 @@ def animacion_carga(mensaje="Cargando..."):
 
 def escribir_mensaje(texto, velocidad=0.01, color="magenta"):
     """
-    Efecto typing sencillo.
-    
-    Args:
-        texto (str): Texto a mostrar con efecto typing.
-        velocidad (float): Tiempo de espera entre caracteres.
-        color (str): Color del texto.
-    Returns:        
-        none
+        Efecto typing sencillo.
+        
+        Args:
+            texto (str): Texto a mostrar con efecto typing.
+            velocidad (float): Tiempo de espera entre caracteres.
+            color (str): Color del texto.
+        Returns:        
+            none
     """
     for c in texto:
         console.print(c, end="", style=f"bold {color}")
@@ -83,12 +83,12 @@ def escribir_mensaje(texto, velocidad=0.01, color="magenta"):
 
 def cargar_json(ruta):
     """
-    Carga un archivo JSON y retorna su contenido.
-    
-    Args:
-        ruta (str): Ruta al archivo JSON.
-    Returns:
-        any: Contenido del archivo JSON.
+        Carga un archivo JSON y retorna su contenido.
+        
+        Args:
+            ruta (str): Ruta al archivo JSON.
+        Returns:
+            any: Contenido del archivo JSON.
     """
     if not os.path.exists(ruta):
         return []
@@ -101,13 +101,13 @@ def cargar_json(ruta):
 
 def guardar_json(ruta, datos):
     """
-    Escribe datos en un archivo JSON.
-    
-    Args:
-        ruta (str): Ruta al archivo JSON.
-        datos (any): Datos a escribir en el archivo.
-    Returns:
-        none
+        Escribe datos en un archivo JSON.
+        
+        Args:
+            ruta (str): Ruta al archivo JSON.
+            datos (any): Datos a escribir en el archivo.
+        Returns:
+            none
     """
     with open(ruta, "w", encoding="utf-8") as f:
         json.dump(datos, f, ensure_ascii=False, indent=4)
@@ -116,13 +116,13 @@ def guardar_json(ruta, datos):
 def cargar_csv_simple(ruta):
     
     """
-    Carga CSV simple asumiendo encabezado en la primera línea y comas como separador.
-    
-    Args:
-        ruta (str): Ruta al archivo CSV.
-    Returns:
-        List[Dict[str, str]]: Lista de diccionarios con los datos del CSV
+        Carga CSV simple asumiendo encabezado en la primera línea y comas como separador.
         
+        Args:
+            ruta (str): Ruta al archivo CSV.
+        Returns:
+            List[Dict[str, str]]: Lista de diccionarios con los datos del CSV
+            
     """
     if not os.path.exists(ruta):
         return []
@@ -142,13 +142,13 @@ def cargar_csv_simple(ruta):
 # -------------------- TABLAS VISUALES --------------------
 def mostrar_tabla_citas(citas, titulo="Citas"):
     """
-    Estructura y muestra una tabla de citas médicas usando Rich.
-    
-    Args:
-        citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
-        titulo (str): Título de la tabla.
-    Returns:
-        none
+        Estructura y muestra una tabla de citas médicas usando Rich.
+        
+        Args:
+            citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
+            titulo (str): Título de la tabla.
+        Returns:
+            none
     """
     tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE)
     tabla.add_column("ID Cita", style="bold yellow")
@@ -170,14 +170,14 @@ def mostrar_tabla_citas(citas, titulo="Citas"):
 
 def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
     """
-    Estructura y muestra una tabla genérica usando Rich.
-    
-    Args:
-        lista (List[Dict[str, str]]): Lista de diccionarios con los datos
-        columnas (List[str]): Lista de nombres de columnas a mostrar.
-        titulo (str): Título de la tabla.
-    Returns:
-        none
+        Estructura y muestra una tabla genérica usando Rich.
+        
+        Args:
+            lista (List[Dict[str, str]]): Lista de diccionarios con los datos
+            columnas (List[str]): Lista de nombres de columnas a mostrar.
+            titulo (str): Título de la tabla.
+        Returns:
+            none
     """
     tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE)
     for col in columnas:
@@ -192,15 +192,15 @@ def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
 
 def buscador(lista, campo, termino):
     """
-    Efectúa una búsqueda simple en una lista de diccionarios por un campo específico.
-    
-    Args:
-        lista (List[Dict[str, str]]): Lista de diccionarios donde buscar.
-        campo (str): Campo del diccionario donde buscar.
-        termino (str): Término a buscar (case insensitive).
-    Returns:
-        List[Dict[str, str]]: Sublista con los elementos que coinciden con el término.
+        Efectúa una búsqueda simple en una lista de diccionarios por un campo específico.
         
+        Args:
+            lista (List[Dict[str, str]]): Lista de diccionarios donde buscar.
+            campo (str): Campo del diccionario donde buscar.
+            termino (str): Término a buscar (case insensitive).
+        Returns:
+            List[Dict[str, str]]: Sublista con los elementos que coinciden con el término.
+            
     """
     
     patron = re.compile(re.escape(termino), re.IGNORECASE)
@@ -309,13 +309,13 @@ def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="d
 
 def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
     """
-    Estructura y muestra un calendario interactivo de citas médicas.
-    
-    Args:
-        ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
-    Returns:
-        none
+        Estructura y muestra un calendario interactivo de citas médicas.
         
+        Args:
+            ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
+        Returns:
+            none
+            
     """
     hoy = datetime.now()
     año, mes = hoy.year, hoy.month
@@ -423,16 +423,16 @@ def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
 
 def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
     """
-    Estructura y muestra las citas de un día específico, permitiendo cancelar.
-    
-    Args:
-        año (int): Año de la fecha a mostrar.
-        mes (int): Mes de la fecha a mostrar.
-        dia (int): Día de la fecha a mostrar.
-        ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
-    Returns:
-        none
+        Estructura y muestra las citas de un día específico, permitiendo cancelar.
         
+        Args:
+            año (int): Año de la fecha a mostrar.
+            mes (int): Mes de la fecha a mostrar.
+            dia (int): Día de la fecha a mostrar.
+            ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
+        Returns:
+            none
+            
     """
     fecha = f"{año:04d}-{mes:02d}-{dia:02d}"
     citas = cargar_json(ruta_citas)
@@ -467,14 +467,14 @@ def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
 
 def estadisticas_citas_por_medico(ruta_medicos="data/medicos.csv", ruta_citas="data/citas.json"):
     """
-    Estructura y muestra estadísticas de citas por médico.
-    
-    Args:
-        ruta_medicos (str): Ruta al archivo CSV de médicos.
-        ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
-    Returns:
-        none
+        Estructura y muestra estadísticas de citas por médico.
         
+        Args:
+            ruta_medicos (str): Ruta al archivo CSV de médicos.
+            ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
+        Returns:
+            none
+            
     """
     medicos = cargar_csv_simple(ruta_medicos)
     citas = cargar_json(ruta_citas)
@@ -521,14 +521,14 @@ def estadisticas_citas_por_medico(ruta_medicos="data/medicos.csv", ruta_citas="d
 
 def selector_interactivo(titulo, opciones):
     """
-    Estructura un selector interactivo usando readchar.
-    
-    Args:
-        titulo (str): Título del menú.
-        opciones (List[str]): Lista de opciones a mostrar.
-    Returns:
-        int: Índice de la opción seleccionada.
+        Estructura un selector interactivo usando readchar.
         
+        Args:
+            titulo (str): Título del menú.
+            opciones (List[str]): Lista de opciones a mostrar.
+        Returns:
+            int: Índice de la opción seleccionada.
+            
     """
     seleccion = 0
     while True:
@@ -556,13 +556,13 @@ def selector_interactivo(titulo, opciones):
 
 def mostrar_menu_simple():
     """
-    Estructura y muestra un menú simple por consola.
-    
-    Args:   
-        none
-    Returns:
-        str: Opción seleccionada por el usuario.
+        Estructura y muestra un menú simple por consola.
         
+        Args:   
+            none
+        Returns:
+            str: Opción seleccionada por el usuario.
+            
     """
     limpiar()
 
@@ -583,13 +583,13 @@ def mostrar_menu_simple():
 
 def vista_principal():
     """
-    Estructura y maneja el menú principal interactivo del sistema de citas médicas.
-    
-    Args:
-        none
-    Returns:
-        none
+        Estructura y maneja el menú principal interactivo del sistema de citas médicas.
         
+        Args:
+            none
+        Returns:
+            none
+            
     """
     # menú que soporta selector interactivo y entrada por número (compatible)
     opciones = [

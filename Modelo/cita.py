@@ -14,11 +14,11 @@ def generar_id(citas: List[Dict[str, Any]]) -> int:
     """
     Genera un nuevo ID autoincremental para una cita.
 
-    Args:
-        citas (List[Dict[str, Any]]): La lista actual de las citas.
-        
-    Returns:
-        int: El nuevo ID a asignar.
+        Args:
+            citas (List[Dict[str, Any]]): La lista actual de las citas.
+            
+        Returns:
+            int: El nuevo ID a asignar.
     """
     if not citas:
         return 1
@@ -38,19 +38,19 @@ def crear_cita(
     """
     (CREATE) Agrega una nueva cita.
 
-    Valida que no exista una cita para el mismo paciente, médico, fecha y hora.
+        Valida que no exista una cita para el mismo paciente, médico, fecha y hora.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        documento_paciente (str): Documento del paciente.
-        documento_medico (str): Documento del médico.
-        fecha (str): Fecha de la cita (YYYY-MM-DD).
-        hora (str): Hora de la cita (HH:MM).
-        motivo (str): Motivo de la cita.
-        estado (str): Estado actual de la cita (ej. 'Pendiente', 'Completada', 'Cancelada').
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento_paciente (str): Documento del paciente.
+            documento_medico (str): Documento del médico.
+            fecha (str): Fecha de la cita (YYYY-MM-DD).
+            hora (str): Hora de la cita (HH:MM).
+            motivo (str): Motivo de la cita.
+            estado (str): Estado actual de la cita (ej. 'Pendiente', 'Completada', 'Cancelada').
 
-    Returns:
-        Optional[Dict[str, Any]]: El diccionario de la cita creada o None si ya existía.
+        Returns:
+            Optional[Dict[str, Any]]: El diccionario de la cita creada o None si ya existía.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
 
@@ -82,13 +82,13 @@ def crear_cita(
 
 def leer_todas_las_citas(filepath: str) -> List[Dict[str, Any]]:
     """
-    (READ) Obtiene la lista completa de las citas.
+        (READ) Obtiene la lista completa de las citas.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
+        Args:
+            filepath (str): Ruta al archivo de datos.
 
-    Returns:
-        List[Dict[str, Any]]: La lista de citas.
+        Returns:
+            List[Dict[str, Any]]: La lista de citas.
     """
     return gestor_datos_citas.cargar_datos(filepath)
 
@@ -97,14 +97,14 @@ def leer_todas_las_citas(filepath: str) -> List[Dict[str, Any]]:
 
 def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[Dict[str, Any]]:
     """
-    Busca una cita específica por su documento.
+        Busca una cita específica por su documento.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        documento (str): documento de la cita a buscar.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento (str): documento de la cita a buscar.
 
-    Returns:
-        Optional[Dict[str, Any]]: El diccionario de la cita si se encuentra, de lo contrario None.
+        Returns:
+            Optional[Dict[str, Any]]: El diccionario de la cita si se encuentra, de lo contrario None.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
     return [c for c in citas if c.get('documento_paciente') == documento_paciente]
@@ -116,15 +116,15 @@ def actualizar_cita(
         datos_nuevos: Dict[str, Any]
 ) -> Optional[Dict[str, Any]]:
     """
-    (UPDATE) Modifica los datos de una cita existente.
+        (UPDATE) Modifica los datos de una cita existente.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        id_cita (str): El ID de la cita a actualizar.
-        datos_nuevos (Dict[str, Any]): Un diccionario con los campos a actualizar.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            id_cita (str): El ID de la cita a actualizar.
+            datos_nuevos (Dict[str, Any]): Un diccionario con los campos a actualizar.
 
-    Returns:
-        Optional[Dict[str, Any]]: El diccionario de la cita actualizada, o None si no se encontró.
+        Returns:
+            Optional[Dict[str, Any]]: El diccionario de la cita actualizada, o None si no se encontró.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
     cita_encontrada = None
@@ -151,14 +151,14 @@ def actualizar_cita(
 
 def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     """
-    Elimina todas las citas asociadas a un documento de paciente.
-    
-    Args:
-        filepath (str): Ruta al archivo de citas
-        documento (str): Documento del paciente
+        Elimina todas las citas asociadas a un documento de paciente.
         
-    Returns:
-        bool: True si se eliminaron citas, False en caso contrario
+        Args:
+            filepath (str): Ruta al archivo de citas
+            documento (str): Documento del paciente
+            
+        Returns:
+            bool: True si se eliminaron citas, False en caso contrario
     """
     # Cargar todas las citas
     citas = gestor_datos_citas.cargar_datos(filepath)

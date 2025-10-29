@@ -12,13 +12,13 @@ from Controlador import gestor_datos_medico
 
 def generar_id(medicos: List[Dict[str, Any]]) -> int:
     """
-    Genera un nuevo ID autoincremental para un médico.
+        Genera un nuevo ID autoincremental para un médico.
 
-    Args:
-        medicos (List[Dict[str, Any]]): Lista actual de los médicos.
+        Args:
+            medicos (List[Dict[str, Any]]): Lista actual de los médicos.
 
-    Returns:
-        int: Nuevo ID a asignar.
+        Returns:
+            int: Nuevo ID a asignar.
     """
     if not medicos:
         return 1
@@ -39,22 +39,22 @@ def crear_medico(
         hospital: str
 ) -> Optional[Dict[str, Any]]:
     """
-    (CREATE) Agrega un nuevo médico.
+        (CREATE) Agrega un nuevo médico.
 
-    Args:
-        filepath (str): Ruta del archivo de datos.
-        tipo_documento (str): Tipo de documento (ej. 'C.C').
-        documento (int): Número de documento.
-        nombres (str): Nombres del médico.
-        apellidos (str): Apellidos del médico.
-        especialidad (str): Especialidad del médico.
-        telefono (int): Teléfono del médico.
-        estado (bool): Estado (activo/inactivo).
-        consultorio (str): Consultorio asignado.
-        hospital (str): Hospital asignado.
+        Args:
+            filepath (str): Ruta del archivo de datos.
+            tipo_documento (str): Tipo de documento (ej. 'C.C').
+            documento (int): Número de documento.
+            nombres (str): Nombres del médico.
+            apellidos (str): Apellidos del médico.
+            especialidad (str): Especialidad del médico.
+            telefono (int): Teléfono del médico.
+            estado (bool): Estado (activo/inactivo).
+            consultorio (str): Consultorio asignado.
+            hospital (str): Hospital asignado.
 
-    Returns:
-        Optional[Dict[str, Any]]: El médico creado o None si ya existía.
+        Returns:
+            Optional[Dict[str, Any]]: El médico creado o None si ya existía.
     """
     medicos = gestor_datos_medico.cargar_datos(filepath)
     str_documento = str(documento)
@@ -85,27 +85,27 @@ def crear_medico(
 
 def leer_todos_los_medicos(filepath: str) -> List[Dict[str, Any]]:
     """
-    (READ) Obtiene la lista completa de los médicos.
+        (READ) Obtiene la lista completa de los médicos.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
+        Args:
+            filepath (str): Ruta al archivo de datos.
 
-    Returns:
-        List[Dict[str, Any]]: Lista de médicos.
+        Returns:
+            List[Dict[str, Any]]: Lista de médicos.
     """
     return gestor_datos_medico.cargar_datos(filepath)
 
 
 def buscar_medico_por_documento(filepath: str, documento: str) -> Optional[Dict[str, Any]]:
     """
-    (READ) Busca un médico por su número de documento.
+        (READ) Busca un médico por su número de documento.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        documento (str): Documento a buscar.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento (str): Documento a buscar.
 
-    Returns:
-        Optional[Dict[str, Any]]: El médico encontrado o None si no existe.
+        Returns:
+            Optional[Dict[str, Any]]: El médico encontrado o None si no existe.
     """
     medicos = gestor_datos_medico.cargar_datos(filepath)
     for medico in medicos:
@@ -116,15 +116,15 @@ def buscar_medico_por_documento(filepath: str, documento: str) -> Optional[Dict[
 
 def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
-    (UPDATE) Actualiza los datos de un médico existente.
+        (UPDATE) Actualiza los datos de un médico existente.
 
-    Args:
-        filepath (str): Ruta del archivo de datos.
-        documento (str): Documento del médico a actualizar.
-        datos_nuevos (Dict[str, Any]): Campos a actualizar.
+        Args:
+            filepath (str): Ruta del archivo de datos.
+            documento (str): Documento del médico a actualizar.
+            datos_nuevos (Dict[str, Any]): Campos a actualizar.
 
-    Returns:
-        Optional[Dict[str, Any]]: Médico actualizado o None si no se encontró.
+        Returns:
+            Optional[Dict[str, Any]]: Médico actualizado o None si no se encontró.
     """
     medicos = gestor_datos_medico.cargar_datos(filepath)
     medico_encontrado = None
@@ -149,14 +149,14 @@ def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any
 
 def eliminar_medico(filepath: str, documento: str) -> bool:
     """
-    (DELETE) Elimina un medico de la agenda.
+        (DELETE) Elimina un medico de la agenda.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        documento (str): El documento del medico a eliminar.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento (str): El documento del medico a eliminar.
 
-    Returns:
-        bool: True si el medico fue eliminado, False si no se encontró.
+        Returns:
+            bool: True si el medico fue eliminado, False si no se encontró.
     """
     medicos = gestor_datos_medico.cargar_datos(filepath)
     medico_a_eliminar = None
