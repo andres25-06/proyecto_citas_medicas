@@ -13,6 +13,8 @@ from rich.panel import Panel
 from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.table import Table
 from Vista.vista_principal import vista_principal 
+from Validaciones import validar_campos
+from Validaciones import entrada_datos
 
 console = Console()
 
@@ -170,47 +172,190 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     return tipo
 
 
+# =========================================================
+# 🔹 Especialidades del Medico
+# =========================================================
+
+def solicitar_especialidad_medica(permitir_vacio: bool = False) -> str | None:
+    """
+    Permite seleccionar la especialidad médica de un médico usando un menú interactivo.
+
+    Args:
+        permitir_vacio (bool): Si es True, permite no cambiar la especialidad.
+    Returns:
+        str | None: Especialidad seleccionada o None si no se cambia.
+    """
+    limpiar()
+    especialidades = {
+        '1': 'Medicina General',
+        '2': 'Pediatría',
+        '3': 'Ginecología y Obstetricia',
+        '4': 'Medicina Interna',
+        '5': 'Cardiología',
+        '6': 'Dermatología',
+        '7': 'Oftalmología',
+        '8': 'Otorrinolaringología',
+        '9': 'Traumatología y Ortopedia',
+        '10': 'Neurología',
+        '11': 'Psiquiatría',
+        '12': 'Urología',
+        '13': 'Gastroenterología',
+        '14': 'Endocrinología',
+        '15' : 'Odontologia'
+    }
+
+    descripciones = {
+        '1': '🩺 Medicina General',
+        '2': '👶 Pediatría',
+        '3': '👩‍🍼 Ginecología y Obstetricia',
+        '4': '🏥 Medicina Interna',
+        '5': '❤️ Cardiología',
+        '6': '🌿 Dermatología',
+        '7': '👁️ Oftalmología',
+        '8': '👂 Otorrinolaringología',
+        '9': '🦴 Traumatología y Ortopedia',
+        '10': '🧠 Neurología',
+        '11': '💬 Psiquiatría',
+        '12': '🚹 Urología',
+        '13': '🍽️ Gastroenterología',
+        '14': '🔬 Endocrinología',
+        '15': '🦷Odontologia'
+    }
+
+    opciones = [desc for desc in descripciones.values()]
+
+    if permitir_vacio:
+        opciones.insert(0, "🔸 No cambiar especialidad")
+
+
+    seleccion = selector_interactivo("🏥 Seleccione la especialidad médica", opciones)
+
+    # Si permite dejar vacío
+    if permitir_vacio and seleccion == 0:
+        console.print("[bold yellow]⚠ No se modificará la especialidad médica.[/bold yellow]")
+        time.sleep(1)
+        return None
+
+    indice_real = seleccion if not permitir_vacio else seleccion - 1
+    codigo = str(indice_real + 1)
+    especialidad = especialidades[codigo]
+
+    console.print(f"[bold green]✅ Especialidad seleccionada:[/bold green] {descripciones[codigo]}")
+    time.sleep(1)
+    return especialidad
+
+# =========================================================
+# 🔹 Especialidades del Medico
+# =========================================================
+
+def estado_medico(permitir_vacio: bool = False) -> str | None:
+    """
+    Permite seleccionar el estado del médico (Activo o Inactivo) usando un selector interactivo.
+
+    Args:
+        permitir_vacio (bool): Si es True, permite no cambiar el estado actual.
+    Returns:    
+        str | None: Estado seleccionado o None si no se cambia.
+    """
+    tipos = {
+        '1': 'Activo',
+        '2': 'Inactivo'
+    }
+
+    descripciones = {
+        '1': '✅ Activo',
+        '2': '❌ Inactivo'
+    }
+
+    opciones = [desc for desc in descripciones.values()]
+
+    if permitir_vacio:
+        opciones.insert(0, "🔸 No cambiar")
+
+    seleccion = selector_interactivo("📋 Seleccione el estado del médico", opciones)
+
+    # Si se permite dejar vacío y se elige "No cambiar"
+    if permitir_vacio and seleccion == 0:
+        console.print("[bold yellow]⚠ No se modificará el estado del médico.[/bold yellow]")
+        time.sleep(1)
+        return None
+
+    # Calcular índice real según si se permitió vacío
+    indice_real = seleccion if not permitir_vacio else seleccion - 1
+    codigo = str(indice_real + 1)
+
+    # Obtener el estado correspondiente
+    estado = tipos[codigo]
+
+    console.print(f"[bold green]✅ Estado seleccionado:[/bold green] {descripciones[codigo]}")
+    time.sleep(1)
+    return estado
+
 
 def menu_crear_medico(filepath: str):
     """
-        Está función permite crear un nuevo médico.
-        Args:
-            filepath (str): La ruta al archivo donde se almacenan los médicos.
-        Returns:
-            none
-            
+    Permite registrar un nuevo médico en el sistema.
+
+    Args:
+        filepath (str): Ruta del archivo donde se almacenan los médicos.
+    Returns:
+        None
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]➕🩺 Registrar Nuevo Médico[/bold cyan]"))
-    solicitar_tipo_documento()
-    documento = IntPrompt.ask("Número de Documento")
-    nombres = Prompt.ask("Nombres")
-    apellidos = Prompt.ask("Apellidos")
-    especialidad = Prompt.ask("Especialidad")
-    telefono = IntPrompt.ask("Teléfono")
-    estado = Prompt.ask("Estado (Activo/Inactivo)", choices=["Activo", "Inactivo"], default="Activo")
-    consultorio = Prompt.ask("Número de Consultorio")
-    hospital = Prompt.ask("Hospital")
 
+    # --- Entradas con validaciones ---
+    tipo_documento = solicitar_tipo_documento()
+    documento = validar_campos.validar_cedula("Número de Documento", filepath)
+    nombres = validar_campos.validar_texto("Nombres")
+    apellidos = validar_campos.validar_texto("Apellidos")
+    especialidad = solicitar_especialidad_medica()
+    telefono = validar_campos.validar_telefono("Teléfono")
+    estado = estado_medico()
+    consultorio = validar_campos.validar_numero("Número de Consultorio")
+
+    # --- Crear diccionario con los datos del médico ---
+    nuevo_medico = {
+        "tipo_documento": tipo_documento,
+        "documento": documento,
+        "nombres": nombres,
+        "apellidos": apellidos,
+        "especialidad": especialidad,
+        "telefono": telefono,
+        "estado": estado,
+        "consultorio": consultorio,
+    }
+
+    # --- Validar campos obligatorios ---
+    campos_obligatorios = ["tipo_documento", "documento", "nombres", "apellidos", "telefono"]
+    if not entrada_datos.validar_datos_relacion_obligatorios(nuevo_medico, campos_obligatorios, "médico"):
+        console.print(Panel("⚠ Faltan datos obligatorios.", border_style="red", title="Error"))
+        input("\nPresione Enter para continuar...")
+        return
+
+    # --- Crear el médico ---
     medico_creado = medico.crear_medico(
         filepath,
+        tipo_documento,
         documento,
         nombres,
         apellidos,
         especialidad,
         telefono,
         estado,
-        consultorio,
-        hospital
+        consultorio
     )
 
+    # --- Confirmación ---
     if medico_creado:
         console.print(Panel(
             f"✅ ¡Médico registrado con éxito!\nID Asignado: [bold yellow]{medico_creado['id']}[/bold yellow]",
-            border_style="green", title="Éxito"
+            border_style="green",
+            title="Éxito"
         ))
     else:
-        console.print(Panel("⚠️ No se pudo registrar al médico.", border_style="red", title="Error"))
+        console.print(Panel("⚠ No se pudo registrar el médico.", border_style="red", title="Error"))
+
     input("\nPresione Enter para continuar...")
 
 
@@ -245,7 +390,6 @@ def menu_leer_medicos(filepath: str):
     tabla.add_column("Teléfono", justify="right")
     tabla.add_column("Estado", justify="center")
     tabla.add_column("Consultorio", justify="center")
-    tabla.add_column("Hospital", justify="center")
 
     for m in medicos:
         tabla.add_row(
@@ -255,7 +399,6 @@ def menu_leer_medicos(filepath: str):
             m.get('telefono', 'N/A'),
             m.get('estado', 'N/A'),
             m.get('consultorio', 'N/A'),
-            m.get('hospital', 'N/A')
         )
 
     console.print(tabla)
