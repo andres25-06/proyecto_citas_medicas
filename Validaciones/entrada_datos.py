@@ -1,13 +1,14 @@
 # Datos obligatorios en registros relacionados
-# Validador de documento no repetido 
+# Validador de documento no repetido
 # -*- coding: utf-8 -*-
 
 
-from rich.console import Console
-from rich.panel import Panel
 import csv
 import json
 import os
+
+from rich.console import Console
+from rich.panel import Panel
 
 console = Console()
 
@@ -104,5 +105,5 @@ def validar_existencia_relacion(documento, lista, tipo):
         print(f"[DEBUG] No existe el archivo {archivo_json}")
 
     print("[DEBUG] No se encontró en ningún lugar ❌")
-    
+
     return False
