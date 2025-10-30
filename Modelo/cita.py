@@ -7,6 +7,7 @@ Este módulo utiliza 'gestor_datos' para la persistencia.
 """
 
 from typing import Any, Dict, List, Optional
+
 from Controlador import gestor_datos_citas
 
 
@@ -59,7 +60,7 @@ def crear_cita(
             cita.get('documento_medico') == documento_medico and
             cita.get('fecha') == fecha ):
             cita.get('hora') == hora
-            print(f"\n Error: Ya existe una cita registrada para ese paciente, médico, fecha y hora.")
+            print("\n Error: Ya existe una cita registrada para ese paciente, médico, fecha y hora.")
             return None
 
     nuevo_id = generar_id(citas)
@@ -161,14 +162,14 @@ def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     """
     # Cargar todas las citas
     citas = gestor_datos_citas.cargar_datos(filepath)
-    
+
     # Filtrar las citas que NO corresponden al documento
     citas_filtradas = [cita for cita in citas if cita.get('documento_paciente') != documento]
-    
+
     # Verificar si se eliminó alguna cita
     if len(citas) == len(citas_filtradas):
         return False  # No se encontró ninguna cita con ese documento
-    
+
     # Guardar las citas filtradas
     gestor_datos_citas.guardar_datos(filepath, citas_filtradas)
     return True

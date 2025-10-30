@@ -1,8 +1,7 @@
 # tests/test_modelo_paciente.py
 # -*- coding: utf-8 -*-
-import pytest
 import csv
-import json
+
 from Modelo import paciente
 
 
