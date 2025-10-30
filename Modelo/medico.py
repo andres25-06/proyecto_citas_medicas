@@ -7,6 +7,7 @@ Este módulo utiliza 'gestor_datos' para la persistencia.
 """
 
 from typing import Any, Dict, List, Optional
+
 from Controlador import gestor_datos_medico
 
 
@@ -169,7 +170,7 @@ def eliminar_medico(filepath: str, documento: str) -> bool:
 
     # Eliminarlo si existe
     if medico_a_eliminar:
-        medicos.remove(medico_a_eliminar)  
+        medicos.remove(medico_a_eliminar)
         gestor_datos_medico.guardar_datos(filepath, medicos)
         return True
 

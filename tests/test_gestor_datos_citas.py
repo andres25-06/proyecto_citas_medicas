@@ -1,7 +1,7 @@
 # tests/test_gestor_datos_citas.py
 # -*- coding: utf-8 -*-
-import pytest
 import csv
+
 from Controlador import gestor_datos_citas as gestor
 
 

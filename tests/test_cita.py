@@ -1,7 +1,7 @@
 # tests/test_modelo_cita.py
 # -*- coding: utf-8 -*-
-import pytest
 import csv
+
 from Modelo import cita
 
 

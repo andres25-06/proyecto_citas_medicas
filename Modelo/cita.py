@@ -10,6 +10,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.prompt import Prompt
 from typing import Any, Dict, List, Optional
+
 from Controlador import gestor_datos_citas
 
 
@@ -62,7 +63,7 @@ def crear_cita(
             cita.get('documento_medico') == documento_medico and
             cita.get('fecha') == fecha ):
             cita.get('hora') == hora
-            print(f"\n Error: Ya existe una cita registrada para ese paciente, médico, fecha y hora.")
+            print("\n Error: Ya existe una cita registrada para ese paciente, médico, fecha y hora.")
             return None
 
     nuevo_id = generar_id(citas)

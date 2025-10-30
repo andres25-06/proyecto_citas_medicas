@@ -4,11 +4,10 @@ Vista del Módulo de Citas con selector interactivo (flechas ↑ ↓)
 y diseño mejorado con emojis para el CRUD.
 """
 import calendar
+import csv
 import datetime
 import json
-import csv
 import os
-import readchar
 import time
 from typing import Dict, Any, List, Optional
 
@@ -18,7 +17,7 @@ from Modelo import medico
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Prompt, IntPrompt, Confirm
+from rich.prompt import Confirm, Prompt
 from rich.table import Table
 
 from Vista.vista_principal import vista_principal
@@ -84,11 +83,47 @@ def elegir_almacenamiento() -> Optional[str]:
     elif seleccion == 2:
         console.print("[bold red]↩ Regresando al menú principal...[/bold red]")
         time.sleep(1)
-        vista_principal()
+        navegacion.ir_a_menu_principal()
         return None
 
 
-def mostrar_calendario(anio: int, mes: int, dia_actual: int):
+def selector_interactivo(titulo, opciones):
+    """ 
+        Permite moverse con flechas ↑ ↓ y seleccionar con Enter.
+
+        Args:
+            titulo (str): Título del menú.
+            opciones (List[str]): Lista de opciones del menú.
+        Returns:
+            int: Índice de la opción seleccionada.
+            
+    """
+    seleccion = 0
+    while True:
+        limpiar()
+        console.print(Panel(f"[bold cyan]{titulo}[/bold cyan]"))
+        for i, opt in enumerate(opciones):
+            prefix = "👉 " if i == seleccion else "   "
+            if "Volver" in opt:
+                estilo = "reverse bold red" if i == seleccion else "bold red"
+            else:
+                estilo = "reverse bold green" if i == seleccion else ""
+            console.print(prefix + opt, style=estilo)
+
+        tecla = readchar.readkey()
+        if tecla == readchar.key.UP:
+            seleccion = (seleccion - 1) % len(opciones)
+        elif tecla == readchar.key.DOWN:
+            seleccion = (seleccion + 1) % len(opciones)
+        elif tecla == readchar.key.ENTER:
+            return seleccion
+
+def mostrar_calendario(anio, mes, dia_actual):
+    """
+    Muestra el calendario del mes con el día seleccionado resaltado.
+    Los días pasados se muestran en gris.
+    """
+    hoy = datetime.date.today()
     tabla = Table(show_header=False, box=None, padding=(0, 1))
     tabla.add_row("L", "M", "X", "J", "V", "S", "D")
 
@@ -100,10 +135,16 @@ def mostrar_calendario(anio: int, mes: int, dia_actual: int):
         for dia in semana:
             if dia == 0:
                 fila.append(" ")
-            elif dia == dia_actual:
-                fila.append(f"[bold reverse green]{dia:2}[/bold reverse green]")
             else:
-                fila.append(f"[orange1]{dia:2}[/orange1]")
+                fecha_dia = datetime.date(anio, mes, dia)
+
+                # 🕒 Colores según condición
+                if fecha_dia < hoy:
+                    fila.append(f"[grey50]{dia:2}[/grey50]")  # Día pasado
+                elif dia == dia_actual:
+                    fila.append(f"[bold reverse green]{dia:2}[/bold reverse green]")  # Día actual seleccionado
+                else:
+                    fila.append(f"[orange1]{dia:2}[/orange1]")  # Día disponible
         tabla.add_row(*fila)
 
     nombre_mes = datetime.date(anio, mes, 1).strftime("%B %Y")
@@ -160,7 +201,12 @@ def seleccionar_fecha() -> Optional[str]:
                     anio += 1
 
         elif tecla == readchar.key.ENTER:
-            return datetime.date(anio, mes, dia_actual).strftime("%Y-%m-%d")
+            fecha_seleccionada = datetime.date(anio, mes, dia_actual)
+            if fecha_seleccionada < hoy:
+                console.print("[red]❌ No puedes seleccionar una fecha anterior a hoy.[/red]")
+                console.input("[yellow]Presiona Enter para continuar...[/yellow]")
+            else:
+                return fecha_seleccionada.strftime("%Y-%m-%d")
 
         elif tecla.lower() == "q":
             return None
@@ -177,6 +223,13 @@ def calendario() -> Optional[str]:
     else:
         console.print("[red]Operación cancelada.[/red]")
         return None
+
+# =========================================================
+# 🔹 Estado de la cita
+# =========================================================
+def estado_cita(permitir_vacio: bool = False) -> str | None:
+    """
+    Permite seleccionar el estado de la cita (Completatada, Pendiente o Cancelada) usando un selector interactivo.
 
 
 def estado_cita(permitir_vacio: bool = False) -> Optional[str]:
@@ -297,8 +350,22 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
 
     if cita_creada:
         console.print(Panel(
-            f"✅ ¡Cita creada con éxito!\n\nID asignado: [bold yellow]{cita_creada.get('id', 'N/A')}[/bold yellow]",
-            border_style="green", title="Éxito"))
+            f"✅ ¡Cita creada con éxito!\n\nID asignado: [bold yellow]{cita_creada['id']}[/bold yellow]",
+            border_style="green",
+            title="Éxito"
+        ))
+
+        # 🔹 Mostrar actualización de estadísticas sin romper el flujo
+        try:
+            from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
+            console.print("\n[cyan]📊 Actualizando estadísticas médicas...[/cyan]")
+            estadisticas_citas_por_medico(
+                ruta_medicos="data/medicos.csv",
+                ruta_citas="data/citas.json",
+                mostrar=False
+            )
+        except Exception as e:
+            console.print(f"[red]No se pudo actualizar estadísticas: {e}[/red]")
     else:
         console.print(Panel("⚠️ Ya existe una cita con esos datos o ocurrió un error.",
                             border_style="red", title="Error"))
@@ -450,6 +517,191 @@ def menu_ver_todas_citas(filepath: str):
         )
 
     console.print(tabla)
+    input("\nPresione Enter para continuar...")
+
+
+def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
+    print("holi",filepath, documento, tipo)
+    """
+        Devuelve el nombre completo de un paciente o médico según su documento.
+
+        Args:
+            filepath (str): Ruta al archivo de datos (JSON o CSV).
+            documento (str): Documento del paciente o médico.x
+            tipo (str): "paciente" o "medico".
+        Returns:    
+            str: Nombre completo o mensaje de no encontrado.
+        
+    """
+    try:
+        if tipo == "paciente":
+            registros = paciente.leer_todos_los_pacientes("data/pacientes.json")
+            registros = paciente.leer_todos_los_pacientes("data/pacientes.csv")
+        else:
+            registros = medico.leer_todos_los_medicos("data/medicos.json")
+            registros = medico.leer_todos_los_medicos("data/medicos.csv")
+
+        for r in registros:
+            if r.get("documento") == documento:
+                return f"{r.get('nombres', '')} {r.get('apellidos', '')}".strip()
+        return f"{documento} (no encontrado)"
+    except Exception as e:
+        return f"Error: {e}"
+
+def buscar_cita_por_documento(citas, documento):
+    posibles_claves = ["documento_paciente", "documento", "doc_paciente"]
+    resultados = []
+    documento = str(documento).strip()
+
+    for c in citas:
+        for clave in posibles_claves:
+            if clave in c and str(c[clave]).strip() == documento:
+                resultados.append(c)
+                break
+    return resultados
+
+
+def obtener_nombre_por_documento(filepath_base, documento):
+    """
+    Busca el nombre completo de una persona (paciente o médico)
+    por su documento en archivos JSON o CSV (busca en ambos si existen).
+
+    Args:
+        filepath_base (str): Ruta base sin extensión o con extensión (.json o .csv)
+        documento (str): Documento a buscar
+    Returns:
+        str: Nombre completo o mensaje de error
+    """
+    documento = str(documento).strip()
+
+    # Quitar extensión si viene incluida
+    base, ext = os.path.splitext(filepath_base)
+    if ext not in (".json", ".csv"):
+        # Probar con ambas rutas
+        rutas = [f"{base}.json", f"{base}.csv"]
+    else:
+        rutas = [filepath_base]
+
+    for ruta in rutas:
+        if not os.path.exists(ruta):
+            continue
+
+        try:
+            # Leer JSON
+            if ruta.endswith(".json"):
+                with open(ruta, "r", encoding="utf-8") as f:
+                    personas = json.load(f)
+            # Leer CSV
+            elif ruta.endswith(".csv"):
+                with open(ruta, "r", encoding="utf-8") as f:
+                    lector = csv.DictReader(f)
+                    personas = list(lector)
+            else:
+                continue
+        except Exception as e:
+            continue
+
+        # Buscar persona por documento
+        for p in personas:
+            doc = str(p.get("documento", "")).strip()
+            if doc == documento:
+                nombre = p.get("nombres", "") or p.get("nombre", "")
+                apellido = p.get("apellidos", "") or p.get("apellido", "")
+                if nombre and apellido:
+                    return f"{nombre.strip()} {apellido.strip()}"
+                elif nombre:
+                    return nombre.strip()
+                else:
+                    return "Sin nombre"
+
+    return "No encontrado"
+
+def menu_buscar_cita_por_documento(filepath: str):
+    """
+    Permite buscar y mostrar las citas de un paciente por su documento.
+    """
+    console = Console()
+    citas = leer_datos_archivo(filepath)
+
+    if not citas:
+        console.print("[red]❌ No hay citas registradas o el archivo no existe.[/red]")
+        console.input("\n[cyan]Presione Enter para volver al menú...[/cyan]")
+        return
+
+    documento = console.input("[cyan]Ingrese el documento del paciente: [/cyan]").strip()
+    resultados = buscar_cita_por_documento(citas, documento)
+
+    if resultados:
+        tabla = Table(title=f"Citas del paciente con documento {documento}")
+        tabla.add_column("ID", style="dim", width=6)
+        tabla.add_column("Paciente", justify="center")
+        tabla.add_column("Médico", justify="center")
+        tabla.add_column("Fecha", justify="center")
+        tabla.add_column("Hora", justify="center")
+        tabla.add_column("Motivo", justify="center")
+        tabla.add_column("Estado", justify="center")
+
+        for c in resultados:
+            nombre_paciente = obtener_nombre_por_documento("data/pacientes", c.get("documento_paciente"))
+            nombre_medico = obtener_nombre_por_documento("data/medicos", c.get("documento_medico"))
+
+            tabla.add_row(
+                str(c.get("id_cita", c.get("id", ""))),
+                nombre_paciente,
+                nombre_medico,
+                c.get("fecha", "N/A"),
+                c.get("hora", "N/A"),
+                c.get("motivo", "N/A"),
+                c.get("estado", "N/A")
+            )
+
+        console.print(tabla)
+    else:
+        console.print(f"[red]❌ No se encontraron citas para el documento {documento}.[/red]")
+
+    console.input("\n[cyan]Presione Enter para volver al menú...[/cyan]")
+
+def mostrar_menu_citas():
+
+    """
+        Muestra el menú principal del módulo de citas.
+        
+        Args:
+            none
+        Returns:
+            none
+    """
+    texto = (
+        "[1] Agendar cita\n"
+        "[2] Cancelar cita\n"
+        "[3] Ver todas las citas\n"
+        "[4] Volver al menú principal"
+    )
+    console.print(Panel(texto, title="[bold green]MÓDULO DE CITAS[/bold green]", border_style="cyan"))
+
+    # Cargar citas desde archivo
+    filepath = os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
+    citas_encontradas = cita.leer_todas_las_citas(filepath)
+
+    if citas_encontradas:
+        for item in citas_encontradas:
+            paciente_nombre = obtener_nombre_completo_por_documento("data/pacientes.json", item["documento_paciente"], "paciente")
+            medico_nombre = obtener_nombre_completo_por_documento("data/medicos.json", item["documento_medico"], "medico")
+
+            console.print(Panel(
+                f"[bold green]Cita encontrada:[/bold green]\n"
+                f"🧍 Paciente: [yellow]{paciente_nombre}[/yellow]\n"
+                f"🩺 Médico: [yellow]{medico_nombre}[/yellow]\n"
+                f"📅 Fecha: [cyan]{item['fecha']}[/cyan]\n"
+                f"⏰ Hora: [cyan]{item['hora']}[/cyan]\n"
+                f"💬 Motivo: {item['motivo']}\n"
+                f"📌 Estado: {item['estado']}",
+                border_style="green",
+                title=f"Cita #{item['id']}"
+            ))
+    else:
+        console.print("[yellow]⚠️ No se encontró ninguna cita con ese documento.[/yellow]")
+
     input("\nPresione Enter para continuar...")
 
 
