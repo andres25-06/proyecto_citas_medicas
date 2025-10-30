@@ -42,7 +42,7 @@ def test_no_permite_citas_duplicadas(tmp_path):
     # Intentar crear otra igual
     duplicada = cita.crear_cita(str(filepath), "333", "444", "2025-10-31", "09:00", "Chequeo", "Pendiente")
 
-    assert duplicada is None  # ✅ No debe permitir duplicados
+    assert duplicada is None  # No debe permitir duplicados
 
 # ---------------------------------------------
 # TEST: LEER TODAS LAS CITAS
