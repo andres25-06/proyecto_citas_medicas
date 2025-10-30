@@ -291,28 +291,6 @@ def mostrar_tabla_citas(
             padding=(1, 2)
         )
     )
-# ---------------------------------
-
-def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="data/medicos.csv"):
-    """
-    Enriquece las citas añadiendo nombres de pacientes y médicos desde archivos CSV.
-    
-    Args:
-        citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
-        ruta_pacientes (str): Ruta al archivo CSV de pacientes.
-        ruta_medicos (str): Ruta al archivo CSV de médicos.
-    Returns:
-        List[Dict[str, str]]: Lista de citas enriquecidas con nombres.
-        
-    """
-    pacientes = cargar_csv_simple(ruta_pacientes)
-    medicos = cargar_csv_simple(ruta_medicos)
-    map_p = {p.get("id_paciente") or p.get("id") or p.get("documento"): p.get("nombre") or p.get("nombres") for p in pacientes}
-    map_m = {m.get("id_medico") or m.get("id") or m.get("documento"): m.get("nombre") or m.get("nombres") for m in medicos}
-    for c in citas:
-        c["paciente_nombre"] = map_p.get(c.get("id_paciente") or c.get("documento_paciente"), c.get("id_paciente") or c.get("documento_paciente"))
-        c["medico_nombre"] = map_m.get(c.get("id_medico") or c.get("documento_medico"), c.get("id_medico") or c.get("documento_medico"))
-    return citas
 
 # ---------------------------------
 # CALENDARIO INTERACTIVO
@@ -448,7 +426,6 @@ def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
     fecha = f"{año:04d}-{mes:02d}-{dia:02d}"
     citas = cargar_json(ruta_citas)
     citas_dia = [c for c in citas if c.get("fecha") == fecha]
-    citas_dia = enriquecer_citas(citas_dia)
     limpiar()
     if not citas_dia:
         console.print(f"[yellow]No hay citas para el {fecha}[/yellow]")
