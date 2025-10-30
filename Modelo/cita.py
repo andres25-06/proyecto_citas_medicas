@@ -5,7 +5,10 @@ Módulo de Lógica de Negocio - Citas
 Contiene todas las funciones para gestionar las citas (CRUD).
 Este módulo utiliza 'gestor_datos' para la persistencia.
 """
-
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.prompt import Prompt
 from typing import Any, Dict, List, Optional
 
 from Controlador import gestor_datos_citas
@@ -94,7 +97,6 @@ def leer_todas_las_citas(filepath: str) -> List[Dict[str, Any]]:
 
 
 
-
 def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[Dict[str, Any]]:
     """
         Busca una cita específica por su documento.
@@ -110,66 +112,105 @@ def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[Di
     return [c for c in citas if c.get('documento_paciente') == documento_paciente]
 
 
-def actualizar_cita(
-        filepath: str,
-        documento: str,
-        datos_nuevos: Dict[str, Any]
-) -> Optional[Dict[str, Any]]:
+def actualizar_cita(filepath: str, id_cita: str, datos_nuevos: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
-        (UPDATE) Modifica los datos de una cita existente.
+    (UPDATE) Actualiza los datos de una cita existente.
 
-        Args:
-            filepath (str): Ruta al archivo de datos.
-            id_cita (str): El ID de la cita a actualizar.
-            datos_nuevos (Dict[str, Any]): Un diccionario con los campos a actualizar.
+    Args:
+        filepath (str): Ruta del archivo JSON con las citas.
+        id_cita (str): ID de la cita a actualizar.
+        datos_nuevos (Dict[str, Any]): Campos que se actualizarán.
 
-        Returns:
-            Optional[Dict[str, Any]]: El diccionario de la cita actualizada, o None si no se encontró.
+    Returns:
+        Optional[Dict[str, Any]]: Cita actualizada o None si no se encontró.
     """
+    # ✅ CORRECCIÓN 1: Eliminar la importación incorrecta de aquí
+    # Ya está importado al inicio del archivo
+    
     citas = gestor_datos_citas.cargar_datos(filepath)
     cita_encontrada = None
     indice = -1
 
-    for i, cita in enumerate(citas):
-        if cita.get('documento') == documento:
-            cita_encontrada = cita
+    for i, c in enumerate(citas):
+        # ✅ CORRECCIÓN 2: Cambiar 'id_cita' por 'id'
+        if c.get('id') == id_cita:
+            cita_encontrada = c
             indice = i
             break
 
-    if cita_encontrada:
-        # Convertimos todos los nuevos valores a string para consistencia
-        for key, value in datos_nuevos.items():
-            datos_nuevos[key] = str(value)
+    if cita_encontrada is None:
+        return None
+    
+    cita_encontrada.update(datos_nuevos)
+    citas[indice] = cita_encontrada
 
-        cita_encontrada.update(datos_nuevos)
-        citas[indice] = cita_encontrada
-        gestor_datos_citas.guardar_datos(filepath, citas)
-        return cita_encontrada
+    gestor_datos_citas.guardar_datos(filepath, citas)
+    return cita_encontrada
 
-    return None
-
-
+console = Console()
 def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     """
-        Elimina todas las citas asociadas a un documento de paciente.
+    Permite eliminar una cita específica de un paciente mostrando sus citas en una tabla.
+    
+    Args:
+        filepath (str): Ruta del archivo de citas
+        documento (str): Documento del paciente
         
-        Args:
-            filepath (str): Ruta al archivo de citas
-            documento (str): Documento del paciente
-            
-        Returns:
-            bool: True si se eliminaron citas, False en caso contrario
+    Returns:
+        bool: True si se eliminó una cita, False si no se eliminó nada
     """
-    # Cargar todas las citas
+
     citas = gestor_datos_citas.cargar_datos(filepath)
 
-    # Filtrar las citas que NO corresponden al documento
-    citas_filtradas = [cita for cita in citas if cita.get('documento_paciente') != documento]
+    citas_paciente = [c for c in citas if c.get("documento_paciente") == documento]
 
-    # Verificar si se eliminó alguna cita
-    if len(citas) == len(citas_filtradas):
-        return False  # No se encontró ninguna cita con ese documento
+    if not citas_paciente:
+        console.print(Panel("[bold yellow]⚠️ No se encontraron citas asociadas a este documento.[/bold yellow]", border_style="yellow"))
+        return False
 
-    # Guardar las citas filtradas
-    gestor_datos_citas.guardar_datos(filepath, citas_filtradas)
+    table = Table(title="📅 Citas del paciente", show_lines=True, border_style="cyan")
+    table.add_column("N°", justify="center", style="bold cyan")
+    table.add_column("Fecha", justify="center")
+    table.add_column("Hora", justify="center")
+    table.add_column("Motivo", justify="left")
+    table.add_column("Estado", justify="center")
+
+    for i, cita in enumerate(citas_paciente, start=1):
+        table.add_row(
+            str(i),
+            cita.get("fecha", "N/A"),
+            cita.get("hora", "N/A"),
+            cita.get("motivo", "N/A"),
+            cita.get("estado", "Pendiente"),
+        )
+
+    console.print(table)
+
+    try:
+        opcion = int(Prompt.ask("\nIngrese el número de la cita que desea eliminar"))
+        if opcion < 1 or opcion > len(citas_paciente):
+            console.print("[bold red]❌ Opción no válida.[/bold red]")
+            return False
+    except ValueError:
+        console.print("[bold red]❌ Debe ingresar un número válido.[/bold red]")
+        return False
+
+    cita_a_eliminar = citas_paciente[opcion - 1]
+
+    console.print(Panel.fit(
+        f"¿Eliminar la cita del [bold cyan]{cita_a_eliminar.get('fecha', 'N/A')}[/bold cyan] a las [bold cyan]{cita_a_eliminar.get('hora', 'N/A')}[/bold cyan]?",
+        border_style="red"
+    ))
+
+    confirmacion = Prompt.ask("Escriba [bold red]S[/bold red] para confirmar o [bold yellow]N[/bold yellow] para cancelar").strip().lower()
+    if confirmacion != "s":
+        console.print("[yellow]Operación cancelada por el usuario.[/yellow]")
+        return False
+
+    citas.remove(cita_a_eliminar)
+    gestor_datos_citas.guardar_datos(filepath, citas)
+
+    console.print(Panel("[bold green]✅ Cita eliminada correctamente.[/bold green]", border_style="green"))
     return True
+
+
