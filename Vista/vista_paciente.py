@@ -4,17 +4,17 @@ Vista del Módulo de Pacientes con selector interactivo (flechas ↑ ↓).
 """
 
 import os
-import readchar
 import time
-from Modelo import paciente
+
+import readchar
 from rich.console import Console
 from rich.panel import Panel
+from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.table import Table
-from rich.prompt import Prompt, IntPrompt, Confirm
-from Vista.vista_principal import vista_principal 
-from Validaciones import validar_campos
-from Validaciones import entrada_datos
 
+from Modelo import paciente
+from Validaciones import entrada_datos, validar_campos
+from Vista import navegacion
 
 console = Console()
 
@@ -116,7 +116,7 @@ def elegir_almacenamiento() -> str:
     elif seleccion == 2:
         console.print("[bold red]↩ Regresando al menú principal...[/bold red]")
         time.sleep(1)
-        vista_principal()
+        navegacion.ir_a_menu_principal()
         return None
 
 
@@ -176,21 +176,21 @@ def selector_interactivo(titulo, opciones):
 # =========================================================
 def menu_crear_paciente(filepath: str):
     """
-    Entradas para registrar un nuevo paciente y guardar en el archivo.
-    
-    Args:
-        filepath (str): Ruta del archivo donde se guardarán los datos.
-    Returns:
-        None
+        Entradas para registrar un nuevo paciente y guardar en el archivo.
+        
+        Args:
+            filepath (str): Ruta del archivo donde se guardarán los datos.
+        Returns:
+            None
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]📝 Registrar Nuevo Paciente[/bold cyan]"))
 
     # --- Captura de datos con validaciones individuales ---
-    tipo_documento = solicitar_tipo_documento()    
+    tipo_documento = solicitar_tipo_documento()
     documento = validar_campos.validar_cedula("Número de Documento", filepath)
-    nombres = validar_campos.validar_texto("Nombres")
-    apellidos = validar_campos.validar_texto("Apellidos")
+    nombres = validar_campos.validar_texto("Nombres").capitalize()
+    apellidos = validar_campos.validar_texto("Apellidos").capitalize()
     direccion = validar_campos.validar_texto("Dirección")
     telefono = validar_campos.validar_telefono("Teléfono")
 
@@ -266,7 +266,7 @@ def menu_leer_pacientes(filepath: str):
 
 
 def menu_actualizar_paciente(filepath: str):
-    
+
     """
         Permite actualizar los datos de un paciente existente.
         
@@ -323,7 +323,7 @@ def menu_actualizar_paciente(filepath: str):
 
 
 def menu_eliminar_paciente(filepath: str):
-    
+
     """
         Permite eliminar un paciente existente.
         

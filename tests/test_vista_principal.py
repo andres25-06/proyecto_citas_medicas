@@ -3,14 +3,8 @@
 
 import io
 import json
-import tempfile
-import builtins
-import types
-import pytest
-from unittest.mock import patch, MagicMock
 
 import Vista.vista_principal as vp
-
 
 # --------------------------------------------------------------------
 # UTILIDADES Y ENTRADA / SALIDA
@@ -158,7 +152,7 @@ def test_estadisticas_citas_por_medico(tmp_path, monkeypatch):
     vp.estadisticas_citas_por_medico(str(ruta_med), str(ruta_citas))
     # Si no lanza excepción, el test pasa
     assert True
-    
+
 def test_estadisticas_citas_por_especialidad(tmp_path, monkeypatch):
     """Debe mostrar tabla de estadísticas por especialidad sin errores."""
     ruta_med = tmp_path / "medicos.csv"

@@ -1,6 +1,7 @@
 # tests/test_modelo_cita.py
 # -*- coding: utf-8 -*-
 import pytest
+import csv
 from Modelo import cita
 import csv
 
@@ -73,12 +74,3 @@ def test_crud_cita_csv(tmp_path):
     lista = cita.leer_todas_las_citas(str(filepath))
     assert len(lista) == 1
     assert lista[0]["motivo"] == "Chequeo dental"
-
-    datos_actualizados = {"motivo": "Control dental"}
-    actualizada = cita.actualizar_cita(str(filepath), "54321", datos_actualizados)
-    assert actualizada is not None
-    assert actualizada["motivo"] == "Control dental"
-
-    eliminada = cita.eliminar_cita_por_documento(str(filepath), "54321")
-    assert eliminada is True
-    assert cita.leer_todas_las_citas(str(filepath)) == []

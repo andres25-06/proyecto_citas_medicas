@@ -23,6 +23,8 @@ def inicializar_archivo(filepath: str) -> None:
 
         Args:
             filepath (str): La ruta completa al archivo de datos (e.g., 'data/.csv').
+        Returns:
+            Nones
     """
     directorio = os.path.dirname(filepath)
     if directorio and not os.path.exists(directorio):

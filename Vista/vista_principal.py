@@ -1,22 +1,26 @@
-# Vista/vista_principal.py 
+# Vista/vista_principal.py
 
-from collections import Counter
-from datetime import datetime
 import calendar
-import csv
 import json
 import os
 import re
 import time
+from collections import Counter
+from datetime import datetime
 
 import readchar
 from rich import box
 from rich.align import Align
+from rich.box import ROUNDED
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from rich.box import ROUNDED
+
+from Vista import navegacion
+from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
+
+
 
 # ---------------------------------
 # Inicialización
@@ -28,21 +32,17 @@ console = Console()
 # ---------------------------------
 
 def limpiar():
-    """
-        Está función limpia la consola dependiendo del sistema operativo.
-        
+    """ Está función limpia la consola dependiendo del sistema operativo.
         Args:
             none    
         Returns:
-            none
-    """
+            none"""
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def animacion_carga(mensaje="Cargando..."):
     """
         Pequeña animación (usa Rich progress internamente simple).
-        
         Args:
             mensaje (str): Mensaje a mostrar durante la animación.
         Returns:
@@ -60,7 +60,6 @@ def animacion_carga(mensaje="Cargando..."):
 def escribir_mensaje(texto, velocidad=0.01, color="magenta"):
     """
         Efecto typing sencillo.
-        
         Args:
             texto (str): Texto a mostrar con efecto typing.
             velocidad (float): Tiempo de espera entre caracteres.
@@ -83,8 +82,7 @@ def escribir_mensaje(texto, velocidad=0.01, color="magenta"):
 
 def cargar_json(ruta):
     """
-        Carga un archivo JSON y retorna su contenido.
-        
+        Carga un archivo JSON y retorna su contenido
         Args:
             ruta (str): Ruta al archivo JSON.
         Returns:
@@ -102,7 +100,6 @@ def cargar_json(ruta):
 def guardar_json(ruta, datos):
     """
         Escribe datos en un archivo JSON.
-        
         Args:
             ruta (str): Ruta al archivo JSON.
             datos (any): Datos a escribir en el archivo.
@@ -114,10 +111,9 @@ def guardar_json(ruta, datos):
 
 
 def cargar_csv_simple(ruta):
-    
+
     """
         Carga CSV simple asumiendo encabezado en la primera línea y comas como separador.
-        
         Args:
             ruta (str): Ruta al archivo CSV.
         Returns:
@@ -143,7 +139,6 @@ def cargar_csv_simple(ruta):
 def mostrar_tabla_citas(citas, titulo="Citas"):
     """
         Estructura y muestra una tabla de citas médicas usando Rich.
-        
         Args:
             citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
             titulo (str): Título de la tabla.
@@ -173,15 +168,18 @@ def mostrar_tabla_citas(citas, titulo="Citas"):
 # ---------------------------------
 def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
     """
-    Muestra una tabla genérica con Rich.
-
-    Args:
-        lista (List[Dict[str, str]]): Datos a mostrar.
-        columnas (List[str]): Nombres de las columnas.
-        titulo (str): Título de la tabla.
+        Muestra una tabla genérica con Rich.
+        Args:
+            lista (List[Dict[str, str]]): Datos a mostrar.
+            columnas (List[str]): Nombres de las columnas.
+            titulo (str): Título de la tabla.
+        Returns:
+            none
     """
     if not lista:
-        console.print(Panel("[bold red]⚠ No hay datos para mostrar.[/bold red]", border_style="red"))
+        console.print(Panel
+                    ("[bold red]⚠ No hay datos para mostrar.[/bold red]", border_style="red")
+                    )
         return
 
     tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE_HEAVY, border_style="cyan")
@@ -191,7 +189,6 @@ def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
     for item in lista:
         fila = [str(item.get(col.lower(), "")) for col in columnas]
         tabla.add_row(*fila)
-
     console.print(tabla)
 
 
@@ -201,7 +198,6 @@ def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
 def buscador(lista, campo, termino):
     """
     Realiza una búsqueda simple (case insensitive).
-
     Args:
         lista (List[Dict[str, str]]): Lista de registros.
         campo (str): Campo donde buscar.
@@ -223,15 +219,27 @@ def mostrar_tabla_citas(
     titulo="📋 Lista de Citas"
 ):
     """
-    Muestra las citas médicas con formato visual enriquecido.
+        Muestra las citas médicas con formato visual enriquecido.
+        Args:
+            citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
+            ruta_pacientes (str): Ruta al archivo CSV de pacientes.
+            ruta_medicos (str): Ruta al archivo CSV de médicos.
+            titulo (str): Título de la tabla.
+        Returns:
+            none
     """
-    from Vista.vista_cita import cargar_datos, obtener_nombre_por_documento  # evita import circular
+    from Vista.vista_cita import (  # evita import circular
+        cargar_datos,
+        obtener_nombre_por_documento,
+    )
 
     pacientes = cargar_datos(ruta_pacientes)
     medicos = cargar_datos(ruta_medicos)
 
     if not citas:
-        console.print(Panel("[bold red]⚠ No hay citas registradas.[/bold red]", border_style="red"))
+        console.print(Panel
+                    ("[bold red]⚠ No hay citas registradas.[/bold red]", border_style="red")
+                    )
         return
 
     tabla = Table(
@@ -291,10 +299,10 @@ def mostrar_tabla_citas(
     )
 # ---------------------------------
 
-def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="data/medicos.csv"):
+def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv",
+                    ruta_medicos="data/medicos.csv"):
     """
     Enriquece las citas añadiendo nombres de pacientes y médicos desde archivos CSV.
-    
     Args:
         citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
         ruta_pacientes (str): Ruta al archivo CSV de pacientes.
@@ -305,11 +313,16 @@ def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="d
     """
     pacientes = cargar_csv_simple(ruta_pacientes)
     medicos = cargar_csv_simple(ruta_medicos)
-    map_p = {p.get("id_paciente") or p.get("id") or p.get("documento"): p.get("nombre") or p.get("nombres") for p in pacientes}
-    map_m = {m.get("id_medico") or m.get("id") or m.get("documento"): m.get("nombre") or m.get("nombres") for m in medicos}
+    map_p = {p.get("id_paciente") or p.get("id") or p.get("documento"):
+            p.get("nombre") or p.get("nombres") for p in pacientes}
+    map_m = {m.get("id_medico") or m.get("id") or m.get("documento"):
+            m.get("nombre") or m.get("nombres") for m in medicos}
     for c in citas:
-        c["paciente_nombre"] = map_p.get(c.get("id_paciente") or c.get("documento_paciente"), c.get("id_paciente") or c.get("documento_paciente"))
-        c["medico_nombre"] = map_m.get(c.get("id_medico") or c.get("documento_medico"), c.get("id_medico") or c.get("documento_medico"))
+        c["paciente_nombre"] = map_p.get(c.get("id_paciente") or c.get("documento_paciente"),
+                                        c.get("id_paciente") or c.get("documento_paciente"))
+        c["medico_nombre"] = map_m.get(c.get("id_medico") or c.get("documento_medico"),
+                                    c.get("id_medico") or c.get("documento_medico"))
+
     return citas
 
 # ---------------------------------
@@ -319,7 +332,6 @@ def enriquecer_citas(citas, ruta_pacientes="data/pacientes.csv", ruta_medicos="d
 def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
     """
         Estructura y muestra un calendario interactivo de citas médicas.
-        
         Args:
             ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
         Returns:
@@ -362,13 +374,12 @@ def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
             for dia in semana:
                 if dia == 0:
                     linea += "    "
+                elif dia == hoy.day and mes == hoy.month and año == hoy.year:
+                    linea += f"[white on bright_green]{dia:2d}[/white on bright_green]  "
+                elif dia in dias_citas:
+                    linea += f"[bold bright_red]{dia:2d}[/bold bright_red]  "
                 else:
-                    if dia == hoy.day and mes == hoy.month and año == hoy.year:
-                        linea += f"[white on bright_green]{dia:2d}[/white on bright_green]  "
-                    elif dia in dias_citas:
-                        linea += f"[bold bright_red]{dia:2d}[/bold bright_red]  "
-                    else:
-                        linea += f"[white]{dia:2d}[/white]  "
+                    linea += f"[white]{dia:2d}[/white]  "
             console.print(Align.center(linea))
 
         controles = (
@@ -409,7 +420,9 @@ def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
 
         elif tecla.lower() == 's':
             limpiar()
-            console.print(Panel("[bold magenta]📊 Mostrando estadísticas de citas por médico...[/bold magenta]", border_style="magenta"))
+            console.print(Panel(
+            "[bold magenta]📊 Mostrando estadísticas de citas por médico...[/bold magenta]",
+            border_style="magenta"))
             estadisticas_citas_por_medico()
             console.input("\n[cyan]Presiona Enter para volver[/cyan]")
 
@@ -433,7 +446,6 @@ def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
 def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
     """
         Estructura y muestra las citas de un día específico, permitiendo cancelar.
-        
         Args:
             año (int): Año de la fecha a mostrar.
             mes (int): Mes de la fecha a mostrar.
@@ -454,8 +466,12 @@ def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
         return
 
     mostrar_tabla_citas(citas_dia, titulo=f"Citas del {fecha}")
-    console.print("\n[c]Acciones:[/c] [cyan]id_cita[/cyan] para cancelar, Enter para volver.")
-    opcion = console.input("[cyan]Ingrese ID de cita a cancelar (o Enter): [/cyan]").strip()
+    console.print(
+        "\n[c]Acciones:[/c] [cyan]id_cita[/cyan] para cancelar, Enter para volver."
+        )
+    opcion = console.input(
+        "[cyan]Ingrese ID de cita a cancelar (o Enter): [/cyan]"
+        ).strip()
     if opcion == "":
         return
 
@@ -474,55 +490,15 @@ def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
 # ESTADÍSTICAS
 # ---------------------------------
 
-def estadisticas_citas_por_medico(ruta_medicos="data/medicos.csv", ruta_citas="data/citas.json"):
-    """
-        Estructura y muestra estadísticas de citas por médico.
-        
-        Args:
-            ruta_medicos (str): Ruta al archivo CSV de médicos.
-            ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
-        Returns:
-            none
-            
-    """
-    medicos = cargar_csv_simple(ruta_medicos)
-    citas = cargar_json(ruta_citas)
+from collections import Counter, defaultdict
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.text import Text
+from rich.box import ROUNDED
 
-    contador = Counter([c.get("documento_medico") or c.get("id_medico") for c in citas])
+console = Console()
 
-    titulo = Text("📊 Estadísticas de Citas por Médico", style="bold cyan")
-    console.print(Panel(titulo, border_style="cyan", box=ROUNDED, padding=(0, 2)))
-
-    tabla = Table(
-        show_lines=True,
-        box=ROUNDED,
-        header_style="bold white on blue",
-        title_style="bold cyan",
-        pad_edge=False
-    )
-    tabla.add_column("🩺 Médico", justify="left", style="bold white")
-    tabla.add_column("💼 Especialidad", justify="left", style="white")
-    tabla.add_column("📅 Total Citas", justify="center", style="bold yellow")
-
-    for m in medicos:
-        id_medico = str(m.get("documento") or m.get("id") or "")
-        nombre = f"{m.get('nombres', '')} {m.get('apellidos', '')}".strip() or "Desconocido"
-        especialidad = m.get("especialidad", "—")
-        total = contador.get(id_medico, 0)
-
-        color_citas = "green" if total > 0 else "dim"
-        tabla.add_row(nombre, especialidad, f"[{color_citas}]{total}[/{color_citas}]")
-
-    panel = Panel(
-        tabla,
-        title="[bold cyan]Resumen General[/bold cyan]",
-        border_style="blue",
-        box=ROUNDED,
-        padding=(1, 2)
-    )
-    console.print(panel, justify="left")
-    console.print("\n[dim cyan]Presiona Enter para volver...[/dim cyan]")
-    console.input()
 
 # ---------------------------------
 # SELECTOR INTERACTIVO
@@ -531,7 +507,6 @@ def estadisticas_citas_por_medico(ruta_medicos="data/medicos.csv", ruta_citas="d
 def selector_interactivo(titulo, opciones):
     """
         Estructura un selector interactivo usando readchar.
-        
         Args:
             titulo (str): Título del menú.
             opciones (List[str]): Lista de opciones a mostrar.
@@ -566,7 +541,6 @@ def selector_interactivo(titulo, opciones):
 def mostrar_menu_simple():
     """
         Estructura y muestra un menú simple por consola.
-        
         Args:   
             none
         Returns:
@@ -576,24 +550,37 @@ def mostrar_menu_simple():
     limpiar()
 
     opciones_tabla = Table(show_header=False, box=box.SIMPLE_HEAVY)
-    opciones_tabla.add_row("[bold green][1][/bold green] 👤 Gestionar Pacientes")
-    opciones_tabla.add_row("[bold green][2][/bold green] 🩺 Gestionar Médicos")
-    opciones_tabla.add_row("[bold green][3][/bold green] 📅 Agendar / Ver Citas")
-    opciones_tabla.add_row("[bold green][4][/bold green] 📊 Ver Calendario de Citas (Inter.)")
-    opciones_tabla.add_row("[bold green][5][/bold green] 📈 Estadísticas por médico")
-    opciones_tabla.add_row("[/] [bold red][0][/bold red] 🚪 Salir")
+    opciones_tabla.add_row(
+        "[bold green][1][/bold green] 👤 Gestionar Pacientes"
+        )
+    opciones_tabla.add_row(
+        "[bold green][2][/bold green] 🩺 Gestionar Médicos"
+        )
+    opciones_tabla.add_row(
+        "[bold green][3][/bold green] 📅 Agendar / Ver Citas"
+        )
+    opciones_tabla.add_row(
+        "[bold green][4][/bold green] 📊 Ver Calendario de Citas (Inter.)"
+        )
+    opciones_tabla.add_row(
+        "[bold green][5][/bold green] 📈 Estadísticas por médico"
+        )
+    opciones_tabla.add_row(
+        "[/] [bold red][0][/bold red] 🚪 Salir"
+        )
 
     console.print(opciones_tabla)
     console.print("[yellow]───────────────────────────────────────────────[/yellow]")
 
-    opcion = console.input("[bold cyan]Seleccione una opción (o use flechas con Enter): [/bold cyan]")
+    opcion = console.input(
+        "[bold cyan]Seleccione una opción (o use flechas con Enter): [/bold cyan]"
+        )
     return opcion
 
 
 def vista_principal():
     """
         Estructura y maneja el menú principal interactivo del sistema de citas médicas.
-        
         Args:
             none
         Returns:
@@ -612,7 +599,9 @@ def vista_principal():
     while True:
         try:
             indice = selector_interactivo(
-                "BIENVENIDO AL SISTEMA DE CITAS MÉDICAS\n🏥 Menú Principal (usa ↑ ↓ + Enter \npara navegar dentro de las opciones)",
+                "BIENVENIDO AL SISTEMA DE CITAS MÉDICAS"
+                "\n🏥 Menú Principal"
+                "\n(usa ↑ ↓ + Enter \npara navegar dentro de las opciones)",
                 opciones
             )
         except Exception:
@@ -629,43 +618,50 @@ def vista_principal():
         if indice == 0:
             animacion_carga("Abriendo módulo de pacientes...")
             try:
-                from Vista.vista_paciente import main_vista_pacientes
-                main_vista_pacientes()
+                navegacion.ir_a_menu_pacientes()
             except Exception as e:
-                console.print(f"[red]Error al cargar módulo de pacientes:[/red] {e}")
+                console.log(e)
+                console.print(
+                    f"[red]Error al cargar módulo de pacientes:[/red] {e}"
+                    )
                 console.input("Enter para volver...")
-
         elif indice == 1:
             animacion_carga("Abriendo módulo de médicos...")
             try:
-                from Vista.vista_medico import main_vista_medicos
-                main_vista_medicos()
-            except Exception:
-                console.print("[yellow]Módulo de médicos no encontrado. (Placeholder)[/yellow]")
+                navegacion.ir_a_menu_medicos()
+            except Exception as e:  
+                console.log(e)
+                console.print(
+                            "[yellow]Módulo de médicos no encontrado. "
+                            "(Placeholder)[/yellow]"
+                            )
                 console.input("Enter para volver...")
-
         elif indice == 2:
             animacion_carga("Abriendo módulo de citas...")
             try:
-                from Vista import vista_cita
-                vista_cita.main_vista_citas()
-            except Exception:
-                console.print("[yellow]Módulo de citas no encontrado. (Placeholder)[/yellow]")
+                navegacion.ir_a_menu_citas()
+            except Exception as e:
+                console.log(e)
+                console.print(
+                    "[yellow]Módulo de citas no encontrado. "
+                    "(Placeholder)[/yellow]"
+                    )
                 console.input("Enter para volver...")
-
-        elif indice == 3:
+        elif indice==3:
             mostrar_calendario_interactivo()
-
-        elif indice == 4:
+            
+        elif indice==4:
             estadisticas_citas_por_medico()
-
-        elif indice == 5:
-            console.print("\n[bold red]Saliendo del sistema...[/bold red]")
+        elif indice==5:
+            console.print(
+                "\n[bold red]Saliendo del sistema...[/bold red]"
+                )
             time.sleep(0.8)
             break
-
         else:
-            console.print("[bold red]Opción no válida.[/bold red]")
+            console.print(
+                "[bold red]Opción no válida.[/bold red]"
+                )
             time.sleep(0.6)
 
 # ---------------------------------
