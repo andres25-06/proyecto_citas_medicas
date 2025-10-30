@@ -168,7 +168,7 @@ def eliminar_paciente(filepath: str, documento: str) -> bool:
 
     # Eliminarlo si existe
     if paciente_a_eliminar:
-        pacientes.remove(paciente_a_eliminar)  
+        pacientes.remove(paciente_a_eliminar)
         gestor_datos_pacientes.guardar_datos(filepath, pacientes)
         return True
 
