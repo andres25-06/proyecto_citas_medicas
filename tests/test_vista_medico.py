@@ -1,7 +1,9 @@
 # -- coding: utf-8 --
-import pytest
 import builtins
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from Vista import vista_medico
 
 

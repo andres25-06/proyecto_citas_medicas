@@ -4,9 +4,8 @@
 Pytest para la Vista del Módulo de Citas.
 Simula interacciones y valida el flujo general de las funciones.
 """
-import io
 import pytest
-import builtins
+
 from Vista import vista_cita
 
 
