@@ -450,15 +450,16 @@ def menu_leer_medicos(filepath: str):
 
     for m in medicos:
         tabla.add_row(
-            m.get('id', 'N/A'),
-            f"{m.get('nombres', '')} {m.get('apellidos', '')}",
-            m.get('especialidad', 'N/A'),
-            m.get('telefono', 'N/A'),
-            m.get('estado', 'N/A'),
-            m.get('consultorio', 'N/A'),
-        )
+        str(m.get('id', 'N/A')),
+        f"{m.get('nombres', '')} {m.get('apellidos', '')}",
+        str(m.get('especialidad', 'N/A')),
+        str(m.get('telefono', 'N/A')),
+        str(m.get('estado', 'N/A')),
+        str(m.get('consultorio', 'N/A')),
+    )
 
-    console.print(tabla)
+
+    console.print(tabla)    
     input("\nPresione Enter para continuar...")
 
 
@@ -647,7 +648,7 @@ def menu_eliminar_medico(filepath: str):
         Returns:        
             none
     """
-    console.print(Panel.fit("[bold cyan]🗑️❌ Eliminar Médico[/bold cyan]"))
+    console.print(Panel.fit("[bold cyan]🗑️ Eliminar Médico[/bold cyan]"))
     documento = Prompt.ask("[bold yellow]Ingrese el documento del médico a eliminar[/bold yellow]")
 
     medico_encontrado = medico.buscar_medico_por_documento(filepath, str(documento))
@@ -689,12 +690,12 @@ def main_vista_medicos():
     console.print(f"\n[bold green]Usando archivo:[/bold green] {archivo}")
 
     opciones = [
-        "➕🩺 Registrar un nuevo médico",
-        "📄👨‍⚕️ Ver todos los médicos",
-        "✏️🩹 Actualizar datos de un médico",
+        "➕ Registrar un nuevo médico",
+        "📄 Ver todos los médicos",
+        "✏️  Actualizar datos de un médico",
         "🔎 Buscar médico",
-        "❌🗑️ Eliminar un médico",
-        "⬅️🔙 Volver al menú principal"
+        "❌ Eliminar un médico",
+        "⬅️ Volver al menú principal"
     ]
 
     while True:
