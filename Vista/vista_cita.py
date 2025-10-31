@@ -939,7 +939,7 @@ def main_vista_citas():
     titulo = "📅 MENÚ DE CITAS MÉDICAS"
     opciones = [
         "➕ Agendar cita",
-        "✏️ Actualizar cita",
+        "✏️  Actualizar cita",
         "❌ Cancelar cita",
         "📋 Ver todas las citas",
         "🔎 Buscar cita",
