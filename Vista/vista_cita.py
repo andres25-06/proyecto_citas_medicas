@@ -19,7 +19,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm, Prompt
 from rich.table import Table
+import readchar
+from rich.prompt import Confirm, IntPrompt, Prompt
 
+import navegacion
 from Vista.vista_principal import vista_principal
 from Validaciones import validar_campos
 from Validaciones import entrada_datos
