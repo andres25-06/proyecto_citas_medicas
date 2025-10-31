@@ -12,14 +12,18 @@ from rich.panel import Panel
 console = Console()
 
 
-def validar_documento_unico(documento: str, lista_registros: list, nombre_archivo: str) -> bool:
+def validar_documento_unico(
+    documento: str, lista_registros: list, nombre_archivo: str
+    ) -> bool:
     """
     Verifica si un documento ya está registrado en una lista de diccionarios.
 
     Args:
         documento (str): Documento a verificar.
-        lista_registros (list): Lista de registros cargados desde archivo (cada uno es un dict).
-        nombre_archivo (str): Nombre del módulo o tipo de registro (ej: 'Paciente', 'Médico').
+        lista_registros (list): Lista de registros cargados desde archivo
+        (cada uno es un dict).
+        nombre_archivo (str): Nombre del módulo o tipo de registro
+        (ej: 'Paciente', 'Médico').
 
     Returns:
         bool: True si el documento es único, False si ya existe.
@@ -27,14 +31,16 @@ def validar_documento_unico(documento: str, lista_registros: list, nombre_archiv
     for registro in lista_registros:
         if str(registro.get("documento", "")).strip() == str(documento).strip():
             console.print(Panel.fit(
-                f"[bold red]⚠️ El documento {documento} ya está registrado en {nombre_archivo}.[/bold red]",
+                f"[bold red]⚠️ El documento {documento} "
+                "ya está registrado en {nombre_archivo}.[/bold red]",
                 border_style="red"
             ))
             return False
     return True
 
 
-def validar_datos_relacion_obligatorios(datos: dict, campos_obligatorios: list, nombre_relacion: str):
+def validar_datos_relacion_obligatorios(
+    datos: dict, campos_obligatorios: list, nombre_relacion: str):
     """
     Comprueba que los campos requeridos de una relación (como cliente o médico)
     no estén vacíos o faltantes.
@@ -54,7 +60,8 @@ def validar_datos_relacion_obligatorios(datos: dict, campos_obligatorios: list, 
                       f"{', '.join(faltantes)}[/bold yellow]")
         return False
 
-    console.print(f"[bold green]✅ Todos los datos obligatorios del {nombre_relacion} están completos.[/bold green]")
+    console.print(f"[bold green]✅ Todos los datos obligatorios del {nombre_relacion} "
+                "están completos.[/bold green]")
     return True
 
 

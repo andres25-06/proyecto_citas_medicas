@@ -5,11 +5,12 @@ Módulo de Lógica de Negocio - Citas
 Contiene todas las funciones para gestionar las citas (CRUD).
 Este módulo utiliza 'gestor_datos' para la persistencia.
 """
+from typing import Any, Dict, List, Optional
+
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
 from rich.prompt import Prompt
-from typing import Any, Dict, List, Optional
+from rich.table import Table
 
 from Controlador import gestor_datos_citas
 
@@ -17,10 +18,8 @@ from Controlador import gestor_datos_citas
 def generar_id(citas: List[Dict[str, Any]]) -> int:
     """
     Genera un nuevo ID autoincremental para una cita.
-
         Args:
             citas (List[Dict[str, Any]]): La lista actual de las citas.
-            
         Returns:
             int: El nuevo ID a asignar.
     """
@@ -30,8 +29,7 @@ def generar_id(citas: List[Dict[str, Any]]) -> int:
     return max_id + 1
 
 
-def crear_cita(
-        filepath: str,
+def crear_cita(filepath: str,
         documento_paciente: str,
         documento_medico: str,
         fecha: str,
@@ -50,10 +48,12 @@ def crear_cita(
             documento_medico (str): Documento del médico.
             fecha (str): Fecha de la cita (YYYY-MM-DD).
             motivo (str): Motivo de la cita.
-            estado (str): Estado actual de la cita (ej. 'Pendiente', 'Completada', 'Cancelada').
+            estado (str): Estado actual de la cita
+            (ej. 'Pendiente', 'Completada', 'Cancelada').
 
         Returns:
-            Optional[Dict[str, Any]]: El diccionario de la cita creada o None si ya existía.
+            Optional[Dict[str, Any]]: El diccionario de
+            la cita creada o None si ya existía.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
 
@@ -63,7 +63,10 @@ def crear_cita(
             cita.get('documento_medico') == documento_medico and
             cita.get('fecha') == fecha ):
             cita.get('hora') == hora
-            print("\n Error: Ya existe una cita registrada para ese paciente, médico, fecha y hora.")
+            print(
+                "\n Error: Ya existe una cita registrada para ese paciente,"
+                "médico, fecha y hora."
+                )
             return None
 
     nuevo_id = generar_id(citas)
@@ -83,7 +86,9 @@ def crear_cita(
     return nueva_cita
 
 
-def leer_todas_las_citas(filepath: str) -> List[Dict[str, Any]]:
+def leer_todas_las_citas(filepath: str) -> List[
+    Dict[str, Any]
+    ]:
     """
         (READ) Obtiene la lista completa de las citas.
 
@@ -97,7 +102,9 @@ def leer_todas_las_citas(filepath: str) -> List[Dict[str, Any]]:
 
 
 
-def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[Dict[str, Any]]:
+def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[
+    Dict[str, Any]
+    ]:
     """
         Busca una cita específica por su documento.
 
@@ -106,13 +113,16 @@ def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[Di
             documento (str): documento de la cita a buscar.
 
         Returns:
-            Optional[Dict[str, Any]]: El diccionario de la cita si se encuentra, de lo contrario None.
+            Optional[Dict[str, Any]]: El diccionario de la cita si se encuentra
+            de lo contrario None.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
     return [c for c in citas if c.get('documento_paciente') == documento_paciente]
 
 
-def actualizar_cita(filepath: str, id_cita: str, datos_nuevos: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def actualizar_cita(
+    filepath: str, id_cita: str, datos_nuevos: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
     """
     (UPDATE) Actualiza los datos de una cita existente.
 
@@ -126,7 +136,6 @@ def actualizar_cita(filepath: str, id_cita: str, datos_nuevos: Dict[str, Any]) -
     """
     # ✅ CORRECCIÓN 1: Eliminar la importación incorrecta de aquí
     # Ya está importado al inicio del archivo
-    
     citas = gestor_datos_citas.cargar_datos(filepath)
     cita_encontrada = None
     indice = -1
@@ -140,7 +149,6 @@ def actualizar_cita(filepath: str, id_cita: str, datos_nuevos: Dict[str, Any]) -
 
     if cita_encontrada is None:
         return None
-    
     cita_encontrada.update(datos_nuevos)
     citas[indice] = cita_encontrada
 
@@ -150,12 +158,11 @@ def actualizar_cita(filepath: str, id_cita: str, datos_nuevos: Dict[str, Any]) -
 console = Console()
 def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     """
-    Permite eliminar una cita específica de un paciente mostrando sus citas en una tabla.
-    
+    Permite eliminar una cita específica de un
+    paciente mostrando sus citas en una tabla.
     Args:
         filepath (str): Ruta del archivo de citas
         documento (str): Documento del paciente
-        
     Returns:
         bool: True si se eliminó una cita, False si no se eliminó nada
     """
@@ -165,7 +172,10 @@ def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     citas_paciente = [c for c in citas if c.get("documento_paciente") == documento]
 
     if not citas_paciente:
-        console.print(Panel("[bold yellow]⚠️ No se encontraron citas asociadas a este documento.[/bold yellow]", border_style="yellow"))
+        console.print(Panel
+                    ("[bold yellow]⚠️ No se encontraron citas asociadas a este"
+                    "documento.[/bold yellow]",
+                    border_style="yellow"))
         return False
 
     table = Table(title="📅 Citas del paciente", show_lines=True, border_style="cyan")
@@ -198,11 +208,18 @@ def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     cita_a_eliminar = citas_paciente[opcion - 1]
 
     console.print(Panel.fit(
-        f"¿Eliminar la cita del [bold cyan]{cita_a_eliminar.get('fecha', 'N/A')}[/bold cyan] a las [bold cyan]{cita_a_eliminar.get('hora', 'N/A')}[/bold cyan]?",
+        f"¿Eliminar la cita del [bold cyan]{
+            cita_a_eliminar.get('fecha', 'N/A')
+            }[/bold cyan] a las [bold cyan]{
+            cita_a_eliminar.get('hora', 'N/A')
+            }[/bold cyan]?",
         border_style="red"
     ))
 
-    confirmacion = Prompt.ask("Escriba [bold red]S[/bold red] para confirmar o [bold yellow]N[/bold yellow] para cancelar").strip().lower()
+    confirmacion = Prompt.ask(
+        "Escriba [bold red]S[/bold red] para confirmar o [bold yellow]N[/bold yellow]"
+        "para cancelar"
+        ).strip().lower()
     if confirmacion != "s":
         console.print("[yellow]Operación cancelada por el usuario.[/yellow]")
         return False
@@ -210,7 +227,8 @@ def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     citas.remove(cita_a_eliminar)
     gestor_datos_citas.guardar_datos(filepath, citas)
 
-    console.print(Panel("[bold green]✅ Cita eliminada correctamente.[/bold green]", border_style="green"))
+    console.print(Panel("[bold green]✅ Cita eliminada correctamente.[/bold green]",
+                        border_style="green"))
     return True
 
 

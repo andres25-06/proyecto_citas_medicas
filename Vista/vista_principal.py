@@ -5,7 +5,6 @@ import json
 import os
 import re
 import time
-from collections import Counter
 from datetime import datetime
 
 import readchar
@@ -14,9 +13,9 @@ from rich.align import Align
 from rich.box import ROUNDED
 from rich.console import Console
 from rich.panel import Panel
+from rich.prompt import Confirm
 from rich.table import Table
 from rich.text import Text
-from rich.prompt import Confirm
 
 from Vista import navegacion
 from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
@@ -407,7 +406,6 @@ def mostrar_tabla_citas(
 # CALENDARIO INTERACTIVO
 # ---------------------------------
 
-import csv
 
 def mostrar_calendario_interactivo(ruta_citas="data/citas"):
     """
@@ -604,8 +602,8 @@ def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas"):
     console.print(tabla)
 
     console.print(
-        f"\n[cyan]Acciones:[/cyan] Ingrese [yellow]ID de cita[/yellow] para cancelar "
-        f"(se mostrará el origen), o [cyan]Enter[/cyan] para volver."
+        "\n[cyan]Acciones:[/cyan] Ingrese [yellow]ID de cita[/yellow] para cancelar "
+        "(se mostrará el origen), o [cyan]Enter[/cyan] para volver."
     )
     opcion = console.input("[cyan]Ingrese ID de cita a cancelar (o Enter): [/cyan]").strip()
 
@@ -653,7 +651,7 @@ def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas"):
     ))
 
     # Confirmar cancelación
-    if Confirm.ask(f"¿Está seguro de cancelar esta cita?", default=False):
+    if Confirm.ask("¿Está seguro de cancelar esta cita?", default=False):
         res = eliminar_cita_por_id(cita_seleccionada.get("id"), ruta_citas)
         eliminado_en = [k for k, v in res.items() if v]
         if eliminado_en:
@@ -804,7 +802,7 @@ def vista_principal():
                 console.input("Enter para volver...")
         elif indice == 3:
             mostrar_calendario_interactivo()
-            
+
         elif indice==4:
             animacion_carga("Abriendo módulo de estadísticas...")
             try:

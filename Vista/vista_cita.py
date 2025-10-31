@@ -9,23 +9,17 @@ import datetime
 import json
 import os
 import time
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 import readchar
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, Prompt, IntPrompt
-from rich.table import Table
-import readchar
 from rich.prompt import Confirm, IntPrompt, Prompt
-from Vista import navegacion
+from rich.table import Table
 
 from Modelo import cita, medico, paciente
 from Validaciones import entrada_datos, validar_campos
 from Vista import navegacion
-
-from Validaciones import validar_campos
-from Validaciones import entrada_datos
 
 console = Console()
 
@@ -41,7 +35,6 @@ NOMBRE_ARCHIVO_JSON = 'citas.json'
 def limpiar():
     """
     Está función limpia la consola para mejorar la legibilidad.
-    
     Args:
         none
     Returns:
@@ -53,7 +46,6 @@ def limpiar():
 def elegir_almacenamiento() -> Optional[str]:
     """
     Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo.
-    
     Args:
         none
     Returns:    
@@ -88,7 +80,6 @@ def elegir_almacenamiento() -> Optional[str]:
 def selector_interactivo(titulo: str, opciones: List[str]) -> int:
     """ 
     Permite moverse con flechas ↑ ↓ y seleccionar con Enter.
-
     Args:
         titulo (str): Título del menú.
         opciones (List[str]): Lista de opciones del menú.
@@ -120,7 +111,6 @@ def mostrar_calendario(anio: int, mes: int, dia_actual: int):
     """
     Muestra el calendario del mes con el día seleccionado resaltado.
     Los días pasados se muestran en gris.
-    
     Args:
         anio (int): Año del calendario.
         mes (int): Mes del calendario.
@@ -160,7 +150,6 @@ def seleccionar_fecha() -> Optional[str]:
     """
     Selector interactivo de fecha con movimiento entre días.
     No permite seleccionar fechas anteriores al día actual.
-    
     Args:
         none
     Returns:
@@ -229,7 +218,6 @@ def seleccionar_fecha() -> Optional[str]:
 def calendario() -> Optional[str]:
     """
     Menú para seleccionar fecha y hora de la cita.
-    
     Args:
         none
     Returns:
@@ -252,7 +240,6 @@ def calendario() -> Optional[str]:
 def estado_cita(permitir_vacio: bool = False) -> Optional[str]:
     """
     Permite seleccionar el estado de la cita (Completada, Pendiente o Cancelada) usando un selector interactivo.
-
     Args:
         permitir_vacio (bool): Si es True, permite dejar el estado sin cambiar.
     Returns:
@@ -301,7 +288,6 @@ def estado_cita(permitir_vacio: bool = False) -> Optional[str]:
 def cargar_datos(ruta: str) -> List[Dict[str, Any]]:
     """
     Carga datos desde un archivo CSV o JSON.
-    
     Args:
         ruta (str): Ruta al archivo.
     Returns:
@@ -309,7 +295,7 @@ def cargar_datos(ruta: str) -> List[Dict[str, Any]]:
     """
     if not os.path.exists(ruta):
         return []
-    
+
     try:
         if ruta.endswith('.json'):
             with open(ruta, 'r', encoding='utf-8') as f:
@@ -325,7 +311,6 @@ def cargar_datos(ruta: str) -> List[Dict[str, Any]]:
 def leer_datos_archivo(filepath: str) -> List[Dict[str, Any]]:
     """
     Lee datos desde un archivo JSON o CSV y devuelve una lista de diccionarios.
-    
     Args:
         filepath (str): Ruta al archivo de datos.
     Returns:
@@ -352,7 +337,8 @@ def cargar_medicos_y_pacientes():
     """
     Carga médicos y pacientes desde JSON o CSV.
     Intenta primero JSON, luego CSV.
-    
+    Args:
+        none
     Returns:
         tuple: (lista_pacientes, lista_medicos)
     """
@@ -363,14 +349,14 @@ def cargar_medicos_y_pacientes():
             pacientes = paciente.leer_todos_los_pacientes("data/pacientes.json")
     except Exception:
         pass
-    
+
     if not pacientes:
         try:
             if os.path.exists("data/pacientes.csv"):
                 pacientes = paciente.leer_todos_los_pacientes("data/pacientes.csv")
         except Exception:
             pass
-    
+
     # Cargar médicos
     medicos = []
     try:
@@ -378,14 +364,14 @@ def cargar_medicos_y_pacientes():
             medicos = medico.leer_todos_los_medicos("data/medicos.json")
     except Exception:
         pass
-    
+
     if not medicos:
         try:
             if os.path.exists("data/medicos.csv"):
                 medicos = medico.leer_todos_los_medicos("data/medicos.csv")
         except Exception:
             pass
-    
+
     return pacientes, medicos
 
 
@@ -395,7 +381,6 @@ def cargar_medicos_y_pacientes():
 def obtener_nombre_completo_por_documento(filepath: str, documento: str, tipo: str) -> str:
     """
     Devuelve el nombre completo de un paciente o médico según su documento.
-
     Args:
         filepath (str): Ruta al archivo de datos (JSON o CSV).
         documento (str): Documento del paciente o médico.
@@ -440,7 +425,6 @@ def obtener_nombre_por_documento(filepath_base: str, documento: str) -> str:
     """
     Busca el nombre completo de una persona (paciente o médico)
     por su documento en archivos JSON o CSV (busca en ambos si existen).
-
     Args:
         filepath_base (str): Ruta base sin extensión o con extensión (.json o .csv)
         documento (str): Documento a buscar
@@ -498,7 +482,6 @@ def obtener_nombre_por_documento(filepath_base: str, documento: str) -> str:
 def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list):
     """
     Menú para agendar una nueva cita médica.
-
     Args:
         filepath (str): Ruta del archivo donde se almacenan las citas.
         lista_pacientes (list): Lista de pacientes registrados.
@@ -512,12 +495,12 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
     # --- Solicitar datos con validaciones ---
     documento_paciente = validar_campos.validar_cedula("Documento del Paciente", filepath)
     documento_medico = validar_campos.validar_cedula("Documento del Médico", filepath)
-    
+
     fecha = calendario()
     if fecha is None:
         input("\nPresione Enter para continuar...")
         return
-    hora = validar_campos.validar_hora("[bold yellow]⏰ Ingresa la hora (HH:MM): [/bold yellow]")
+    hora = validar_campos.validar_hora(" la hora ")
     motivo = validar_campos.validar_texto("Motivo de la consulta")
     estado = estado_cita()
 
@@ -539,10 +522,10 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
         if doc == str(documento_medico).strip():
             medico_encontrado = m
             break
-    
+
     if medico_encontrado:
         estado_medico = str(medico_encontrado.get("estado", "")).strip()
-        
+
         if estado_medico.lower() == "inactivo":
             console.print(Panel(
                 f"⚠️ El médico está INACTIVO y no puede atender citas.\n\n"
@@ -599,10 +582,7 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
         # 🔹 Mostrar actualización de estadísticas sin romper el flujo
         try:
             from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
-            console.print("\n[cyan]📊 Actualizando estadísticas médicas...[/cyan]")
             estadisticas_citas_por_medico(
-                ruta_medicos="data/medicos.csv",
-                ruta_citas="data/citas.json",
                 mostrar=False
             )
         except Exception as e:
@@ -619,7 +599,6 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
 def menu_actualizar_cita(filepath: str):
     """
     Menú para actualizar datos de una cita existente.
-    
     Args:
         filepath (str): Ruta del archivo donde se almacenan las citas.
     Returns:
@@ -690,11 +669,11 @@ def menu_actualizar_cita(filepath: str):
 
     if Confirm.ask("¿Desea guardar los cambios?", default=True):
         cita_actualizada = cita.actualizar_cita(
-            filepath, 
-            cita_actual.get("id"), 
+            filepath,
+            cita_actual.get("id"),
             datos_nuevos
         )
-        
+
         if cita_actualizada:
             console.print(Panel("[bold green]✅ ¡Cita actualizada con éxito![/bold green]", border_style="green"))
         else:
@@ -708,7 +687,6 @@ def menu_actualizar_cita(filepath: str):
 def menu_cancelar_cita(filepath: str):
     """
     Menú para cancelar todas las citas de un paciente según su documento.
-    
     Args:
         filepath (str): Ruta del archivo donde se almacenan las citas.
     Returns:
@@ -732,7 +710,9 @@ def menu_cancelar_cita(filepath: str):
 
             # 🔹 Actualizar estadísticas automáticamente
             try:
-                from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
+                from Vista.vista_estadisticas_medico import (
+                    estadisticas_citas_por_medico,
+                )
                 console.print("\n[cyan]📊 Actualizando estadísticas de médicos...[/cyan]")
                 estadisticas_citas_por_medico(
                     ruta_medicos="data/medicos.csv",
@@ -753,7 +733,6 @@ def menu_cancelar_cita(filepath: str):
 def menu_ver_todas_citas(filepath: str):
     """
     Muestra todas las citas médicas registradas.
-    
     Args:
         filepath (str): La ruta al archivo donde se almacenan las citas.
     Returns:
@@ -805,7 +784,6 @@ def menu_ver_todas_citas(filepath: str):
 def buscar_cita_por_documento(citas: List[Dict[str, Any]], documento: str) -> List[Dict[str, Any]]:
     """
     Busca todas las citas asociadas a un documento de paciente.
-    
     Args:
         citas (List[Dict[str, Any]]): Lista de todas las citas.
         documento (str): Documento del paciente a buscar.
@@ -827,7 +805,6 @@ def buscar_cita_por_documento(citas: List[Dict[str, Any]], documento: str) -> Li
 def menu_buscar_cita_por_documento(filepath: str):
     """
     Permite buscar y mostrar las citas de un paciente por su documento.
-    
     Args:
         filepath (str): Ruta del archivo donde se almacenan las citas.
     Returns:
@@ -877,7 +854,6 @@ def menu_buscar_cita_por_documento(filepath: str):
 def mostrar_menu_citas():
     """
     Muestra el menú principal del módulo de citas.
-    
     Args:
         none
     Returns:
@@ -923,7 +899,6 @@ def mostrar_menu_citas():
 def main_vista_citas():
     """
     Función principal para manejar el menú de citas médicas.
-    
     Args:
         none
     Returns:

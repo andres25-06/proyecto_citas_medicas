@@ -60,7 +60,10 @@ def crear_medico(
 
     # --- Validar duplicado ---
     if any(m.get('documento') == str_documento for m in medicos):
-        print(f"\n[bold red]⚠ Error:[/bold red] El documento '{str_documento}' ya se encuentra registrado.")
+        print(
+            f"\n[bold red]⚠ Error:[/bold red] El documento '{str_documento}'"
+            "ya se encuentra registrado."
+            )
         return None
 
     # --- Generar nuevo ID ---
@@ -84,7 +87,9 @@ def crear_medico(
 
     return nuevo_medico
 
-def leer_todos_los_medicos(filepath: str) -> List[Dict[str, Any]]:
+def leer_todos_los_medicos(filepath: str) -> List[
+    Dict[str, Any]
+    ]:
     """
         (READ) Obtiene la lista completa de los médicos.
 
@@ -97,7 +102,9 @@ def leer_todos_los_medicos(filepath: str) -> List[Dict[str, Any]]:
     return gestor_datos_medico.cargar_datos(filepath)
 
 
-def buscar_medico_por_documento(filepath: str, documento: str) -> Optional[Dict[str, Any]]:
+def buscar_medico_por_documento(filepath: str, documento: str) -> Optional[
+    Dict[str, Any]
+    ]:
     """
         (READ) Busca un médico por su número de documento.
 
@@ -115,7 +122,10 @@ def buscar_medico_por_documento(filepath: str, documento: str) -> Optional[Dict[
     return None
 
 
-def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[
+    str, Any]) -> Optional[
+    Dict[str, Any]
+    ]:
     """
         (UPDATE) Actualiza los datos de un médico existente.
 
@@ -139,11 +149,11 @@ def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any
 
     if medico_encontrado:
         campos_permitidos = [
-            'nombres', 
-            'apellidos', 
-            'especialidad', 
-            'telefono', 
-            'estado', 
+            'nombres',
+            'apellidos',
+            'especialidad',
+            'telefono',
+            'estado',
             'consultorio',
             'tipo_documento'
         ]
@@ -152,7 +162,8 @@ def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any
             if key in campos_permitidos:
                 medico_encontrado[key] = str(value)
             else:
-                print(f"⚠️ Advertencia: El campo '{key}' no está permitido para actualización.")
+                print(f"⚠️ Advertencia: El campo '{key}' "
+                    "no está permitido para actualización.")
 
         medicos[indice] = medico_encontrado
         gestor_datos_medico.guardar_datos(filepath, medicos)
@@ -175,9 +186,11 @@ def cambiar_estado_medico(filepath: str, documento: str, nuevo_estado: str) -> b
             bool: True si se actualizó correctamente, False en caso contrario.
     """
     if nuevo_estado not in ['Activo', 'Inactivo']:
-        print(f"❌ Error: Estado '{nuevo_estado}' no válido. Use 'Activo' o 'Inactivo'.")
+        print(
+            f"❌ Error: Estado '{nuevo_estado}' no válido. Use 'Activo' o 'Inactivo'."
+            )
         return False
-    
+
     resultado = actualizar_medico(filepath, documento, {'estado': nuevo_estado})
     return resultado is not None
 

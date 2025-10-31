@@ -1,14 +1,15 @@
 # vista_superadmin.py
 import os
 import time
+
 import readchar
+from rich.align import Align
 from rich.console import Console
 from rich.panel import Panel
-from rich.align import Align
 from rich.theme import Theme
 
 # Importar funciones del login
-from Vista.vista_login import leer_usuarios, guardar_usuarios
+from Vista.vista_login import guardar_usuarios, leer_usuarios
 
 # ---------- CONFIGURACIÓN ----------
 custom_theme = Theme({
@@ -45,11 +46,10 @@ def selector_lista_con_flechas(titulo, items, allow_back=True):
                     contenido.append(f"[bold white on red]  ▶ {it}[/bold white on red]")
                 else:
                     contenido.append(f"[bold white on blue]  ▶ {it}[/bold white on blue]")
+            elif any(k in it.lower() for k in ("salir", "eliminar", "borrar")):
+                contenido.append(f"[red]  {it}[/red]")
             else:
-                if any(k in it.lower() for k in ("salir", "eliminar", "borrar")):
-                    contenido.append(f"[red]  {it}[/red]")
-                else:
-                    contenido.append(f"[cyan]  {it}[/cyan]")
+                contenido.append(f"[cyan]  {it}[/cyan]")
 
         panel = Panel(
             Align.center("\n".join(contenido)),
@@ -209,5 +209,5 @@ def panel_superadmin(usuario):
             console.print(Panel("[bold red]👋 Cerrando sesión de superadmin...[/bold red]", border_style="red", width=70))
             time.sleep(1)
             return
- 
+
 

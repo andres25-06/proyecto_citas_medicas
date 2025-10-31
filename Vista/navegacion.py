@@ -1,6 +1,6 @@
 # Vista/navegacion.py
 
-from Vista import vista_principal, vista_cita, vista_medico, vista_paciente
+from Vista import vista_cita, vista_medico, vista_paciente, vista_principal
 
 
 def ir_a_menu_principal():

@@ -4,15 +4,15 @@ Vista del Módulo de Médicos con selector interactivo (flechas ↑ ↓)
 y diseño mejorado con emojis para el CRUD.
 """
 
+import csv
+import json
 import os
 import time
-import json
-import csv
 
 import readchar
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, IntPrompt, Prompt
+from rich.prompt import Confirm, Prompt
 from rich.table import Table
 
 from Modelo import medico
@@ -475,7 +475,7 @@ def menu_actualizar_medico(filepath: str):
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]✏️🩺 Actualizar Datos de Médico[/bold cyan]"))
-    
+
     documento = Prompt.ask("[bold yellow]Ingrese el documento del médico a actualizar[/bold yellow]")
 
     medico_actual = medico.buscar_medico_por_documento(filepath, str(documento))
@@ -494,9 +494,9 @@ def menu_actualizar_medico(filepath: str):
     info_actual.add_row("📌 Estado:", f"[yellow]{medico_actual.get('estado', 'N/A')}[/yellow]")
     info_actual.add_row("🚪 Consultorio:", f"[yellow]{medico_actual.get('consultorio', 'N/A')}[/yellow]")
     console.print(info_actual)
-    
+
     console.print("\n[dim]💡 Presione Enter para no modificar un campo o seleccione la opción para cambiar.[/dim]\n")
-    
+
     datos_nuevos = {}
 
     # Actualizar nombres
@@ -555,22 +555,22 @@ def menu_actualizar_medico(filepath: str):
         medico_actualizado = medico.actualizar_medico(filepath, str(documento), datos_nuevos)
         if medico_actualizado:
             console.print(Panel(
-                "✅ ¡Datos del médico actualizados con éxito!", 
-                border_style="green", 
+                "✅ ¡Datos del médico actualizados con éxito!",
+                border_style="green",
                 title="Éxito"
             ))
         else:
             console.print(Panel(
-                "❌ Error al actualizar los datos.", 
-                border_style="red", 
+                "❌ Error al actualizar los datos.",
+                border_style="red",
                 title="Error"
             ))
     else:
         console.print("[yellow]Operación cancelada por el usuario.[/yellow]")
-    
+
     input("\nPresione Enter para continuar...")
 
-    
+
 def menu_buscar_medico(filepath_base: str):
     """
     Menú interactivo para buscar médicos por documento o especialidad.
