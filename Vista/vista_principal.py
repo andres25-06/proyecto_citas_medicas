@@ -623,7 +623,20 @@ def vista_principal():
             mostrar_calendario_interactivo()
             
         elif indice==4:
-            estadisticas_citas_por_medico()
+            animacion_carga("Abriendo módulo de estadísticas...")
+            try:
+                stats = estadisticas_citas_por_medico()
+                if not stats:
+                    console.print(Panel(
+                        "[bold yellow]⚠️ No hay estadísticas del médico.[/bold yellow]",
+                        border_style="yellow"
+                    ))
+                    console.input("\n[cyan]Presiona Enter para volver al menú[/cyan]")
+                else:
+                    console.input("\n[cyan]Presiona Enter para volver al menú[/cyan]")
+            except Exception as e:
+                console.log(e)
+                console.input("Enter para volver...")
         elif indice==5:
             console.print(
                 "\n[bold red]Saliendo del sistema...[/bold red]"
