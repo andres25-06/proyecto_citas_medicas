@@ -1,4 +1,3 @@
-import pytest
 from Modelo import cita
 
 
@@ -64,7 +63,7 @@ def test_buscar_cita_por_documento(tmp_path):
 # TEST: ACTUALIZAR CITA (usa documento_paciente)
 def test_cargar_citas_json(tmp_path):
     filepath = tmp_path / "citas.json"
-    
+
     # Crear una cita
     cita.crear_cita(
         str(filepath),

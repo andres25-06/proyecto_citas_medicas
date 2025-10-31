@@ -1,14 +1,14 @@
 # tests/test_modelo_paciente.py
 # -*- coding: utf-8 -*-
 import csv
-import pytest
+
 from Modelo import paciente
 
 
 def test_crud_paciente_completo(tmp_path):
     filepath_json = tmp_path / "pacientes.json"
     filepath_csv = tmp_path / "pacientes.csv"
-    
+
     # CREAR PACIENTES de prueba para los testing
     pacientes = [
         {"tipo_documento": "C.C", "documento": 101, "nombres": "María", "apellidos": "Gómez", "direccion": "Calle 10", "telefono": 3005551234},

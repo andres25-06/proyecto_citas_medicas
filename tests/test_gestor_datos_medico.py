@@ -1,4 +1,3 @@
-import pytest
 from Controlador import gestor_datos_medico as gestor
 
 

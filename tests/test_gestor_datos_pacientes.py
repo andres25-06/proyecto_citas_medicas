@@ -1,7 +1,7 @@
 # tests/test_gestor_datos_pacientes.py
 # -*- coding: utf-8 -*-
-import pytest
 from Controlador import gestor_datos_pacientes as gestor
+
 
 # TEST JSON
 def test_crud_pacientes_json(tmp_path):

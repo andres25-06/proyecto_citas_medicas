@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # # tests/test_validar_campos.py
 # import sys
 # import os
@@ -18,6 +19,30 @@
 # @patch("rich.prompt.Prompt.ask", return_value="Sergio")
 # def test_validar_texto(mock_prompt):
 #     resultado = validar_campos.validar_texto("Nombre")
+=======
+# tests/test_validar_campos.py
+import json
+import os
+import sys
+import tempfile
+from unittest.mock import patch
+
+import pytest
+
+import Validaciones as validar_campos
+
+# ---------------------------
+# Permitir importar Validaciones.py desde la raíz
+# ---------------------------
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+
+
+# ==============================
+# TESTS validar_texto
+# ==============================
+
+>>>>>>> e2ec289b63fca7e398bd5f31a993b44c114e966b
 
 # @patch("rich.prompt.Prompt.ask", side_effect=["", "ab", "Juan"])
 # def test_validar_texto_reintentos(mock_prompt):

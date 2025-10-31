@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import json
-import os
-import csv
 from Controlador import gestor_datos_medico as medico
+
 
 def test_crud_medico_json(tmp_path):
     filepath = tmp_path / "medicos.json"
