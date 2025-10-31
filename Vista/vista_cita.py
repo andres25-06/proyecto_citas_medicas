@@ -16,11 +16,16 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm, Prompt, IntPrompt
 from rich.table import Table
+import readchar
+from rich.prompt import Confirm, IntPrompt, Prompt
+from Vista import navegacion
 
 from Modelo import cita, medico, paciente
 from Validaciones import entrada_datos, validar_campos
 from Vista import navegacion
 
+from Validaciones import validar_campos
+from Validaciones import entrada_datos
 
 console = Console()
 
