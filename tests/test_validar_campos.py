@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import patch, mock_open
 from datetime import datetime
 
-import Validaciones as val  # Asegúrate de que el archivo se llame Validaciones.py
+import Validaciones as val  # Importar módulo de validación
 
 
 # ======================================================
