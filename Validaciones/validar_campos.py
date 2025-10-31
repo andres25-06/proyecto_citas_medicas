@@ -1,17 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Módulo: Validaciones de Entrada de Datos
----------------------------------------
-Contiene funciones reutilizables para validar entradas del usuario en consola,
-usando la librería Rich para mostrar mensajes visualmente atractivos.
 
-Incluye:
-- Campos vacíos
-- Tipos de datos (números, texto, fechas, etc.)
-- Longitud mínima y máxima
-- Formatos específicos (correo, teléfono, cédula)
-- Rango de valores numéricos
-"""
 
 import csv
 import json
@@ -176,10 +164,12 @@ def validar_cedula(etiqueta: str, filepath: str, min_digitos: int = 6, max_digit
         # Si todo está correcto
         return valor
 
+from datetime import datetime
+
 def validar_hora(etiqueta: str) -> str:
     """
     Solicita y valida una hora en formato HH:MM (24 horas).
-    Repite hasta que el formato sea correcto.
+    Solo permite horas entre 07:00 y 18:00 (7 a.m. - 6 p.m.).
     
     Args:
         etiqueta (str): Texto que se muestra al solicitar la hora.
@@ -190,8 +180,15 @@ def validar_hora(etiqueta: str) -> str:
     while True:
         hora = input(f"Ingrese {etiqueta} (HH:MM): ").strip()
         try:
-            # Intenta convertir a formato de hora
-            datetime.strptime(hora, "%H:%M")
-            return hora
+            hora_obj = datetime.strptime(hora, "%H:%M")
+            # Validar rango permitido
+            if 7 <= hora_obj.hour <= 18:
+                # Si es exactamente las 18:00, solo se acepta si los minutos son 00
+                if hora_obj.hour == 18 and hora_obj.minute > 0:
+                    print("⚠️  La última cita permitida es a las 18:00 en punto.")
+                else:
+                    return hora
+            else:
+                print("⚠️  Solo se permiten horas entre las 07:00 y las 18:00.")
         except ValueError:
             print("⚠️  Formato de hora inválido. Use el formato HH:MM (ejemplo: 09:30).")
