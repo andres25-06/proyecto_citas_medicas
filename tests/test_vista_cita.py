@@ -9,9 +9,8 @@ import pytest
 from Vista import vista_cita
 
 
-# =========================================================
-# 🔹 Utilidades
-# =========================================================
+
+# Utilidades
 @pytest.fixture(autouse=True)
 def no_clear(monkeypatch):
     """Evita limpiar la consola en los tests."""
@@ -31,9 +30,8 @@ def mock_console(monkeypatch):
     return dummy
 
 
-# =========================================================
-# 🔹 Pruebas de funciones auxiliares
-# =========================================================
+
+#  Pruebas de funciones auxiliares
 def test_leer_datos_archivo_json(tmp_path):
     """Debe leer correctamente un archivo JSON válido."""
     archivo = tmp_path / "citas.json"
@@ -79,9 +77,7 @@ def test_estado_cita_permitir_vacio(monkeypatch, mock_console):
     assert estado is None
 
 
-# =========================================================
-# 🔹 Prueba del calendario y selección de fecha
-# =========================================================
+# test Prueba del calendario y selección de fecha
 # def test_calendario_y_fecha(monkeypatch, mock_console):
 #     """Simula la selección de una fecha."""
 #     # Selector de fecha que retorna una fecha fija
@@ -92,9 +88,8 @@ def test_estado_cita_permitir_vacio(monkeypatch, mock_console):
 #     assert "10:00" in resultado
 
 
-# =========================================================
-# 🔹 Prueba de obtener_nombre_completo_por_documento
-# =========================================================
+
+#test Prueba de obtener_nombre_completo_por_documento
 # def test_obtener_nombre_completo_por_documento(tmp_path):
 #     """Debe devolver el nombre completo si encuentra el documento."""
 #     archivo = tmp_path / "pacientes.json"
@@ -112,9 +107,8 @@ def test_obtener_nombre_completo_no_encontrado(tmp_path):
     assert "(no encontrado)" in nombre
 
 
-# =========================================================
-# 🔹 Prueba de menu_cancelar_cita
-# =========================================================
+
+#  test de menu_cancelar_cita
 def test_menu_cancelar_cita(monkeypatch, mock_console, tmp_path):
     """Simula cancelar cita con confirmación afirmativa."""
     filepath = tmp_path / "citas.json"
