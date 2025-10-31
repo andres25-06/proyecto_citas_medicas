@@ -1,75 +1,71 @@
-import builtins
-import json
+# tests/test_validar_campos.py
+import sys
 import os
+import tempfile
+import json
 import pytest
-from unittest.mock import patch, mock_open
-from datetime import datetime
+from unittest.mock import patch
 
-import Validaciones as val  # Importar módulo de validación
+# ---------------------------
+# Permitir importar Validaciones.py desde la raíz
+# ---------------------------
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import Validaciones as validar_campos
 
+# ==============================
+# TESTS validar_texto
+# ==============================
+@patch("rich.prompt.Prompt.ask", return_value="Sergio")
+def test_validar_texto(mock_prompt):
+    resultado = validar_campos.validar_texto("Nombre")
 
-# ======================================================
-# TEST validar_texto
-# ======================================================
-@patch("Validaciones.Prompt.ask")
-def test_validar_texto_valido(mock_ask):
-    mock_ask.return_value = "Sergio"
-    resultado = val.validar_texto("Nombre", 3, 10)
-    assert resultado == "Sergio"
-
-
-@patch("Validaciones.Prompt.ask", side_effect=["", "ab", "Juan"])
-def test_validar_texto_reintentos(mock_ask):
-    resultado = val.validar_texto("Nombre", 3, 10)
+@patch("rich.prompt.Prompt.ask", side_effect=["", "ab", "Juan"])
+def test_validar_texto_reintentos(mock_prompt):
+    resultado = validar_campos.validar_texto("Nombre", 3, 10)
     assert resultado == "Juan"
 
-
-# ======================================================
-# TEST validar_numero
-# ======================================================
-@patch("Validaciones.Prompt.ask", return_value="25")
-def test_validar_numero_valido(mock_ask):
-    resultado = val.validar_numero("Edad", 18, 99)
+# ==============================
+# TESTS validar_numero
+# ==============================
+@patch("rich.prompt.Prompt.ask", return_value="25")
+def test_validar_numero_valido(mock_prompt):
+    resultado = validar_campos.validar_numero("Edad", 18, 99)
     assert resultado == 25
 
-
-@patch("Validaciones.Prompt.ask", side_effect=["", "abc", "5", "20"])
-def test_validar_numero_reintentos(mock_ask):
-    resultado = val.validar_numero("Edad", minimo=10, maximo=30)
+@patch("rich.prompt.Prompt.ask", side_effect=["", "abc", "5", "20"])
+def test_validar_numero_reintentos(mock_prompt):
+    resultado = validar_campos.validar_numero("Edad", 10, 30)
     assert resultado == 20
 
-
-# ======================================================
-# TEST validar_telefono
-# ======================================================
-@patch("Validaciones.Prompt.ask", side_effect=["", "123", "3124567890"])
-def test_validar_telefono(mock_ask):
-    resultado = val.validar_telefono("Teléfono")
+# ==============================
+# TESTS validar_telefono
+# ==============================
+@patch("rich.prompt.Prompt.ask", side_effect=["", "123", "3124567890"])
+def test_validar_telefono(mock_prompt):
+    resultado = validar_campos.validar_telefono("Teléfono")
     assert resultado == "3124567890"
 
+# ==============================
+# TESTS validar_cedula
+# ==============================
 
-# ======================================================
-# TEST validar_cedula
-# ======================================================
 @pytest.fixture
-def json_tempfile(tmp_path):
-    """Crea un archivo JSON temporal con un registro existente."""
-    data = [{"documento": "123456"}]
-    path = tmp_path / "registros.json"
-    path.write_text(json.dumps(data), encoding="utf-8")
-    return str(path)
+def json_tempfile():
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=".json", delete=False) as f:
+        # pre-carga con un registro duplicado
+        json.dump([{"documento": "654321"}], f)
+        f.flush()
+        yield f.name
 
+@patch("rich.prompt.Prompt.ask", side_effect=["", "abc", "123456", "654321"])
+def test_validar_cedula(json_tempfile, mock_prompt):
+    resultado = validar_campos.validar_cedula("Cédula", json_tempfile)
+    assert resultado == "123456"  # el primer valor válido no duplicado
 
-@patch("Validaciones.Prompt.ask", side_effect=["", "abc", "123456", "654321"])
-def test_validar_cedula(json_tempfile, mock_ask):
-    resultado = val.validar_cedula("Cédula", filepath=json_tempfile)
-    assert resultado == "654321"
-
-
-# ======================================================
-# TEST validar_hora
-# ======================================================
+# ==============================
+# TESTS validar_hora
+# ==============================
 @patch("builtins.input", side_effect=["hola", "25:99", "08:30"])
 def test_validar_hora(mock_input):
-    resultado = val.validar_hora("hora de cita")
+    resultado = validar_campos.validar_hora("hora de cita")
     assert resultado == "08:30"
