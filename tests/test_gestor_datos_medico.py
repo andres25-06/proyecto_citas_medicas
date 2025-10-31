@@ -1,9 +1,8 @@
 import pytest
 from Controlador import gestor_datos_medico as gestor
 
-# ======================================================
+
 # TEST JSON
-# ======================================================
 def test_crud_medicos_json(tmp_path):
     filepath = tmp_path / "medicos.json"
 
@@ -46,9 +45,7 @@ def test_crud_medicos_json(tmp_path):
     final = gestor.cargar_datos(str(filepath))
     assert final == []
 
-# ======================================================
 # TEST CSV
-# ======================================================
 def test_crud_medicos_csv(tmp_path):
     filepath = tmp_path / "medicos.csv"
 
