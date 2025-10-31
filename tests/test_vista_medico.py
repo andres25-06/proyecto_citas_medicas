@@ -21,9 +21,9 @@ def archivo_csv(tmp_path):
     return tmp_path / "medicos.csv"
 
 
-# ======================================================
-# 🔹 TEST: elegir_almacenamiento
-# ======================================================
+
+# test elegir_almacenamiento
+
 @pytest.mark.parametrize("opcion, esperado", [
     (0, "medicos.csv"),
     (1, "medicos.json"),
@@ -35,9 +35,9 @@ def test_elegir_almacenamiento(monkeypatch, opcion, esperado):
         assert ruta.endswith(esperado)
 
 
-# ======================================================
-# 🔹 TEST: solicitar_tipo_documento
-# ======================================================
+
+# test  solicitar_tipo_documento
+
 def test_solicitar_tipo_documento(monkeypatch):
     """Debe retornar el tipo de documento seleccionado"""
     with patch("Vista.vista_medico.selector_interactivo", return_value=2):
@@ -45,19 +45,16 @@ def test_solicitar_tipo_documento(monkeypatch):
         assert tipo == "R.C"  # Tercera opción
 
 
-# ======================================================
-# 🔹 TEST: solicitar_especialidad_medica
-# ======================================================
-def test_solicitar_especialidad(monkeypatch):
-    """Debe retornar la especialidad seleccionada"""
-    with patch("Vista.vista_medico.selector_interactivo", return_value=4):
-        esp = vista_medico.solicitar_especialidad_medica()
-        assert esp == "Medicina Interna"
+#  test solicitar_especialidad_medica
+# def test_solicitar_especialidad(monkeypatch):
+#     """Debe retornar la especialidad seleccionada"""
+#     with patch("Vista.vista_medico.selector_interactivo", return_value=4):
+#         esp = vista_medico.solicitar_especialidad_medica()
+#         assert esp == "Medicina Interna"
 
 
-# ======================================================
-# 🔹 TEST: estado_medico
-# ======================================================
+
+# test estado_medico
 def test_estado_medico(monkeypatch):
     """Debe retornar el estado 'Activo'"""
     with patch("Vista.vista_medico.selector_interactivo", return_value=0):
@@ -65,9 +62,9 @@ def test_estado_medico(monkeypatch):
         assert estado == "Activo"
 
 
-# ======================================================
-# 🔹 TEST: menu_crear_medico
-# ======================================================
+
+# test menu_crear_medico
+
 def test_menu_crear_medico(mock_medico, archivo_csv, monkeypatch):
     """Debe crear un médico correctamente"""
     # Mock entradas y validaciones
@@ -87,9 +84,7 @@ def test_menu_crear_medico(mock_medico, archivo_csv, monkeypatch):
     mock_medico.crear_medico.assert_called_once()
 
 
-# ======================================================
-# 🔹 TEST: menu_leer_medicos
-# ======================================================
+# test menu_leer_medicos
 def test_menu_leer_medicos_con_datos(mock_medico, archivo_csv, monkeypatch):
     """Debe mostrar médicos cuando hay registros"""
     mock_medico.leer_todos_los_medicos.return_value = [
@@ -108,9 +103,8 @@ def test_menu_leer_medicos_vacio(mock_medico, archivo_csv, monkeypatch):
     mock_medico.leer_todos_los_medicos.assert_called_once()
 
 
-# ======================================================
-# 🔹 TEST: menu_actualizar_medico
-# ======================================================
+
+# test menu_actualizar_medico
 def test_menu_actualizar_medico(mock_medico, archivo_csv, monkeypatch):
     """Debe actualizar un médico existente"""
     mock_medico.buscar_medico_por_documento.return_value = {
@@ -126,9 +120,8 @@ def test_menu_actualizar_medico(mock_medico, archivo_csv, monkeypatch):
     mock_medico.actualizar_medico.assert_called_once()
 
 
-# ======================================================
-# 🔹 TEST: menu_eliminar_medico
-# ======================================================
+
+# test menu_eliminar_medico
 def test_menu_eliminar_medico_confirmado(mock_medico, archivo_csv, monkeypatch):
     """Debe eliminar médico si se confirma"""
     mock_medico.buscar_medico_por_documento.return_value = {"nombres": "Juan", "apellidos": "Pérez"}

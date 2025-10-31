@@ -1,53 +1,89 @@
-# tests/test_gestor_datos_medico.py
-# -*- coding: utf-8 -*-
-import csv
-
+import pytest
 from Controlador import gestor_datos_medico as gestor
 
 
+# TEST JSON
 def test_crud_medicos_json(tmp_path):
     filepath = tmp_path / "medicos.json"
 
+    # Inicializar archivo
+    gestor.inicializar_archivo(str(filepath))
+
     medico = {
-        "documento": "555",
+        "id": "1",
+        "tipo_documento": "CC",
+        "documento": "12345678",
         "nombres": "Laura",
         "apellidos": "Mora",
+        "direccion": "Calle 1",
         "especialidad": "Cardiología",
-        "telefono": "3125554444"
+        "telefono": "3125554444",
+        "estado": "activo",
+        "consultorio": "101",
+        "hospital": "Hospital Central"
     }
 
-    gestor.crear_medico(medico, str(filepath))
-    lista = gestor.leer_todos_los_medicos(str(filepath))
+    # CREAR
+    datos = gestor.cargar_datos(str(filepath))
+    datos.append(medico)
+    gestor.guardar_datos(str(filepath), datos)
+
+    # LEER
+    lista = gestor.cargar_datos(str(filepath))
     assert len(lista) == 1
+    assert lista[0]["nombres"] == "Laura"
 
-    buscado = gestor.buscar_medico_por_documento("555", str(filepath))
-    assert buscado["especialidad"] == "Cardiología"
+    # ACTUALIZAR
+    lista[0]["especialidad"] = "Dermatología"
+    gestor.guardar_datos(str(filepath), lista)
+    actualizado = gestor.cargar_datos(str(filepath))
+    assert actualizado[0]["especialidad"] == "Dermatología"
 
-    buscado["especialidad"] = "Dermatología"
-    gestor.actualizar_medico(buscado, str(filepath))
-    actualizado = gestor.buscar_medico_por_documento("555", str(filepath))
-    assert actualizado["especialidad"] == "Dermatología"
+    # ELIMINAR
+    actualizado.pop(0)
+    gestor.guardar_datos(str(filepath), actualizado)
+    final = gestor.cargar_datos(str(filepath))
+    assert final == []
 
-    gestor.eliminar_medico("555", str(filepath))
-    assert gestor.leer_todos_los_medicos(str(filepath)) == []
-
-
+# TEST CSV
 def test_crud_medicos_csv(tmp_path):
     filepath = tmp_path / "medicos.csv"
-    campos = ["documento", "nombres", "apellidos", "especialidad", "telefono"]
 
-    with open(filepath, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=campos)
-        writer.writeheader()
+    # Inicializar archivo
+    gestor.inicializar_archivo(str(filepath))
 
     medico = {
-        "documento": "666",
+        "id": "2",
+        "tipo_documento": "CC",
+        "documento": "87654321",
         "nombres": "Carlos",
         "apellidos": "Ruiz",
+        "direccion": "Calle 2",
         "especialidad": "Pediatría",
-        "telefono": "3101239876"
+        "telefono": "3101239876",
+        "estado": "activo",
+        "consultorio": "102",
+        "hospital": "Hospital Norte"
     }
 
-    gestor.crear_medico(medico, str(filepath))
-    lista = gestor.leer_todos_los_medicos(str(filepath))
-    assert lista[0]["especialidad"] == "Pediatría"
+    # CREAR
+    datos = gestor.cargar_datos(str(filepath))
+    datos.append(medico)
+    gestor.guardar_datos(str(filepath), datos)
+
+    # LEER
+    lista = gestor.cargar_datos(str(filepath))
+    assert len(lista) == 1
+    assert lista[0]["nombres"] == "Carlos"
+
+    # ACTUALIZAR
+    lista[0]["especialidad"] = "Neurología"
+    gestor.guardar_datos(str(filepath), lista)
+    actualizado = gestor.cargar_datos(str(filepath))
+    assert actualizado[0]["especialidad"] == "Neurología"
+
+    # ELIMINAR
+    actualizado.pop(0)
+    gestor.guardar_datos(str(filepath), actualizado)
+    final = gestor.cargar_datos(str(filepath))
+    assert final == []

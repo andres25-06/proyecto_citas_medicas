@@ -1,54 +1,49 @@
-# tests/test_modelo_medico.py
 # -*- coding: utf-8 -*-
+import json
+import os
 import csv
-
-from Modelo import medico
-
+from Controlador import gestor_datos_medico as medico
 
 def test_crud_medico_json(tmp_path):
     filepath = tmp_path / "medicos.json"
 
-    nuevo_medico = {
-        "documento": "303",
-        "nombres": "Pedro",
-        "apellidos": "Jiménez",
-        "especialidad": "Oftalmología",
-        "telefono": "3128884567"
-    }
+    # Crear lista de médicos
+    medicos = [
+        {
+            "id": "1",
+            "tipo_documento": "CC",
+            "documento": 1023456789,
+            "nombres": "Laura",
+            "apellidos": "Pérez Gómez",
+            "direccion": "Calle 10 #5-23",
+            "especialidad": "Cardiología",
+            "telefono": 3124567890,
+            "estado": "Activo",
+            "consultorio": "201A",
+            "hospital": "Clínica Central"
+        }
+    ]
 
-    medico.crear_medico(nuevo_medico, str(filepath))
+    # Guardar datos
+    medico.guardar_datos(str(filepath), medicos)
 
-    lista = medico.leer_todos_los_medicos(str(filepath))
-    assert len(lista) == 1
+    # Leer datos y validar creación
+    datos = medico.cargar_datos(str(filepath))
+    assert len(datos) == 1
+    assert datos[0]["nombres"] == "Laura"
 
-    encontrado = medico.buscar_medico_por_documento("303", str(filepath))
-    assert encontrado["especialidad"] == "Oftalmología"
+    # Actualizar especialidad
+    datos[0]["especialidad"] = "Dermatología"
+    medico.guardar_datos(str(filepath), datos)
+    actualizado = medico.cargar_datos(str(filepath))
+    assert actualizado[0]["especialidad"] == "Dermatología"
 
-    encontrado["especialidad"] = "Neurología"
-    medico.actualizar_medico(encontrado, str(filepath))
-    actualizado = medico.buscar_medico_por_documento("303", str(filepath))
-    assert actualizado["especialidad"] == "Neurología"
+    # Eliminar (dejar lista vacía)
+    actualizado.pop(0)
+    medico.guardar_datos(str(filepath), actualizado)
+    final = medico.cargar_datos(str(filepath))
+    assert final == []
+"""
+def test_crear medico"""
 
-    medico.eliminar_medico("303", str(filepath))
-    assert medico.leer_todos_los_medicos(str(filepath)) == []
 
-
-def test_crud_medico_csv(tmp_path):
-    filepath = tmp_path / "medicos.csv"
-    campos = ["documento", "nombres", "apellidos", "especialidad", "telefono"]
-
-    with open(filepath, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=campos)
-        writer.writeheader()
-
-    nuevo_medico = {
-        "documento": "404",
-        "nombres": "Claudia",
-        "apellidos": "Morales",
-        "especialidad": "Dermatología",
-        "telefono": "3101112233"
-    }
-
-    medico.crear_medico(nuevo_medico, str(filepath))
-    lista = medico.leer_todos_los_medicos(str(filepath))
-    assert lista[0]["nombres"] == "Claudia"
