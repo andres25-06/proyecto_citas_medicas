@@ -1,55 +1,96 @@
-# tests/test_gestor_datos_citas.py
-# -*- coding: utf-8 -*-
 import csv
-
+import pytest
 from Controlador import gestor_datos_citas as gestor
 
-
+# ======================================================
+# TEST CRUD CITAS JSON
+# ======================================================
 def test_crud_citas_json(tmp_path):
     filepath = tmp_path / "citas.json"
 
+    # Inicializar archivo
+    gestor.inicializar_archivo(str(filepath))
+
     cita = {
         "id": 1,
-        "paciente": "Juan Pérez",
-        "medico": "Laura Mora",
+        "documento_paciente": "12345678",
+        "documento_medico": "87654321",
         "fecha": "2025-10-28",
         "hora": "08:00",
-        "motivo": "Chequeo"
+        "motivo": "Chequeo",
+        "estado": "pendiente"
     }
 
-    gestor.crear_cita(cita, str(filepath))
-    lista = gestor.leer_todas_las_citas(str(filepath))
-    assert len(lista) == 1
+    # CREAR: agregar cita
+    datos = gestor.cargar_datos(str(filepath))
+    datos.append(cita)
+    gestor.guardar_datos(str(filepath), datos)
 
-    buscada = gestor.buscar_cita_por_id(1, str(filepath))
-    assert buscada["motivo"] == "Chequeo"
+    # LEER
+    citas = gestor.cargar_datos(str(filepath))
+    assert len(citas) == 1
+    assert citas[0]["id"] == 1
 
-    buscada["motivo"] = "Control anual"
-    gestor.actualizar_cita(buscada, str(filepath))
-    actualizada = gestor.buscar_cita_por_id(1, str(filepath))
-    assert actualizada["motivo"] == "Control anual"
+    # ACTUALIZAR
+    for c in citas:
+        if str(c["id"]) == "1":
+            c["estado"] = "completada"
+    gestor.guardar_datos(str(filepath), citas)
 
-    gestor.eliminar_cita(1, str(filepath))
-    assert gestor.leer_todas_las_citas(str(filepath)) == []
+    citas = gestor.cargar_datos(str(filepath))
+    assert citas[0]["estado"] == "completada"
+
+    # ELIMINAR
+    citas = [c for c in citas if str(c["id"]) != "1"]
+    gestor.guardar_datos(str(filepath), citas)
+
+    citas = gestor.cargar_datos(str(filepath))
+    assert len(citas) == 0
 
 
+# ======================================================
+# TEST CRUD CITAS CSV
+# ======================================================
 def test_crud_citas_csv(tmp_path):
     filepath = tmp_path / "citas.csv"
-    campos = ["id", "paciente", "medico", "fecha", "hora", "motivo"]
 
-    with open(filepath, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=campos)
-        writer.writeheader()
+    # Inicializar archivo
+    gestor.inicializar_archivo(str(filepath))
 
     cita = {
         "id": 2,
-        "paciente": "Ana Gómez",
-        "medico": "Carlos Ruiz",
+        "documento_paciente": "23456789",
+        "documento_medico": "98765432",
         "fecha": "2025-10-29",
         "hora": "09:00",
-        "motivo": "Revisión"
+        "motivo": "Revisión",
+        "estado": "pendiente"
     }
 
-    gestor.crear_cita(cita, str(filepath))
-    lista = gestor.leer_todas_las_citas(str(filepath))
-    assert lista[0]["motivo"] == "Revisión"
+    # CREAR: agregar cita
+    datos = gestor.cargar_datos(str(filepath))
+    datos.append(cita)
+    gestor.guardar_datos(str(filepath), datos)
+
+    # LEER
+    # LEER
+    citas = gestor.cargar_datos(str(filepath))
+    assert len(citas) == 1
+    assert int(citas[0]["id"]) == 2  # <-- convertir a int
+
+
+    # ACTUALIZAR
+    for c in citas:
+        if str(c["id"]) == "2":
+            c["estado"] = "completada"
+    gestor.guardar_datos(str(filepath), citas)
+
+    citas = gestor.cargar_datos(str(filepath))
+    assert citas[0]["estado"] == "completada"
+
+    # ELIMINAR
+    citas = [c for c in citas if str(c["id"]) != "2"]
+    gestor.guardar_datos(str(filepath), citas)
+
+    citas = gestor.cargar_datos(str(filepath))
+    assert len(citas) == 0
