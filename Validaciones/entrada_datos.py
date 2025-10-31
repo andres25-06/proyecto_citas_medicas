@@ -44,12 +44,10 @@ def validar_datos_relacion_obligatorios(
     """
     Comprueba que los campos requeridos de una relación (como cliente o médico)
     no estén vacíos o faltantes.
-    
     Args:
         datos (dict): Diccionario con los datos de la relación.
         campos_obligatorios (list): Lista de nombres de campos que son obligatorios.
         nombre_relacion (str): Nombre del tipo de relación (ej: 'Paciente', 'Médico').
-    
     Returns:
         bool: True si todos los campos obligatorios están presentes, False si faltan.
     """
@@ -57,7 +55,7 @@ def validar_datos_relacion_obligatorios(
 
     if faltantes:
         console.print(f"[bold yellow]⚠️ Faltan datos obligatorios del {nombre_relacion}: "
-                      f"{', '.join(faltantes)}[/bold yellow]")
+                    f"{', '.join(faltantes)}[/bold yellow]")
         return False
 
     console.print(f"[bold green]✅ Todos los datos obligatorios del {nombre_relacion} "

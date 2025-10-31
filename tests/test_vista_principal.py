@@ -1,9 +1,9 @@
 import io
 import json
-import pytest
-import Vista.vista_principal as vp
-import io
+
 from rich.console import Console
+
+import Vista.vista_principal as vp
 
 
 def test_limpiar(monkeypatch):
@@ -134,15 +134,7 @@ def test_mostrar_citas_por_dia(tmp_path, monkeypatch):
     assert contenido_final == []
 
 
-def test_estadisticas_citas_por_medico(tmp_path, monkeypatch):
-    ruta_med = tmp_path / "medicos.csv"
-    ruta_citas = tmp_path / "citas.json"
-    ruta_med.write_text("id,nombres,apellidos,especialidad\na1,Carlos,Ramírez,Cardiólogo\n", encoding="utf-8")
-    ruta_citas.write_text(json.dumps([{"id_medico": "a1"}]), encoding="utf-8")
-    monkeypatch.setattr(vp.console, "print", lambda *a, **k: None)
-    monkeypatch.setattr(vp.console, "input", lambda *a, **k: "")
-    vp.estadisticas_citas_por_medico(str(ruta_med), str(ruta_citas))
-    assert True
+
 def test_estadisticas_citas_por_medico(tmp_path, monkeypatch):
     ruta_medicos = tmp_path / "medicos.csv"
     ruta_citas = tmp_path / "citas.json"

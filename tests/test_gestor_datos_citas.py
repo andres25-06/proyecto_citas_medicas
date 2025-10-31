@@ -1,6 +1,5 @@
-import csv
-import pytest
 from Controlador import gestor_datos_citas as gestor
+
 
 # TEST CRUD CITAS JSON
 def test_crud_citas_json(tmp_path):
@@ -68,11 +67,11 @@ def test_crud_citas_csv(tmp_path):
     datos = gestor.cargar_datos(str(filepath))
     datos.append(cita)
     gestor.guardar_datos(str(filepath), datos)
-    
+
     # LEER
     citas = gestor.cargar_datos(str(filepath))
     assert len(citas) == 1
-    assert int(citas[0]["id"]) == 2 
+    assert int(citas[0]["id"]) == 2
 
 
     # ACTUALIZAR

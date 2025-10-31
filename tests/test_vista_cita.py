@@ -9,7 +9,6 @@ import pytest
 from Vista import vista_cita
 
 
-
 # Utilidades
 @pytest.fixture(autouse=True)
 def no_clear(monkeypatch):

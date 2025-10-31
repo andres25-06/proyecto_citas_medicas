@@ -1,18 +1,19 @@
-import os
-import time
 import json
+import os
 import random
-import string
-import readchar
 import re
-from rich.console import Console
-from rich.panel import Panel
+import string
+import time
+
+import readchar
 from rich.align import Align
+from rich.console import Console
+from rich.live import Live
+from rich.panel import Panel
+from rich.progress import BarColumn, Progress, TextColumn
+from rich.table import Table
 from rich.text import Text
 from rich.theme import Theme
-from rich.live import Live
-from rich.table import Table
-from rich.progress import Progress, BarColumn, TextColumn
 
 # =====================================================================
 # CONFIGURACIÓN DE CRÉDITOS Y DATOS DEL PROYECTO
@@ -42,7 +43,7 @@ ASESORES = [
 # =====================================================================
 custom_theme = Theme({
     "title": "bold white on blue",
-    "menu": "cyan", 
+    "menu": "cyan",
     "selected_normal": "bold white on blue",
     "selected_danger": "bold white on red",
     "danger": "red",
@@ -144,22 +145,22 @@ def enviar_correo_simulado(dest, asunto, mensaje):
 def mostrar_splash_rapido():
     """Versión rápida del splash al iniciar."""
     limpiar()
-    
+
     tabla_rapida = Table.grid(padding=(0, 2))
     tabla_rapida.add_column(justify="center", style="cyan")
-    
+
     tabla_rapida.add_row("[bold cyan]💊 " + DATOS_PROYECTO["nombre"] + " 💊[/bold cyan]")
     tabla_rapida.add_row("[yellow]v" + DATOS_PROYECTO["version"] + "[/yellow]")
     tabla_rapida.add_row("")
     tabla_rapida.add_row(f"[dim]{DATOS_PROYECTO['programa']}[/dim]")
     tabla_rapida.add_row(f"[dim]Ficha: {DATOS_PROYECTO['numero_ficha']}[/dim]")
-    
+
     panel = Panel(
         tabla_rapida,
         border_style="bright_blue",
         padding=(2, 4)
     )
-    
+
     console.print(Align.center(panel))
     time.sleep(2)
     limpiar()
@@ -167,81 +168,81 @@ def mostrar_splash_rapido():
 def mostrar_splash_creditos():
     """Muestra una pantalla elegante con los créditos del proyecto."""
     limpiar()
-    
+
     # Tabla principal con información del proyecto
     tabla_proyecto = Table.grid(padding=(0, 2))
     tabla_proyecto.add_column(justify="center", style="cyan")
-    
+
     tabla_proyecto.add_row("[bold cyan]💊 " + DATOS_PROYECTO["nombre"] + " 💊[/bold cyan]")
     tabla_proyecto.add_row("")
     tabla_proyecto.add_row(f"[yellow]Versión:[/yellow] [bold]{DATOS_PROYECTO['version']}[/bold]")
     tabla_proyecto.add_row("")
-    
+
     panel_proyecto = Panel(
         tabla_proyecto,
         title="[bold white on blue]📋 INFORMACIÓN DEL PROYECTO[/bold white on blue]",
         border_style="bright_blue",
         padding=(1, 2)
     )
-    
+
     # Tabla de información académica
     tabla_academica = Table.grid(padding=(0, 1))
     tabla_academica.add_column(style="yellow", width=20)
     tabla_academica.add_column(style="white")
-    
+
     tabla_academica.add_row("📌 Ficha:", f"[bold]{DATOS_PROYECTO['numero_ficha']}[/bold]")
     tabla_academica.add_row("🎓 Programa:", f"[bold]{DATOS_PROYECTO['programa']}[/bold]")
-    
+
     panel_academica = Panel(
         tabla_academica,
         title="[bold white on blue]🏫 INFORMACIÓN ACADÉMICA[/bold white on blue]",
         border_style="bright_blue",
         padding=(1, 2)
     )
-    
+
     # Tabla de desarrolladores
     tabla_dev = Table.grid(padding=(0, 1))
     tabla_dev.add_column(style="cyan")
-    
+
     tabla_dev.add_row("[bold cyan]Equipo de Desarrollo:[/bold cyan]")
     tabla_dev.add_row("")
     for dev in DESARROLLADORES:
         tabla_dev.add_row(f"  ✦ {dev}")
-    
+
     panel_dev = Panel(
         tabla_dev,
         title="[bold white on blue]👨‍💻 DESARROLLADORES[/bold white on blue]",
         border_style="bright_blue",
         padding=(1, 2)
     )
-    
+
     # Tabla de asesores
     tabla_asesores = Table.grid(padding=(0, 1))
     tabla_asesores.add_column(style="green")
-    
+
     tabla_asesores.add_row("[bold green]Bajo la asesoría de:[/bold green]")
     tabla_asesores.add_row("")
     for asesor in ASESORES:
         tabla_asesores.add_row(f"  ★ {asesor}")
-    
+
     panel_asesores = Panel(
         tabla_asesores,
         title="[bold white on green]🎯 ASESORES[/bold white on green]",
         border_style="bright_green",
         padding=(1, 2)
     )
-    
+
     # Mostrar todo
     console.print(Align.center(panel_proyecto))
     console.print(Align.center(panel_academica))
     console.print(Align.center(panel_dev))
     console.print(Align.center(panel_asesores))
-    
+
     # Pie de página
     pie = Text("Presiona ENTER para continuar...", justify="center")
     pie.stylize("italic yellow")
     console.print(pie)
-    
+
     # Esperar a que presione ENTER
     input()
     limpiar()
@@ -369,9 +370,8 @@ def input_oculto_registro(prompt="Contraseña: ", require_strong=False):
                 contrasena = contrasena[:-1]
             elif ch == "\x03":
                 raise KeyboardInterrupt
-            else:
-                if len(contrasena) < 128:
-                    contrasena += ch
+            elif len(contrasena) < 128:
+                contrasena += ch
 
 # =====================================================================
 # INPUT OCULTO SIMPLE (para iniciar sesión)
@@ -402,11 +402,10 @@ def input_oculto_simple(prompt="Contraseña: "):
         elif ch == "\x03":
             raise KeyboardInterrupt
         # CARACTER NORMAL
-        else:
-            if len(contrasena) < 128:
-                contrasena += ch
-                # muestra asterisco visual
-                print("*", end="", flush=True)
+        elif len(contrasena) < 128:
+            contrasena += ch
+            # muestra asterisco visual
+            print("*", end="", flush=True)
 
 # =====================================================================
 # RENDER DEL CUADRO DE LOGIN
@@ -428,11 +427,10 @@ def cuadro_login_render(opciones, seleccion):
                 lines.append(f"[selected_danger]  ▶ {op}[/selected_danger]")
             else:
                 lines.append(f"[danger]  {op}[/danger]")
+        elif is_selected:
+            lines.append(f"[selected_normal]  ▶ {op}[/selected_normal]")
         else:
-            if is_selected:
-                lines.append(f"[selected_normal]  ▶ {op}[/selected_normal]")
-            else:
-                lines.append(f"[menu]  {op}[/menu]")
+            lines.append(f"[menu]  {op}[/menu]")
     contenido = "\n".join(lines)
     panel = Panel(Align.center(contenido),
                 title="[bold cyan]💊 INGRESO AL SISTEMA -"
