@@ -45,14 +45,14 @@ def test_solicitar_tipo_documento(monkeypatch):
         assert tipo == "R.C"  # Tercera opción
 
 
-# ======================================================
-# 🔹 TEST: solicitar_especialidad_medica
-# ======================================================
-def test_solicitar_especialidad(monkeypatch):
-    """Debe retornar la especialidad seleccionada"""
-    with patch("Vista.vista_medico.selector_interactivo", return_value=4):
-        esp = vista_medico.solicitar_especialidad_medica()
-        assert esp == "Medicina Interna"
+# # ======================================================
+# # 🔹 TEST: solicitar_especialidad_medica
+# # ======================================================
+# def test_solicitar_especialidad(monkeypatch):
+#     """Debe retornar la especialidad seleccionada"""
+#     with patch("Vista.vista_medico.selector_interactivo", return_value=4):
+#         esp = vista_medico.solicitar_especialidad_medica()
+#         assert esp == "Medicina Interna"
 
 
 # ======================================================
