@@ -138,14 +138,48 @@ def actualizar_medico(filepath: str, documento: str, datos_nuevos: Dict[str, Any
             break
 
     if medico_encontrado:
+        campos_permitidos = [
+            'nombres', 
+            'apellidos', 
+            'especialidad', 
+            'telefono', 
+            'estado', 
+            'consultorio',
+            'tipo_documento'
+        ]
+
         for key, value in datos_nuevos.items():
-            medico_encontrado[key] = str(value)
+            if key in campos_permitidos:
+                medico_encontrado[key] = str(value)
+            else:
+                print(f"⚠️ Advertencia: El campo '{key}' no está permitido para actualización.")
 
         medicos[indice] = medico_encontrado
         gestor_datos_medico.guardar_datos(filepath, medicos)
         return medico_encontrado
 
     return None
+
+
+def cambiar_estado_medico(filepath: str, documento: str, nuevo_estado: str) -> bool:
+    """
+        Cambia específicamente el estado de un médico (Activo/Inactivo).
+        Función especializada para mayor claridad y seguridad.
+
+        Args:
+            filepath (str): Ruta del archivo de datos.
+            documento (str): Documento del médico.
+            nuevo_estado (str): 'Activo' o 'Inactivo'
+
+        Returns:
+            bool: True si se actualizó correctamente, False en caso contrario.
+    """
+    if nuevo_estado not in ['Activo', 'Inactivo']:
+        print(f"❌ Error: Estado '{nuevo_estado}' no válido. Use 'Activo' o 'Inactivo'.")
+        return False
+    
+    resultado = actualizar_medico(filepath, documento, {'estado': nuevo_estado})
+    return resultado is not None
 
 
 def eliminar_medico(filepath: str, documento: str) -> bool:
