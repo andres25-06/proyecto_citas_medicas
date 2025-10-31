@@ -1,9 +1,8 @@
 import pytest
 from Modelo import cita
 
-# ---------------------------------------------
+
 # TEST: CREAR CITA NUEVA
-# ---------------------------------------------
 def test_crear_cita_json(tmp_path):
     filepath = tmp_path / "citas.json"
 
@@ -30,9 +29,7 @@ def test_crear_cita_json(tmp_path):
     assert creada["motivo"] == "Consulta general"
     assert creada["documento_paciente"] == "11111"
 
-# ---------------------------------------------
 # TEST: EVITAR DUPLICADOS
-# ---------------------------------------------
 def test_no_permite_citas_duplicadas(tmp_path):
     filepath = tmp_path / "citas.json"
 
@@ -44,9 +41,7 @@ def test_no_permite_citas_duplicadas(tmp_path):
 
     assert duplicada is None  # No debe permitir duplicados
 
-# ---------------------------------------------
 # TEST: LEER TODAS LAS CITAS
-# ---------------------------------------------
 def test_leer_todas_las_citas(tmp_path):
     filepath = tmp_path / "citas.json"
     cita.crear_cita(str(filepath), "555", "666", "2025-11-01", "08:00", "Examen", "Pendiente")
@@ -56,9 +51,7 @@ def test_leer_todas_las_citas(tmp_path):
     assert len(todas) == 2
     assert todas[0]["estado"] in ["Pendiente", "Completada"]
 
-# ---------------------------------------------
 # TEST: BUSCAR CITA POR DOCUMENTO
-# ---------------------------------------------
 def test_buscar_cita_por_documento(tmp_path):
     filepath = tmp_path / "citas.json"
     cita.crear_cita(str(filepath), "999", "111", "2025-12-01", "07:00", "Odontología", "Pendiente")
@@ -68,9 +61,7 @@ def test_buscar_cita_por_documento(tmp_path):
     assert len(resultado) == 1
     assert resultado[0]["motivo"] == "Odontología"
 
-# ---------------------------------------------
 # TEST: ACTUALIZAR CITA (usa documento_paciente)
-# ---------------------------------------------
 def test_cargar_citas_json(tmp_path):
     filepath = tmp_path / "citas.json"
     
@@ -95,9 +86,7 @@ def test_cargar_citas_json(tmp_path):
     assert citas_cargadas[0]["estado"] == "Pendiente"
 
 
-# ---------------------------------------------
 # TEST: ELIMINAR CITA POR DOCUMENTO
-# ---------------------------------------------
 def test_eliminar_cita_por_documento(tmp_path):
     filepath = tmp_path / "citas.json"
     cita.crear_cita(str(filepath), "20202", "30303", "2025-11-03", "14:00", "Vacunación", "Pendiente")
