@@ -71,12 +71,11 @@ def test_crud_citas_csv(tmp_path):
     datos = gestor.cargar_datos(str(filepath))
     datos.append(cita)
     gestor.guardar_datos(str(filepath), datos)
-
-    # LEER
+    
     # LEER
     citas = gestor.cargar_datos(str(filepath))
     assert len(citas) == 1
-    assert int(citas[0]["id"]) == 2  # <-- convertir a int
+    assert int(citas[0]["id"]) == 2 
 
 
     # ACTUALIZAR
