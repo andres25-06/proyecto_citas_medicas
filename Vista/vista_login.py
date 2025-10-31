@@ -1,26 +1,48 @@
-# vista_login.py
-import json
 import os
-import random
-import re
-import string
 import time
-
+import json
+import random
+import string
 import readchar
-from rich.align import Align
+import re
 from rich.console import Console
-from rich.live import Live
 from rich.panel import Panel
-from rich.progress import BarColumn, Progress, TextColumn
-from rich.table import Table
+from rich.align import Align
+from rich.text import Text
 from rich.theme import Theme
+from rich.live import Live
+from rich.table import Table
+from rich.progress import Progress, BarColumn, TextColumn
 
-# -------------------------------------------------------------
+# =====================================================================
+# CONFIGURACIÓN DE CRÉDITOS Y DATOS DEL PROYECTO
+# =====================================================================
+DATOS_PROYECTO = {
+    "nombre": "SISTEMA DE GESTIÓN CITAS MEDICAS",
+    "numero_ficha": "2993648",
+    "programa": "ANÁLISIS Y DESARROLLO DE SOFTWARE",
+    "version": "1.0.0",
+}
+
+DESARROLLADORES = [
+    "Developer 1 - Backend", "EIDER ANDRES ARDILA PITA",
+    "Developer 2 - Frontend", "JIMY SEBASTIAN ANGARITA TRIANA",
+    "Developer 3 - Archivos Planos", "MARIA KAMILA FUENTES VARGAS",
+    "Developer 4 - QA y Test", "SERGIO ALEJANDRO GARCIA SOSA"
+]
+
+ASESORES = [
+    "Instructor ", "ANDRES FELIPE SANDOVAL",
+    "Instructor ", "DIEGO OJEDA"
+
+]
+
+# =====================================================================
 # CONFIGURACIÓN DE CONSOLA Y TEMA
-# -------------------------------------------------------------
+# =====================================================================
 custom_theme = Theme({
     "title": "bold white on blue",
-    "menu": "cyan",
+    "menu": "cyan", 
     "selected_normal": "bold white on blue",
     "selected_danger": "bold white on red",
     "danger": "red",
@@ -33,9 +55,9 @@ console = Console(theme=custom_theme)
 DATA_PATH = "data/usuarios.json"
 CORREOS_SIMULADOS = "data/correos_simulados.txt"
 
-# -------------------------------------------------------------
+# =====================================================================
 # UTILIDADES GENERALES
-# -------------------------------------------------------------
+# =====================================================================
 def limpiar():
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -69,10 +91,117 @@ def enviar_correo_simulado(dest, asunto, mensaje):
     with open(CORREOS_SIMULADOS, "a", encoding="utf-8") as f:
         f.write(f"Para: {dest}\nAsunto: {asunto}\n{mensaje}\n{'-'*40}\n")
 
+# =====================================================================
+# FUNCIONES DE SPLASH Y CRÉDITOS
+# =====================================================================
+def mostrar_splash_rapido():
+    """Versión rápida del splash al iniciar."""
+    limpiar()
+    
+    tabla_rapida = Table.grid(padding=(0, 2))
+    tabla_rapida.add_column(justify="center", style="cyan")
+    
+    tabla_rapida.add_row("[bold cyan]💊 " + DATOS_PROYECTO["nombre"] + " 💊[/bold cyan]")
+    tabla_rapida.add_row("[yellow]v" + DATOS_PROYECTO["version"] + "[/yellow]")
+    tabla_rapida.add_row("")
+    tabla_rapida.add_row(f"[dim]{DATOS_PROYECTO['programa']}[/dim]")
+    tabla_rapida.add_row(f"[dim]Ficha: {DATOS_PROYECTO['numero_ficha']}[/dim]")
+    
+    panel = Panel(
+        tabla_rapida,
+        border_style="bright_blue",
+        padding=(2, 4)
+    )
+    
+    console.print(Align.center(panel))
+    time.sleep(2)
+    limpiar()
 
-# -------------------------------------------------------------
+def mostrar_splash_creditos():
+    """Muestra una pantalla elegante con los créditos del proyecto."""
+    limpiar()
+    
+    # Tabla principal con información del proyecto
+    tabla_proyecto = Table.grid(padding=(0, 2))
+    tabla_proyecto.add_column(justify="center", style="cyan")
+    
+    tabla_proyecto.add_row("[bold cyan]💊 " + DATOS_PROYECTO["nombre"] + " 💊[/bold cyan]")
+    tabla_proyecto.add_row("")
+    tabla_proyecto.add_row(f"[yellow]Versión:[/yellow] [bold]{DATOS_PROYECTO['version']}[/bold]")
+    tabla_proyecto.add_row("")
+    
+    panel_proyecto = Panel(
+        tabla_proyecto,
+        title="[bold white on blue]📋 INFORMACIÓN DEL PROYECTO[/bold white on blue]",
+        border_style="bright_blue",
+        padding=(1, 2)
+    )
+    
+    # Tabla de información académica
+    tabla_academica = Table.grid(padding=(0, 1))
+    tabla_academica.add_column(style="yellow", width=20)
+    tabla_academica.add_column(style="white")
+    
+    tabla_academica.add_row("📌 Ficha:", f"[bold]{DATOS_PROYECTO['numero_ficha']}[/bold]")
+    tabla_academica.add_row("🎓 Programa:", f"[bold]{DATOS_PROYECTO['programa']}[/bold]")
+    
+    panel_academica = Panel(
+        tabla_academica,
+        title="[bold white on blue]🏫 INFORMACIÓN ACADÉMICA[/bold white on blue]",
+        border_style="bright_blue",
+        padding=(1, 2)
+    )
+    
+    # Tabla de desarrolladores
+    tabla_dev = Table.grid(padding=(0, 1))
+    tabla_dev.add_column(style="cyan")
+    
+    tabla_dev.add_row("[bold cyan]Equipo de Desarrollo:[/bold cyan]")
+    tabla_dev.add_row("")
+    for dev in DESARROLLADORES:
+        tabla_dev.add_row(f"  ✦ {dev}")
+    
+    panel_dev = Panel(
+        tabla_dev,
+        title="[bold white on blue]👨‍💻 DESARROLLADORES[/bold white on blue]",
+        border_style="bright_blue",
+        padding=(1, 2)
+    )
+    
+    # Tabla de asesores
+    tabla_asesores = Table.grid(padding=(0, 1))
+    tabla_asesores.add_column(style="green")
+    
+    tabla_asesores.add_row("[bold green]Bajo la asesoría de:[/bold green]")
+    tabla_asesores.add_row("")
+    for asesor in ASESORES:
+        tabla_asesores.add_row(f"  ★ {asesor}")
+    
+    panel_asesores = Panel(
+        tabla_asesores,
+        title="[bold white on green]🎯 ASESORES[/bold white on green]",
+        border_style="bright_green",
+        padding=(1, 2)
+    )
+    
+    # Mostrar todo
+    console.print(Align.center(panel_proyecto))
+    console.print(Align.center(panel_academica))
+    console.print(Align.center(panel_dev))
+    console.print(Align.center(panel_asesores))
+    
+    # Pie de página
+    pie = Text("Presiona ENTER para continuar...", justify="center")
+    pie.stylize("italic yellow")
+    console.print(pie)
+    
+    # Esperar a que presione ENTER
+    input()
+    limpiar()
+
+# =====================================================================
 # VALIDACIÓN DE CONTRASEÑA (solo para registro)
-# -------------------------------------------------------------
+# =====================================================================
 def evaluar_contrasena(passw: str) -> dict:
     """Evalúa la seguridad de la contraseña."""
     reglas = {
@@ -154,13 +283,13 @@ def input_oculto_registro(prompt="Contraseña: ", require_strong=False):
                 contrasena = contrasena[:-1]
             elif ch == "\x03":
                 raise KeyboardInterrupt
-            elif len(contrasena) < 128:
-                contrasena += ch
+            else:
+                if len(contrasena) < 128:
+                    contrasena += ch
 
-
-# -------------------------------------------------------------
+# =====================================================================
 # INPUT OCULTO SIMPLE (para iniciar sesión)
-# -------------------------------------------------------------
+# =====================================================================
 def input_oculto_simple(prompt="Contraseña: "):
     """Entrada oculta simple con asteriscos visibles."""
     contrasena = ""
@@ -181,16 +310,15 @@ def input_oculto_simple(prompt="Contraseña: "):
         elif ch == "\x03":
             raise KeyboardInterrupt
         # CARACTER NORMAL
-        elif len(contrasena) < 128:
-            contrasena += ch
-            # muestra asterisco visual
-            print("*", end="", flush=True)
+        else:
+            if len(contrasena) < 128:
+                contrasena += ch
+                # muestra asterisco visual
+                print("*", end="", flush=True)
 
-
-
-# -------------------------------------------------------------
+# =====================================================================
 # RENDER DEL CUADRO DE LOGIN
-# -------------------------------------------------------------
+# =====================================================================
 def cuadro_login_render(opciones, seleccion):
     lines = []
     for i, op in enumerate(opciones):
@@ -200,10 +328,11 @@ def cuadro_login_render(opciones, seleccion):
                 lines.append(f"[selected_danger]  ▶ {op}[/selected_danger]")
             else:
                 lines.append(f"[danger]  {op}[/danger]")
-        elif is_selected:
-            lines.append(f"[selected_normal]  ▶ {op}[/selected_normal]")
         else:
-            lines.append(f"[menu]  {op}[/menu]")
+            if is_selected:
+                lines.append(f"[selected_normal]  ▶ {op}[/selected_normal]")
+            else:
+                lines.append(f"[menu]  {op}[/menu]")
     contenido = "\n".join(lines)
     panel = Panel(Align.center(contenido),
                   title="[bold cyan]💊 INGRESO AL SISTEMA - CUADRO DE LOGIN 💊[/bold cyan]",
@@ -223,10 +352,9 @@ def selector_con_flechas(opciones):
         elif key == readchar.key.ENTER:
             return seleccion
 
-
-# -------------------------------------------------------------
+# =====================================================================
 # FUNCIONALIDADES DE LOGIN
-# -------------------------------------------------------------
+# =====================================================================
 def registrar_usuario():
     limpiar()
     console.print(Panel("[bold yellow]🧾 Registro de nuevo usuario[/bold yellow]", border_style="bright_yellow", width=60))
@@ -290,15 +418,14 @@ def recuperar_contrasena():
     console.print("[error]❌ Usuario no encontrado.[/error]")
     time.sleep(1.5)
 
-
-# -------------------------------------------------------------
+# =====================================================================
 # INICIAR SESIÓN
-# -------------------------------------------------------------
+# =====================================================================
 def iniciar_sesion():
     limpiar()
     console.print(Panel("[bold cyan]🔐 Iniciar sesión[/bold cyan]", border_style="bright_blue", width=60))
     usuario = console.input("Nombre de usuario: ").strip()
-    contrasena = input_oculto_simple("Contraseña: ")  # ← aquí entrada sin validación
+    contrasena = input_oculto_simple("Contraseña: ")
 
     resultado = validar_credenciales(usuario, contrasena)
     if resultado == "pendiente":
@@ -313,16 +440,21 @@ def iniciar_sesion():
     time.sleep(1.5)
     return None
 
-
-# -------------------------------------------------------------
+# =====================================================================
 # FUNCIÓN PRINCIPAL DEL LOGIN
-# -------------------------------------------------------------
-from Vista.vista_superadmin import panel_superadmin
-
+# =====================================================================
+try:
+    from Vista.vista_superadmin import panel_superadmin
+except ImportError:
+    def panel_superadmin(usuario):
+        limpiar()
+        console.print("[bold green]Panel de Superadmin cargado[/bold green]")
+        time.sleep(2)
 
 def login():
+    mostrar_splash_rapido()
     asegurar_data()
-    opciones = ["Iniciar sesión", "Registrarse", "Recuperar contraseña", "Salir"]
+    opciones = ["Iniciar sesión", "Registrarse", "Recuperar contraseña", "Ver Créditos", "Salir"]
     while True:
         idx = selector_con_flechas(opciones)
         opcion = opciones[idx]
@@ -336,8 +468,16 @@ def login():
             registrar_usuario()
         elif opcion == "Recuperar contraseña":
             recuperar_contrasena()
+        elif opcion == "Ver Créditos":
+            mostrar_splash_creditos()
         elif opcion == "Salir":
             limpiar()
             console.print(Panel("[bold red]👋 Saliendo del sistema...[/bold red]", border_style="red", width=60))
             time.sleep(1)
             exit()
+
+# =====================================================================
+# EJECUTAR EL LOGIN
+# =====================================================================
+if __name__ == "__main__":
+    login()
