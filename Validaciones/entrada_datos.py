@@ -1,60 +1,111 @@
 # Datos obligatorios en registros relacionados
-# Coherencia entre módulos (por ejemplo, pedido vinculado a cliente existente)
+# Validador de documento no repetido
 # -*- coding: utf-8 -*-
-"""
-Validaciones de Relaciones y Coherencia entre Módulos (con Rich).
 
-Verifica:
-- Que existan los datos obligatorios en registros relacionados.
-- Que las relaciones sean coherentes (ej: pedido vinculado a cliente existente).
-"""
+
+import csv
+import json
+import os
 
 from rich.console import Console
+from rich.panel import Panel
 
 console = Console()
 
 
-def validar_existencia_relacion(id_relacion, lista_registros, nombre_relacion: str):
+def validar_documento_unico(
+    documento: str, lista_registros: list, nombre_archivo: str
+    ) -> bool:
     """
-    Verifica que un ID relacionado (por ejemplo, id_cliente) exista en otra lista o módulo.
+    Verifica si un documento ya está registrado en una lista de diccionarios.
 
-    Parámetros:
-    - id_relacion: valor del ID que se está comprobando (ej: 3)
-    - lista_registros: lista de diccionarios con los registros existentes (ej: lista de clientes)
-    - nombre_relacion: texto descriptivo de la relación (ej: 'cliente', 'paciente', 'médico')
+    Args:
+        documento (str): Documento a verificar.
+        lista_registros (list): Lista de registros cargados desde archivo
+        (cada uno es un dict).
+        nombre_archivo (str): Nombre del módulo o tipo de registro
+        (ej: 'Paciente', 'Médico').
 
-    Retorna:
-    - True si existe
-    - False si no existe (y muestra advertencia)
+    Returns:
+        bool: True si el documento es único, False si ya existe.
     """
-    existe = any(str(r.get("id")) == str(id_relacion) for r in lista_registros)
-
-    if not existe:
-        console.print(f"[bold red]❌ No se encontró un {nombre_relacion} con ID {id_relacion}. "
-                    f"Verifica que el {nombre_relacion} exista antes de continuar.[/bold red]")
-        return False
-
-    console.print(f"[bold green]✅ {nombre_relacion.capitalize()} con ID {id_relacion} verificado correctamente.[/bold green]")
+    for registro in lista_registros:
+        if str(registro.get("documento", "")).strip() == str(documento).strip():
+            console.print(Panel.fit(
+                f"[bold red]⚠️ El documento {documento} "
+                "ya está registrado en {nombre_archivo}.[/bold red]",
+                border_style="red"
+            ))
+            return False
     return True
 
 
-
-def validar_datos_relacion_obligatorios(datos: dict, campos_obligatorios: list, nombre_relacion: str):
+def validar_datos_relacion_obligatorios(
+    datos: dict, campos_obligatorios: list, nombre_relacion: str):
     """
-    Comprueba que los campos requeridos de una relación (como cliente o médico)
-    no estén vacíos o faltantes.
-
-    Parámetros:
-    - datos: diccionario del registro (ej: {"id":1,"nombre":"Juan"})
-    - campos_obligatorios: lista de campos que deben existir y tener valor
-    - nombre_relacion: texto descriptivo del módulo o relación
+        Comprueba que los campos requeridos de una relación (como cliente o médico)
+        no estén vacíos o faltantes.
+        Args:
+            datos (dict): Diccionario con los datos de la relación.
+            campos_obligatorios (list): Lista de nombres de campos que son obligatorios.
+            nombre_relacion (str): Nombre del tipo de relación
+            (ej: 'Paciente', 'Médico').
+        Returns:
+            bool: True si todos los campos obligatorios están presentes,
+            False si faltan.
     """
     faltantes = [campo for campo in campos_obligatorios if not datos.get(campo)]
 
     if faltantes:
-        console.print(f"[bold yellow]⚠️ Faltan datos obligatorios del {nombre_relacion}: "
+        console.print(f"[bold yellow]⚠️ Faltan datos obligatorios del {nombre_relacion}:"
                     f"{', '.join(faltantes)}[/bold yellow]")
         return False
 
-    console.print(f"[bold green]✅ Todos los datos obligatorios del {nombre_relacion} están completos.[/bold green]")
+    console.print(f"[bold green]✅ Todos los datos obligatorios del {nombre_relacion} "
+                "están completos.[/bold green]")
     return True
+
+def validar_existencia_relacion(documento, lista, tipo):
+    """
+    Verifica si un paciente o médico existe en la lista, CSV o JSON.
+    """
+
+
+
+    # --- Definir nombres de archivos según tipo ---
+    nombre_base = tipo.lower()
+    archivo_csv = f"Data/{nombre_base}.csv"
+    archivo_json = f"Data/{nombre_base}.json"
+
+    # --- Buscar en el CSV ---
+    if os.path.exists(archivo_csv):
+        print(f"[DEBUG] Buscando en {archivo_csv}...")
+        with open(archivo_csv, "r", encoding="utf-8") as f:
+            lector = csv.DictReader(f)
+            for fila in lector:
+                print(f"[DEBUG] Revisando CSV: {fila.get('documento')}")
+                if str(fila.get("documento")) == str(documento):
+                    print("[DEBUG] Encontrado en CSV ✅")
+                    return True
+    else:
+        print(f"[DEBUG] No existe el archivo {archivo_csv}")
+
+    # --- Buscar en el JSON ---
+    if os.path.exists(archivo_json):
+        print(f"[DEBUG] Buscando en {archivo_json}...")
+        with open(archivo_json, "r", encoding="utf-8") as f:
+            try:
+                datos = json.load(f)
+                for item in datos:
+                    print(f"[DEBUG] Revisando JSON: {item.get('documento')}")
+                    if str(item.get("documento")) == str(documento):
+                        print("[DEBUG] Encontrado en JSON ✅")
+                        return True
+            except json.JSONDecodeError:
+                print("[DEBUG] Error al leer el JSON (vacío o mal formado)")
+    else:
+        print(f"[DEBUG] No existe el archivo {archivo_json}")
+
+    print("[DEBUG] No se encontró en ningún lugar ❌")
+
+    return False

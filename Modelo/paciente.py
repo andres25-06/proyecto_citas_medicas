@@ -13,13 +13,13 @@ from Controlador import gestor_datos_pacientes
 
 def generar_id(pacientes: List[Dict[str, Any]]) -> int:
     """
-    Genera un nuevo ID autoincremental para un aprendiz.
+        Genera un nuevo ID autoincremental para un aprendiz.
 
-    Args:
-        pacientes (List[Dict[str, Any]]): La lista actual de aprendices.
+        Args:
+            pacientes (List[Dict[str, Any]]): La lista actual de aprendices.
 
-    Returns:
-        int: El nuevo ID a asignar.
+        Returns:
+            int: El nuevo ID a asignar.
     """
     if not pacientes:
         return 1
@@ -36,21 +36,22 @@ def crear_paciente(
         telefono: int
 ) -> Optional[Dict[str, Any]]:
     """
-    (CREATE) Agrega un nuevo paciente a la agenda.
+        (CREATE) Agrega un nuevo paciente a la agenda.
 
-    Valida que el número de documento no exista antes de agregarlo.
+        Valida que el número de documento no exista antes de agregarlo.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        tipo_documento (str): Abreviatura del tipo de documento (ej. 'C.C').
-        documento (int): Número de documento del aprendiz.
-        nombres (str): Nombres del aprendiz.
-        apellidos (str): Apellidos del aprendiz.
-        direccion (str): Dirección de residencia.
-        telefono (int): Número de teléfono.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            tipo_documento (str): Abreviatura del tipo de documento (ej. 'C.C').
+            documento (int): Número de documento del aprendiz.
+            nombres (str): Nombres del aprendiz.
+            apellidos (str): Apellidos del aprendiz.
+            direccion (str): Dirección de residencia.
+            telefono (int): Número de teléfono.
 
-    Returns:
-        Optional[Dict[str, Any]]: El diccionario del paciente creado o None si ya existía.
+        Returns:
+            Optional[Dict[str, Any]]: El diccionario del paciente creado o
+            None si ya existía.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     str_documento = str(documento)
@@ -75,28 +76,33 @@ def crear_paciente(
     gestor_datos_pacientes.guardar_datos(filepath, pacientes)
     return nuevo_paciente
 
-def leer_todos_los_pacientes(filepath: str) -> List[Dict[str, Any]]:
+def leer_todos_los_pacientes(filepath: str) -> List[
+    Dict[str, Any]
+    ]:
     """
-    (READ) Obtiene la lista completa de los pacientes.
+        (READ) Obtiene la lista completa de los pacientes.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
+        Args:
+            filepath (str): Ruta al archivo de datos.
 
-    Returns:
-        List[Dict[str, Any]]: La lista de pacientes.
+        Returns:
+            List[Dict[str, Any]]: La lista de pacientes.
     """
     return gestor_datos_pacientes.cargar_datos(filepath)
 
-def buscar_paciente_por_documento(filepath: str, documento: str) -> Optional[Dict[str, Any]]:
+def buscar_paciente_por_documento(filepath: str, documento: str) -> Optional[
+    Dict[str, Any]
+    ]:
     """
-    Busca un paciente específico por su número de documento.
+        Busca un paciente específico por su número de documento.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        documento (str): El documento a buscar.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento (str): El documento a buscar.
 
-    Returns:
-        Optional[Dict[str, Any]]: El diccionario del paciente si se encuentra, de lo contrario None.
+        Returns:
+            Optional[Dict[str, Any]]: El diccionario del paciente si se encuentra,
+            de lo contrario None.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     for paciente in pacientes:
@@ -110,15 +116,16 @@ def actualizar_paciente(
         datos_nuevos: Dict[str, Any]
 ) -> Optional[Dict[str, Any]]:
     """
-    (UPDATE) Modifica los datos de un paciente existente.
+        (UPDATE) Modifica los datos de un paciente existente.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        documento (str): El documento del paciente a actualizar.
-        datos_nuevos (Dict[str, Any]): Un diccionario con los campos a actualizar.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento (str): El documento del paciente a actualizar.
+            datos_nuevos (Dict[str, Any]): Un diccionario con los campos a actualizar.
 
-    Returns:
-        Optional[Dict[str, Any]]: El diccionario del paciente actualizado, o None si no se encontró.
+        Returns:
+            Optional[Dict[str, Any]]: El diccionario del paciente actualizado,
+            o None si no se encontró.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     paciente_encontrado = None
@@ -148,14 +155,14 @@ def actualizar_paciente(
 
 def eliminar_paciente(filepath: str, documento: str) -> bool:
     """
-    (DELETE) Elimina un paciente de la agenda.
+        (DELETE) Elimina un paciente de la agenda.
 
-    Args:
-        filepath (str): Ruta al archivo de datos.
-        documento (str): El documento del paciente a eliminar.
+        Args:
+            filepath (str): Ruta al archivo de datos.
+            documento (str): El documento del paciente a eliminar.
 
-    Returns:
-        bool: True si el paciente fue eliminado, False si no se encontró.
+        Returns:
+            bool: True si el paciente fue eliminado, False si no se encontró.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     paciente_a_eliminar = None
@@ -168,7 +175,7 @@ def eliminar_paciente(filepath: str, documento: str) -> bool:
 
     # Eliminarlo si existe
     if paciente_a_eliminar:
-        pacientes.remove(paciente_a_eliminar)  
+        pacientes.remove(paciente_a_eliminar)
         gestor_datos_pacientes.guardar_datos(filepath, pacientes)
         return True
 
