@@ -511,7 +511,7 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
     if fecha is None:
         input("\nPresione Enter para continuar...")
         return
-    hora = validar_campos.validar_hora("[bold yellow]⏰ Ingresa la hora (HH:MM): [/bold yellow]")
+    hora = validar_campos.validar_hora(" la hora ")
     motivo = validar_campos.validar_texto("Motivo de la consulta")
     estado = estado_cita()
 
@@ -593,10 +593,7 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
         # 🔹 Mostrar actualización de estadísticas sin romper el flujo
         try:
             from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
-            console.print("\n[cyan]📊 Actualizando estadísticas médicas...[/cyan]")
             estadisticas_citas_por_medico(
-                ruta_medicos="data/medicos.csv",
-                ruta_citas="data/citas.json",
                 mostrar=False
             )
         except Exception as e:
