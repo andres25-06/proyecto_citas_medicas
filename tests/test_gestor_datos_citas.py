@@ -2,9 +2,7 @@ import csv
 import pytest
 from Controlador import gestor_datos_citas as gestor
 
-# ======================================================
 # TEST CRUD CITAS JSON
-# ======================================================
 def test_crud_citas_json(tmp_path):
     filepath = tmp_path / "citas.json"
 
@@ -48,9 +46,8 @@ def test_crud_citas_json(tmp_path):
     assert len(citas) == 0
 
 
-# ======================================================
 # TEST CRUD CITAS CSV
-# ======================================================
+
 def test_crud_citas_csv(tmp_path):
     filepath = tmp_path / "citas.csv"
 
