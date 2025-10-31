@@ -230,7 +230,7 @@ def calendario() -> Optional[str]:
 def estado_cita(permitir_vacio: bool = False) -> str | None:
     """
     Permite seleccionar el estado de la cita (Completatada, Pendiente o Cancelada) usando un selector interactivo.
-
+    """
 
 def estado_cita(permitir_vacio: bool = False) -> Optional[str]:
     tipos = {
