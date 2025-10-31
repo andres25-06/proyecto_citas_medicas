@@ -1,4 +1,0 @@
-id,documento_paciente,documento_medico,fecha,hora,motivo,estado
-1,1056928954,123456789,2025-11-01,12:00,dolor,Pendiente
-2,1056928954,123456789,2025-11-09,12:00,dolor,Completada
-3,1056928954,123456789,2025-11-15,9:00,dolor,Completada
