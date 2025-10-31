@@ -16,11 +16,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
+from rich.prompt import Confirm
 
 from Vista import navegacion
 from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
-
-
 
 # ---------------------------------
 # Inicialización
@@ -111,14 +110,12 @@ def guardar_json(ruta, datos):
 
 
 def cargar_csv_simple(ruta):
-
     """
         Carga CSV simple asumiendo encabezado en la primera línea y comas como separador.
         Args:
             ruta (str): Ruta al archivo CSV.
         Returns:
             List[Dict[str, str]]: Lista de diccionarios con los datos del CSV
-            
     """
     if not os.path.exists(ruta):
         return []
@@ -135,46 +132,181 @@ def cargar_csv_simple(ruta):
         filas.append(dict(zip(encabezado, valores)))
     return filas
 
-# -------------------- TABLAS VISUALES --------------------
-def mostrar_tabla_citas(citas, titulo="Citas"):
+
+def guardar_citas_csv(ruta_csv, citas):
     """
-        Estructura y muestra una tabla de citas médicas usando Rich.
-        Args:
-            citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
-            titulo (str): Título de la tabla.
-        Returns:
-            none
+    Guarda las citas en formato CSV.
+    Args:
+        ruta_csv (str): Ruta al archivo CSV
+        citas (list): Lista de diccionarios con las citas
+    Returns:
+        bool: True si se guardó correctamente
     """
-    tabla = Table(title=titulo, show_lines=True, box=box.SIMPLE)
-    tabla.add_column("ID Cita", style="bold yellow")
-    tabla.add_column("Paciente", style="cyan")
-    tabla.add_column("Médico", style="magenta")
-    tabla.add_column("Fecha", justify="center")
-    tabla.add_column("Hora", justify="center")
-    tabla.add_column("Motivo")
-    for c in citas:
-        tabla.add_row(
-            c.get("id_cita", ""),
-            c.get("paciente_nombre", c.get("id_paciente", "")),
-            c.get("medico_nombre", c.get("id_medico", "")),
-            c.get("fecha", ""),
-            c.get("hora", ""),
-            c.get("motivo_consulta", "")
-        )
-    console.print(tabla)
+    if not citas:
+        # Si no hay citas, crear archivo vacío con encabezados
+        with open(ruta_csv, 'w', encoding='utf-8', newline='') as f:
+            import csv as _csv
+            writer = _csv.DictWriter(f, fieldnames=['id', 'documento_paciente', 'documento_medico', 'fecha', 'hora', 'motivo', 'estado'])
+            writer.writeheader()
+        return True
+
+    try:
+        # Obtener todos los campos posibles
+        campos = []
+        for cita in citas:
+            for k in cita.keys():
+                if k not in campos and not k.startswith("_"):  # ignorar campos internos como _source
+                    campos.append(k)
+
+        # Asegurar orden de campos comunes
+        campos_ordenados = ['id', 'documento_paciente', 'documento_medico', 'fecha', 'hora', 'motivo', 'estado']
+        for c in campos:
+            if c not in campos_ordenados:
+                campos_ordenados.append(c)
+
+        import csv as _csv
+        with open(ruta_csv, 'w', encoding='utf-8', newline='') as f:
+            writer = _csv.DictWriter(f, fieldnames=campos_ordenados)
+            writer.writeheader()
+            # quitar campos internos antes de escribir
+            filas = []
+            for c in citas:
+                row = {k: v for k, v in c.items() if not k.startswith("_")}
+                filas.append(row)
+            writer.writerows(filas)
+        return True
+    except Exception as e:
+        console.print(f"[red]Error al guardar CSV: {e}[/red]")
+        return False
 
 # ---------------------------------
-# MOSTRAR TABLA GENÉRICA
+# FECHAS: normalizar
 # ---------------------------------
+def normalizar_fecha(fecha_str):
+    """
+    Intenta normalizar una fecha a formato YYYY-MM-DD.
+    Si no puede parsear, devuelve la cadena original.
+    Soporta formatos comunes: YYYY-MM-DD, DD/MM/YYYY, DD-MM-YYYY, YYYY/MM/DD.
+    """
+    if not fecha_str:
+        return ""
+    fecha_str = fecha_str.strip()
+    formatos = ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%Y/%m/%d", "%Y-%d-%m"]
+    for fmt in formatos:
+        try:
+            dt = datetime.strptime(fecha_str, fmt)
+            return dt.strftime("%Y-%m-%d")
+        except Exception:
+            continue
+    # si no pudo, intentar heurística: si contiene '/' y patrón dd/mm/yyyy invert
+    m = re.match(r"(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})", fecha_str)
+    if m:
+        d, mo, y = m.groups()
+        if len(y) == 2:
+            y = "20" + y
+        try:
+            dt = datetime(int(y), int(mo), int(d))
+            return dt.strftime("%Y-%m-%d")
+        except Exception:
+            pass
+    # fallback: devolver original (no normalizada)
+    return fecha_str
+
+# ---------------------------------
+# CARGAR / ELIMINAR CITAS (JSON + CSV juntos)
+# ---------------------------------
+def cargar_citas(ruta_base="data/citas"):
+    """
+    Carga citas desde JSON y CSV, las fusiona y retorna la lista combinada.
+    Cada cita contiene el campo interno "_source" con valor "json" o "csv".
+    Args:
+        ruta_base (str): Ruta base sin extensión
+    Returns:
+        list: lista de citas combinadas
+    """
+    ruta_json = ruta_base + ".json"
+    ruta_csv = ruta_base + ".csv"
+
+    citas_comb = []
+
+    # JSON
+    if os.path.exists(ruta_json):
+        try:
+            j = cargar_json(ruta_json)
+            if isinstance(j, list):
+                for c in j:
+                    c = dict(c)  # copia
+                    # normalizar fecha si existe
+                    raw_fecha = c.get("fecha", "")
+                    c["_original_fecha"] = raw_fecha
+                    c["fecha"] = normalizar_fecha(raw_fecha) if raw_fecha else ""
+                    c["_source"] = "json"
+                    citas_comb.append(c)
+        except Exception:
+            pass
+
+    # CSV
+    if os.path.exists(ruta_csv):
+        try:
+            cvs = cargar_csv_simple(ruta_csv)
+            for c in cvs:
+                c = dict(c)  # copia
+                raw_fecha = c.get("fecha", "")
+                c["_original_fecha"] = raw_fecha
+                c["fecha"] = normalizar_fecha(raw_fecha) if raw_fecha else ""
+                c["_source"] = "csv"
+                citas_comb.append(c)
+        except Exception:
+            pass
+
+    return citas_comb
+
+def eliminar_cita_por_id(id_cita, ruta_base="data/citas"):
+    """
+    Elimina la cita con id `id_cita` buscando tanto en JSON como en CSV.
+    Si existe en ambos, elimina de ambos (retorna info de dónde fue eliminada).
+    Args:
+        id_cita (str)
+        ruta_base (str)
+    Returns:
+        dict: {'json': bool, 'csv': bool} indicando si se eliminó en cada formato
+    """
+    id_cita = str(id_cita)
+    ruta_json = ruta_base + ".json"
+    ruta_csv = ruta_base + ".csv"
+    resultado = {"json": False, "csv": False}
+
+    # JSON
+    if os.path.exists(ruta_json):
+        try:
+            citas = cargar_json(ruta_json) or []
+            citas_n = [c for c in citas if str(c.get("id", "")) != id_cita]
+            if len(citas_n) != len(citas):
+                guardar_json(ruta_json, citas_n)
+                resultado["json"] = True
+        except Exception:
+            pass
+
+    # CSV
+    if os.path.exists(ruta_csv):
+        try:
+            cvs = cargar_csv_simple(ruta_csv) or []
+            cvs_n = [c for c in cvs if str(c.get("id", "")) != id_cita]
+            if len(cvs_n) != len(cvs):
+                guardar_citas_csv(ruta_csv, cvs_n)
+                resultado["csv"] = True
+        except Exception:
+            pass
+
+    return resultado
+
+# ============================================================
+# MOSTRAR TABLA DE CITAS (se mantiene la versión genérica)
+# ============================================================
+
 def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
     """
         Muestra una tabla genérica con Rich.
-        Args:
-            lista (List[Dict[str, str]]): Datos a mostrar.
-            columnas (List[str]): Nombres de las columnas.
-            titulo (str): Título de la tabla.
-        Returns:
-            none
     """
     if not lista:
         console.print(Panel
@@ -191,26 +323,8 @@ def mostrar_tabla_generica(lista, columnas, titulo="Tabla"):
         tabla.add_row(*fila)
     console.print(tabla)
 
-
 # ---------------------------------
-# BUSCADOR GENÉRICO
-# ---------------------------------
-def buscador(lista, campo, termino):
-    """
-    Realiza una búsqueda simple (case insensitive).
-    Args:
-        lista (List[Dict[str, str]]): Lista de registros.
-        campo (str): Campo donde buscar.
-        termino (str): Texto a buscar.
-    Returns:
-        List[Dict[str, str]]: Coincidencias encontradas.
-    """
-    patron = re.compile(re.escape(termino), re.IGNORECASE)
-    return [item for item in lista if patron.search(str(item.get(campo, "")))]
-
-
-# ---------------------------------
-# MOSTRAR TABLA DE CITAS
+# MOSTRAR TABLA DE CITAS (NO CALENDAR)
 # ---------------------------------
 def mostrar_tabla_citas(
     citas,
@@ -219,22 +333,10 @@ def mostrar_tabla_citas(
     titulo="📋 Lista de Citas"
 ):
     """
-        Muestra las citas médicas con formato visual enriquecido.
-        Args:
-            citas (List[Dict[str, str]]): Lista de diccionarios con los datos de las citas.
-            ruta_pacientes (str): Ruta al archivo CSV de pacientes.
-            ruta_medicos (str): Ruta al archivo CSV de médicos.
-            titulo (str): Título de la tabla.
-        Returns:
-            none
+    Muestra las citas médicas con formato visual enriquecido.
+    Ahora puede recibir citas ya fusionadas (tienen _source).
     """
-    from Vista.vista_cita import (  # evita import circular
-        cargar_datos,
-        obtener_nombre_por_documento,
-    )
-
-    pacientes = cargar_datos(ruta_pacientes)
-    medicos = cargar_datos(ruta_medicos)
+    from Vista.vista_cita import obtener_nombre_por_documento
 
     if not citas:
         console.print(Panel
@@ -257,14 +359,16 @@ def mostrar_tabla_citas(
     tabla.add_column("📅 Fecha", justify="center", style="bright_green")
     tabla.add_column("⏰ Hora", justify="center", style="bright_yellow")
     tabla.add_column("💬 Motivo", style="white")
+    tabla.add_column("📁 Origen", justify="center", style="white")
     tabla.add_column("📌 Estado", justify="center", style="bold")
 
     for idx, c in enumerate(citas, start=1):
-        doc_paciente = c.get("documento_paciente") or c.get("id_paciente") or c.get("paciente")
-        doc_medico = c.get("documento_medico") or c.get("id_medico") or c.get("medico")
+        # Usar los nombres de campos correctos del modelo
+        doc_paciente = c.get("documento_paciente", "")
+        doc_medico = c.get("documento_medico", "")
 
-        nombre_paciente = obtener_nombre_por_documento(pacientes, doc_paciente)
-        nombre_medico = obtener_nombre_por_documento(medicos, doc_medico)
+        nombre_paciente = obtener_nombre_por_documento("data/pacientes", doc_paciente)
+        nombre_medico = obtener_nombre_por_documento("data/medicos", doc_medico)
 
         estado = str(c.get("estado", "Desconocido")).capitalize()
         if estado.lower() == "pendiente":
@@ -276,15 +380,16 @@ def mostrar_tabla_citas(
         else:
             color_estado = f"[dim]{estado}[/dim]"
 
-        fila_color = "white" if idx % 2 == 0 else "bright_white"
+        origen = c.get("_source", "desconocido").upper()
 
         tabla.add_row(
-            f"[{fila_color}]{c.get('id', '')}[/{fila_color}]",
-            f"[{fila_color}]{nombre_paciente}[/{fila_color}]",
-            f"[{fila_color}]{nombre_medico}[/{fila_color}]",
-            f"[{fila_color}]{c.get('fecha', '')}[/{fila_color}]",
-            f"[{fila_color}]{c.get('hora', '')}[/{fila_color}]",
-            f"[{fila_color}]{c.get('motivo', '')}[/{fila_color}]",
+            str(c.get('id', '')),
+            nombre_paciente,
+            nombre_medico,
+            c.get('fecha', ''),
+            c.get('hora', ''),
+            c.get('motivo', ''),
+            origen,
             color_estado
         )
 
@@ -302,34 +407,51 @@ def mostrar_tabla_citas(
 # CALENDARIO INTERACTIVO
 # ---------------------------------
 
-def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
+import csv
+
+def mostrar_calendario_interactivo(ruta_citas="data/citas"):
     """
-        Estructura y muestra un calendario interactivo de citas médicas.
-        Args:
-            ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
-        Returns:
-            none
-            
+    Estructura y muestra un calendario interactivo de citas médicas.
+    Soporta tanto JSON como CSV (fusionando ambos).
     """
     hoy = datetime.now()
     año, mes = hoy.year, hoy.month
 
     while True:
         limpiar()
-        citas = cargar_json(ruta_citas)
+
+        citas = cargar_citas(ruta_citas)
 
         dias_citas = set()
         for c in citas:
+            fecha_str = c.get("fecha", "")
+            if not fecha_str:
+                continue
             try:
-                f = datetime.strptime(c.get("fecha", ""), "%Y-%m-%d")
+                f = datetime.strptime(fecha_str, "%Y-%m-%d")
                 if f.year == año and f.month == mes:
                     dias_citas.add(f.day)
             except Exception:
                 continue
 
         nombre_mes = calendar.month_name[mes]
+        citas_este_mes = 0
+        for c in citas:
+            fecha_str = c.get("fecha", "")
+            try:
+                f = datetime.strptime(fecha_str, "%Y-%m-%d")
+                if f.year == año and f.month == mes:
+                    citas_este_mes += 1
+            except Exception:
+                continue
+
+        formatos_presentes = sorted(list({c.get("_source", "") for c in citas if c.get("_source")}))
+        formato_display = "+".join([f.upper() for f in formatos_presentes]) if formatos_presentes else "Ninguno"
+        icono_formato = "🧾" if "json" in formatos_presentes and "csv" not in formatos_presentes else ("📄" if "csv" in formatos_presentes and "json" not in formatos_presentes else "🧾📄" if formatos_presentes else "❓")
+
         panel_titulo = Panel.fit(
-            f"📅 [bold bright_cyan]{nombre_mes} {año}[/bold bright_cyan]",
+            f"📅 [bold bright_cyan]{nombre_mes} {año}[/bold bright_cyan]\n"
+            f"[dim]Citas este mes: {citas_este_mes} | Formato: {icono_formato} {formato_display}[/dim]",
             border_style="bright_green",
             box=ROUNDED,
             padding=(0, 4)
@@ -396,7 +518,10 @@ def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
             console.print(Panel(
             "[bold magenta]📊 Mostrando estadísticas de citas por médico...[/bold magenta]",
             border_style="magenta"))
-            estadisticas_citas_por_medico()
+            try:
+                estadisticas_citas_por_medico()
+            except Exception as e:
+                console.print(f"[red]Error generando estadísticas: {e}[/red]")
             console.input("\n[cyan]Presiona Enter para volver[/cyan]")
 
         elif tecla == readchar.key.ENTER:
@@ -412,65 +537,143 @@ def mostrar_calendario_interactivo(ruta_citas="data/citas.json"):
                 console.print("[red]❌ Entrada no válida.[/red]")
                 time.sleep(0.8)
 
-# ---------------------------------
-# MOSTRAR / CANCELAR CITAS POR DÍA
-# ---------------------------------
 
-def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas.json"):
+def mostrar_citas_por_dia(año, mes, dia, ruta_citas="data/citas"):
     """
-        Estructura y muestra las citas de un día específico, permitiendo cancelar.
-        Args:
-            año (int): Año de la fecha a mostrar.
-            mes (int): Mes de la fecha a mostrar.
-            dia (int): Día de la fecha a mostrar.
-            ruta_citas (str): Ruta al archivo JSON donde se almacenan las citas.
-        Returns:
-            none
-            
+    Muestra las citas de un día específico y permite cancelar.
+    Soporta JSON + CSV fusionados.
     """
     fecha = f"{año:04d}-{mes:02d}-{dia:02d}"
-    citas = cargar_json(ruta_citas)
-    citas_dia = [c for c in citas if c.get("fecha") == fecha]
+
+    citas = cargar_citas(ruta_citas)
+    citas_dia = []
+    for c in citas:
+        if c.get("fecha") == fecha:
+            citas_dia.append(c)
+
     limpiar()
     if not citas_dia:
         console.print(f"[yellow]No hay citas para el {fecha}[/yellow]")
         console.input("[cyan]Enter para volver...[/cyan]")
         return
 
-    mostrar_tabla_citas(citas_dia, titulo=f"Citas del {fecha}")
-    console.print(
-        "\n[c]Acciones:[/c] [cyan]id_cita[/cyan] para cancelar, Enter para volver."
+    from Vista.vista_cita import obtener_nombre_por_documento
+
+    tabla = Table(
+        title=f"📅 Citas del {fecha}",
+        show_lines=True,
+        box=box.ROUNDED,
+        border_style="bright_blue"
+    )
+
+    tabla.add_column("Índice", justify="center", style="dim")
+    tabla.add_column("🆔 ID", justify="center", style="bold yellow")
+    tabla.add_column("👤 Paciente", style="bright_cyan")
+    tabla.add_column("🩺 Médico", style="bright_magenta")
+    tabla.add_column("⏰ Hora", justify="center", style="bright_yellow")
+    tabla.add_column("💬 Motivo", style="white")
+    tabla.add_column("📁 Origen", justify="center", style="white")
+    tabla.add_column("📌 Estado", justify="center", style="bold")
+
+    for idx, c in enumerate(citas_dia, start=1):
+        nombre_paciente = obtener_nombre_por_documento("data/pacientes", c.get("documento_paciente", ""))
+        nombre_medico = obtener_nombre_por_documento("data/medicos", c.get("documento_medico", ""))
+        estado = str(c.get("estado", "Desconocido")).capitalize()
+        if estado.lower() == "pendiente":
+            color_estado = "[bold yellow]🕒 Pendiente[/bold yellow]"
+        elif estado.lower() in ("completada", "realizada"):
+            color_estado = "[bold green]✅ Completada[/bold green]"
+        elif estado.lower() == "cancelada":
+            color_estado = "[bold red]❌ Cancelada[/bold red]"
+        else:
+            color_estado = f"[dim]{estado}[/dim]"
+
+        origen = c.get("_source", "desconocido").upper()
+
+        tabla.add_row(
+            str(idx),
+            str(c.get("id", "")),
+            nombre_paciente,
+            nombre_medico,
+            c.get("hora", ""),
+            c.get("motivo", ""),
+            origen,
+            color_estado
         )
-    opcion = console.input(
-        "[cyan]Ingrese ID de cita a cancelar (o Enter): [/cyan]"
-        ).strip()
+
+    console.print(tabla)
+
+    console.print(
+        f"\n[cyan]Acciones:[/cyan] Ingrese [yellow]ID de cita[/yellow] para cancelar "
+        f"(se mostrará el origen), o [cyan]Enter[/cyan] para volver."
+    )
+    opcion = console.input("[cyan]Ingrese ID de cita a cancelar (o Enter): [/cyan]").strip()
+
     if opcion == "":
         return
 
-    citas_all = cargar_json(ruta_citas)
-    if not any(str(c.get("id")) == opcion for c in citas_all):
-        console.print("[red]ID no encontrado.[/red]")
+    # Buscar coincidencias por id en las citas del día
+    matches = [c for c in citas_dia if str(c.get("id")) == opcion]
+    if not matches:
+        console.print("[red]❌ ID no encontrado en las citas de este día.[/red]")
         time.sleep(0.8)
         return
 
-    citas_all = [c for c in citas_all if str(c.get("id")) != opcion]
-    guardar_json(ruta_citas, citas_all)
-    console.print("[green]Cita cancelada con éxito.[/green]")
-    time.sleep(0.8)
+    # Si hay múltiples coincidencias (mismo id en ambos archivos), pedir elegir cuál
+    cita_seleccionada = None
+    if len(matches) == 1:
+        cita_seleccionada = matches[0]
+    else:
+        console.print("[yellow]Se encontraron múltiples citas con ese ID en diferentes orígenes:[/yellow]")
+        for i, c in enumerate(matches, start=1):
+            console.print(f"[{i}] ID: {c.get('id')} | Origen: {c.get('_source')} | Hora: {c.get('hora')} | Motivo: {c.get('motivo')}")
+        sel = console.input("[cyan]Ingrese el número de la cita a cancelar: [/cyan]").strip()
+        if sel.isdigit():
+            sel_i = int(sel)
+            if 1 <= sel_i <= len(matches):
+                cita_seleccionada = matches[sel_i - 1]
+            else:
+                console.print("[red]Selección inválida.[/red]")
+                time.sleep(0.8)
+                return
+        else:
+            console.print("[red]Entrada inválida.[/red]")
+            time.sleep(0.8)
+            return
 
-# ---------------------------------
-# ESTADÍSTICAS
-# ---------------------------------
+    # Detalles de la cita seleccionada
+    console.print(Panel.fit(
+        f"[bold yellow]Cita a cancelar:[/bold yellow]\n"
+        f"🆔 ID: {cita_seleccionada.get('id')}\n"
+        f"📅 Fecha: {cita_seleccionada.get('fecha')}\n"
+        f"⏰ Hora: {cita_seleccionada.get('hora')}\n"
+        f"💬 Motivo: {cita_seleccionada.get('motivo')}\n"
+        f"📁 Origen: {cita_seleccionada.get('_source')}",
+        border_style="yellow"
+    ))
 
-from collections import Counter, defaultdict
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.text import Text
-from rich.box import ROUNDED
+    # Confirmar cancelación
+    if Confirm.ask(f"¿Está seguro de cancelar esta cita?", default=False):
+        res = eliminar_cita_por_id(cita_seleccionada.get("id"), ruta_citas)
+        eliminado_en = [k for k, v in res.items() if v]
+        if eliminado_en:
+            console.print(Panel(
+                f"[bold green]✅ Cita eliminada en: {', '.join(eliminado_en).upper()}[/bold green]",
+                border_style="green"
+            ))
+            try:
+                estadisticas_citas_por_medico()
+            except Exception:
+                pass
+        else:
+            console.print(Panel(
+                "[bold red]❌ No se pudo eliminar la cita (archivo no encontrado o error).[/bold red]",
+                border_style="red"
+            ))
+    else:
+        console.print("[yellow]Operación cancelada por el usuario.[/yellow]")
 
-console = Console()
-
+    time.sleep(1.2)
 
 # ---------------------------------
 # SELECTOR INTERACTIVO
@@ -479,12 +682,6 @@ console = Console()
 def selector_interactivo(titulo, opciones):
     """
         Estructura un selector interactivo usando readchar.
-        Args:
-            titulo (str): Título del menú.
-            opciones (List[str]): Lista de opciones a mostrar.
-        Returns:
-            int: Índice de la opción seleccionada.
-            
     """
     seleccion = 0
     while True:
@@ -511,14 +708,6 @@ def selector_interactivo(titulo, opciones):
 # ---------------------------------
 
 def mostrar_menu_simple():
-    """
-        Estructura y muestra un menú simple por consola.
-        Args:   
-            none
-        Returns:
-            str: Opción seleccionada por el usuario.
-            
-    """
     limpiar()
 
     opciones_tabla = Table(show_header=False, box=box.SIMPLE_HEAVY)
@@ -552,14 +741,8 @@ def mostrar_menu_simple():
 
 def vista_principal():
     """
-        Estructura y maneja el menú principal interactivo del sistema de citas médicas.
-        Args:
-            none
-        Returns:
-            none
-            
+        Menu principal interactivo.
     """
-    # menú que soporta selector interactivo y entrada por número (compatible)
     opciones = [
         "👤 Gestionar Pacientes",
         "🩺 Gestionar Médicos",
@@ -601,7 +784,7 @@ def vista_principal():
             animacion_carga("Abriendo módulo de médicos...")
             try:
                 navegacion.ir_a_menu_medicos()
-            except Exception as e:  
+            except Exception as e:
                 console.log(e)
                 console.print(
                             "[yellow]Módulo de médicos no encontrado. "
@@ -619,12 +802,15 @@ def vista_principal():
                     "(Placeholder)[/yellow]"
                     )
                 console.input("Enter para volver...")
-        elif indice==3:
+        elif indice == 3:
             mostrar_calendario_interactivo()
-            
-        elif indice==4:
-            estadisticas_citas_por_medico()
-        elif indice==5:
+        elif indice == 4:
+            try:
+                estadisticas_citas_por_medico()
+            except Exception as e:
+                console.print(f"[red]Error mostrando estadísticas: {e}[/red]")
+                console.input("Enter para volver...")
+        elif indice == 5:
             console.print(
                 "\n[bold red]Saliendo del sistema...[/bold red]"
                 )
@@ -637,7 +823,36 @@ def vista_principal():
             time.sleep(0.6)
 
 # ---------------------------------
-# EJECUCIÓN DIRECTA (debug / pruebas)
+# FUNCIÓN DE DEBUG (OPCIONAL)
 # ---------------------------------
+def verificar_citas_debug():
+    """
+    Función de debugging para verificar que las citas se estén cargando correctamente.
+    Ejecutar solo para pruebas.
+    """
+    ruta = "data/citas.json"
+    if os.path.exists(ruta):
+        with open(ruta, 'r', encoding='utf-8') as f:
+            citas = json.load(f)
+
+        console.print(Panel(f"[bold green]✅ Archivo encontrado: {ruta}[/bold green]"))
+        console.print(f"[cyan]Total de citas:[/cyan] {len(citas)}")
+
+        if citas:
+            console.print("\n[yellow]Primera cita como ejemplo:[/yellow]")
+            console.print(json.dumps(citas[0], indent=2, ensure_ascii=False))
+
+            console.print("\n[yellow]Campos disponibles:[/yellow]")
+            console.print(list(citas[0].keys()))
+
+            console.print("\n[yellow]Fechas encontradas:[/yellow]")
+            for c in citas[:5]:  # Mostrar máximo 5
+                console.print(f"  - ID {c.get('id')}: {c.get('fecha')}")
+    else:
+        console.print(Panel(f"[bold red]❌ Archivo no encontrado: {ruta}[/bold red]"))
+
+    console.input("\n[cyan]Presiona Enter para continuar...[/cyan]")
+
 if __name__ == "__main__":
+    verificar_citas_debug()
     vista_principal()
