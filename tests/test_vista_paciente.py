@@ -21,9 +21,9 @@ def archivo_csv(tmp_path):
     return tmp_path / "pacientes.csv"
 
 
-# ======================================================
-# 🔹 TEST: solicitar_tipo_documento
-# ======================================================
+
+# test solicitar_tipo_documento
+
 def test_solicitar_tipo_documento(monkeypatch):
     """Debe retornar el tipo de documento correcto"""
     with patch("Vista.vista_paciente.selector_interactivo", return_value=1):
@@ -45,9 +45,9 @@ def test_elegir_almacenamiento(monkeypatch, opcion, esperado):
         assert ruta.endswith(esperado)
 
 
-# ======================================================
-# 🔹 TEST: menu_crear_paciente
-# ======================================================
+
+# test menu_crear_paciente
+
 def test_menu_crear_paciente(mock_paciente, archivo_csv, monkeypatch):
     """Debe crear un paciente correctamente"""
     # Mock de validaciones y entradas
@@ -65,9 +65,8 @@ def test_menu_crear_paciente(mock_paciente, archivo_csv, monkeypatch):
     mock_paciente.crear_paciente.assert_called_once()
 
 
-# ======================================================
-# 🔹 TEST: menu_leer_pacientes
-# ======================================================
+# test menu_leer_pacientes
+
 def test_menu_leer_pacientes_con_datos(mock_paciente, archivo_csv, monkeypatch):
     """Debe mostrar pacientes en una tabla"""
     mock_paciente.leer_todos_los_pacientes.return_value = [
@@ -86,9 +85,7 @@ def test_menu_leer_pacientes_vacio(mock_paciente, archivo_csv, monkeypatch):
     mock_paciente.leer_todos_los_pacientes.assert_called_once()
 
 
-# ======================================================
-# 🔹 TEST: menu_actualizar_paciente
-# ======================================================
+# tes menu_actualizar_paciente
 def test_menu_actualizar_paciente(mock_paciente, archivo_csv, monkeypatch):
     """Debe actualizar un paciente existente"""
     mock_paciente.buscar_paciente_por_documento.return_value = {
@@ -104,9 +101,7 @@ def test_menu_actualizar_paciente(mock_paciente, archivo_csv, monkeypatch):
     mock_paciente.actualizar_paciente.assert_called_once()
 
 
-# ======================================================
-# 🔹 TEST: menu_eliminar_paciente
-# ======================================================
+# test menu_eliminar_paciente
 def test_menu_eliminar_paciente_confirmado(mock_paciente, archivo_csv, monkeypatch):
     """Debe eliminar paciente si se confirma"""
     mock_paciente.buscar_paciente_por_documento.return_value = {
