@@ -29,8 +29,7 @@ def generar_id(citas: List[Dict[str, Any]]) -> int:
     return max_id + 1
 
 
-def crear_cita(
-        filepath: str,
+def crear_cita(filepath: str,
         documento_paciente: str,
         documento_medico: str,
         fecha: str,
@@ -53,7 +52,7 @@ def crear_cita(
             (ej. 'Pendiente', 'Completada', 'Cancelada').
 
         Returns:
-            Optional[Dict[str, Any]]: El diccionario de 
+            Optional[Dict[str, Any]]: El diccionario de
             la cita creada o None si ya existía.
     """
     citas = gestor_datos_citas.cargar_datos(filepath)
@@ -65,7 +64,8 @@ def crear_cita(
             cita.get('fecha') == fecha ):
             cita.get('hora') == hora
             print(
-                "\n Error: Ya existe una cita registrada para ese paciente, médico, fecha y hora."
+                "\n Error: Ya existe una cita registrada para ese paciente,"
+                "médico, fecha y hora."
                 )
             return None
 
@@ -102,7 +102,9 @@ def leer_todas_las_citas(filepath: str) -> List[
 
 
 
-def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[Dict[str, Any]]:
+def buscar_cita_por_documento(filepath: str, documento_paciente: str) -> list[
+    Dict[str, Any]
+    ]:
     """
         Busca una cita específica por su documento.
 
@@ -156,7 +158,7 @@ def actualizar_cita(
 console = Console()
 def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     """
-    Permite eliminar una cita específica de un 
+    Permite eliminar una cita específica de un
     paciente mostrando sus citas en una tabla.
     Args:
         filepath (str): Ruta del archivo de citas
@@ -170,7 +172,10 @@ def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     citas_paciente = [c for c in citas if c.get("documento_paciente") == documento]
 
     if not citas_paciente:
-        console.print(Panel("[bold yellow]⚠️ No se encontraron citas asociadas a este documento.[/bold yellow]", border_style="yellow"))
+        console.print(Panel
+                    ("[bold yellow]⚠️ No se encontraron citas asociadas a este"
+                    "documento.[/bold yellow]",
+                    border_style="yellow"))
         return False
 
     table = Table(title="📅 Citas del paciente", show_lines=True, border_style="cyan")
@@ -203,11 +208,18 @@ def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     cita_a_eliminar = citas_paciente[opcion - 1]
 
     console.print(Panel.fit(
-        f"¿Eliminar la cita del [bold cyan]{cita_a_eliminar.get('fecha', 'N/A')}[/bold cyan] a las [bold cyan]{cita_a_eliminar.get('hora', 'N/A')}[/bold cyan]?",
+        f"¿Eliminar la cita del [bold cyan]{
+            cita_a_eliminar.get('fecha', 'N/A')
+            }[/bold cyan] a las [bold cyan]{
+            cita_a_eliminar.get('hora', 'N/A')
+            }[/bold cyan]?",
         border_style="red"
     ))
 
-    confirmacion = Prompt.ask("Escriba [bold red]S[/bold red] para confirmar o [bold yellow]N[/bold yellow] para cancelar").strip().lower()
+    confirmacion = Prompt.ask(
+        "Escriba [bold red]S[/bold red] para confirmar o [bold yellow]N[/bold yellow]"
+        "para cancelar"
+        ).strip().lower()
     if confirmacion != "s":
         console.print("[yellow]Operación cancelada por el usuario.[/yellow]")
         return False
@@ -215,7 +227,8 @@ def eliminar_cita_por_documento(filepath: str, documento: str) -> bool:
     citas.remove(cita_a_eliminar)
     gestor_datos_citas.guardar_datos(filepath, citas)
 
-    console.print(Panel("[bold green]✅ Cita eliminada correctamente.[/bold green]", border_style="green"))
+    console.print(Panel("[bold green]✅ Cita eliminada correctamente.[/bold green]",
+                        border_style="green"))
     return True
 
 

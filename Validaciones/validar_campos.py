@@ -164,7 +164,6 @@ def validar_cedula(etiqueta: str, filepath: str, min_digitos: int = 6, max_digit
         # Si todo está correcto
         return valor
 
-from datetime import datetime
 
 def validar_hora(etiqueta: str) -> str:
     """

@@ -1,26 +1,26 @@
 # vista_login.py
-import os
-import time
 import json
+import os
 import random
-import string
-import readchar
 import re
-from rich.console import Console
-from rich.panel import Panel
+import string
+import time
+
+import readchar
 from rich.align import Align
-from rich.text import Text
-from rich.theme import Theme
+from rich.console import Console
 from rich.live import Live
+from rich.panel import Panel
+from rich.progress import BarColumn, Progress, TextColumn
 from rich.table import Table
-from rich.progress import Progress, BarColumn, TextColumn
+from rich.theme import Theme
 
 # -------------------------------------------------------------
 # CONFIGURACIÓN DE CONSOLA Y TEMA
 # -------------------------------------------------------------
 custom_theme = Theme({
     "title": "bold white on blue",
-    "menu": "cyan", 
+    "menu": "cyan",
     "selected_normal": "bold white on blue",
     "selected_danger": "bold white on red",
     "danger": "red",
@@ -154,9 +154,8 @@ def input_oculto_registro(prompt="Contraseña: ", require_strong=False):
                 contrasena = contrasena[:-1]
             elif ch == "\x03":
                 raise KeyboardInterrupt
-            else:
-                if len(contrasena) < 128:
-                    contrasena += ch
+            elif len(contrasena) < 128:
+                contrasena += ch
 
 
 # -------------------------------------------------------------
@@ -182,11 +181,10 @@ def input_oculto_simple(prompt="Contraseña: "):
         elif ch == "\x03":
             raise KeyboardInterrupt
         # CARACTER NORMAL
-        else:
-            if len(contrasena) < 128:
-                contrasena += ch
-                # muestra asterisco visual
-                print("*", end="", flush=True)
+        elif len(contrasena) < 128:
+            contrasena += ch
+            # muestra asterisco visual
+            print("*", end="", flush=True)
 
 
 
@@ -202,11 +200,10 @@ def cuadro_login_render(opciones, seleccion):
                 lines.append(f"[selected_danger]  ▶ {op}[/selected_danger]")
             else:
                 lines.append(f"[danger]  {op}[/danger]")
+        elif is_selected:
+            lines.append(f"[selected_normal]  ▶ {op}[/selected_normal]")
         else:
-            if is_selected:
-                lines.append(f"[selected_normal]  ▶ {op}[/selected_normal]")
-            else:
-                lines.append(f"[menu]  {op}[/menu]")
+            lines.append(f"[menu]  {op}[/menu]")
     contenido = "\n".join(lines)
     panel = Panel(Align.center(contenido),
                   title="[bold cyan]💊 INGRESO AL SISTEMA - CUADRO DE LOGIN 💊[/bold cyan]",
@@ -321,6 +318,7 @@ def iniciar_sesion():
 # FUNCIÓN PRINCIPAL DEL LOGIN
 # -------------------------------------------------------------
 from Vista.vista_superadmin import panel_superadmin
+
 
 def login():
     asegurar_data()

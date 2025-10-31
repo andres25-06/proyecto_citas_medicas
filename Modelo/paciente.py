@@ -50,7 +50,8 @@ def crear_paciente(
             telefono (int): Número de teléfono.
 
         Returns:
-            Optional[Dict[str, Any]]: El diccionario del paciente creado o None si ya existía.
+            Optional[Dict[str, Any]]: El diccionario del paciente creado o
+            None si ya existía.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     str_documento = str(documento)
@@ -75,7 +76,9 @@ def crear_paciente(
     gestor_datos_pacientes.guardar_datos(filepath, pacientes)
     return nuevo_paciente
 
-def leer_todos_los_pacientes(filepath: str) -> List[Dict[str, Any]]:
+def leer_todos_los_pacientes(filepath: str) -> List[
+    Dict[str, Any]
+    ]:
     """
         (READ) Obtiene la lista completa de los pacientes.
 
@@ -87,7 +90,9 @@ def leer_todos_los_pacientes(filepath: str) -> List[Dict[str, Any]]:
     """
     return gestor_datos_pacientes.cargar_datos(filepath)
 
-def buscar_paciente_por_documento(filepath: str, documento: str) -> Optional[Dict[str, Any]]:
+def buscar_paciente_por_documento(filepath: str, documento: str) -> Optional[
+    Dict[str, Any]
+    ]:
     """
         Busca un paciente específico por su número de documento.
 
@@ -96,7 +101,8 @@ def buscar_paciente_por_documento(filepath: str, documento: str) -> Optional[Dic
             documento (str): El documento a buscar.
 
         Returns:
-            Optional[Dict[str, Any]]: El diccionario del paciente si se encuentra, de lo contrario None.
+            Optional[Dict[str, Any]]: El diccionario del paciente si se encuentra,
+            de lo contrario None.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     for paciente in pacientes:
@@ -118,7 +124,8 @@ def actualizar_paciente(
             datos_nuevos (Dict[str, Any]): Un diccionario con los campos a actualizar.
 
         Returns:
-            Optional[Dict[str, Any]]: El diccionario del paciente actualizado, o None si no se encontró.
+            Optional[Dict[str, Any]]: El diccionario del paciente actualizado,
+            o None si no se encontró.
     """
     pacientes = gestor_datos_pacientes.cargar_datos(filepath)
     paciente_encontrado = None

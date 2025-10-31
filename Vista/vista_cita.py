@@ -9,23 +9,17 @@ import datetime
 import json
 import os
 import time
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 import readchar
 from rich.console import Console
 from rich.panel import Panel
-from rich.prompt import Confirm, Prompt, IntPrompt
-from rich.table import Table
-import readchar
 from rich.prompt import Confirm, IntPrompt, Prompt
-from Vista import navegacion
+from rich.table import Table
 
 from Modelo import cita, medico, paciente
 from Validaciones import entrada_datos, validar_campos
 from Vista import navegacion
-
-from Validaciones import validar_campos
-from Validaciones import entrada_datos
 
 console = Console()
 
@@ -309,7 +303,7 @@ def cargar_datos(ruta: str) -> List[Dict[str, Any]]:
     """
     if not os.path.exists(ruta):
         return []
-    
+
     try:
         if ruta.endswith('.json'):
             with open(ruta, 'r', encoding='utf-8') as f:
@@ -363,14 +357,14 @@ def cargar_medicos_y_pacientes():
             pacientes = paciente.leer_todos_los_pacientes("data/pacientes.json")
     except Exception:
         pass
-    
+
     if not pacientes:
         try:
             if os.path.exists("data/pacientes.csv"):
                 pacientes = paciente.leer_todos_los_pacientes("data/pacientes.csv")
         except Exception:
             pass
-    
+
     # Cargar médicos
     medicos = []
     try:
@@ -378,14 +372,14 @@ def cargar_medicos_y_pacientes():
             medicos = medico.leer_todos_los_medicos("data/medicos.json")
     except Exception:
         pass
-    
+
     if not medicos:
         try:
             if os.path.exists("data/medicos.csv"):
                 medicos = medico.leer_todos_los_medicos("data/medicos.csv")
         except Exception:
             pass
-    
+
     return pacientes, medicos
 
 
@@ -512,7 +506,7 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
     # --- Solicitar datos con validaciones ---
     documento_paciente = validar_campos.validar_cedula("Documento del Paciente", filepath)
     documento_medico = validar_campos.validar_cedula("Documento del Médico", filepath)
-    
+
     fecha = calendario()
     if fecha is None:
         input("\nPresione Enter para continuar...")
@@ -539,10 +533,10 @@ def menu_agendar_cita(filepath: str, lista_pacientes: list, lista_medicos: list)
         if doc == str(documento_medico).strip():
             medico_encontrado = m
             break
-    
+
     if medico_encontrado:
         estado_medico = str(medico_encontrado.get("estado", "")).strip()
-        
+
         if estado_medico.lower() == "inactivo":
             console.print(Panel(
                 f"⚠️ El médico está INACTIVO y no puede atender citas.\n\n"
@@ -690,11 +684,11 @@ def menu_actualizar_cita(filepath: str):
 
     if Confirm.ask("¿Desea guardar los cambios?", default=True):
         cita_actualizada = cita.actualizar_cita(
-            filepath, 
-            cita_actual.get("id"), 
+            filepath,
+            cita_actual.get("id"),
             datos_nuevos
         )
-        
+
         if cita_actualizada:
             console.print(Panel("[bold green]✅ ¡Cita actualizada con éxito![/bold green]", border_style="green"))
         else:
@@ -732,7 +726,9 @@ def menu_cancelar_cita(filepath: str):
 
             # 🔹 Actualizar estadísticas automáticamente
             try:
-                from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
+                from Vista.vista_estadisticas_medico import (
+                    estadisticas_citas_por_medico,
+                )
                 console.print("\n[cyan]📊 Actualizando estadísticas de médicos...[/cyan]")
                 estadisticas_citas_por_medico(
                     ruta_medicos="data/medicos.csv",
