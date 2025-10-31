@@ -42,7 +42,6 @@ def limpiar():
 
 
 def elegir_almacenamiento() -> str:
-    limpiar()
     """
         Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo.
         
@@ -52,6 +51,7 @@ def elegir_almacenamiento() -> str:
             str: Ruta del archivo seleccionado para almacenamiento.
             
     """
+    limpiar()
     opciones = [
         "📄 CSV (Archivo de texto plano)",
         "🧾 JSON (Formato estructurado)",
@@ -97,7 +97,7 @@ def selector_interactivo(titulo, opciones):
         console.print(Panel(f"[bold cyan]{titulo}[/bold cyan]"))
         for i, opt in enumerate(opciones):
             prefix = "👉 " if i == seleccion else "   "
-            # Verde para opciones normales, rojo si es “volver”
+            # Verde para opciones normales, rojo si es "volver"
             if "Volver" in opt:
                 estilo = "reverse bold red" if i == seleccion else "bold red"
             else:
@@ -118,7 +118,6 @@ def selector_interactivo(titulo, opciones):
 # =========================================================
 
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
-    limpiar()
     """
         Permite seleccionar el tipo de documento usando el selector interactivo, con opción de volver.
         
@@ -128,6 +127,7 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
             str | None: Tipo de documento seleccionado o None si no se cambia.
             
     """
+    limpiar()
     tipos = {
         '1': 'C.C',
         '2': 'T.I',
@@ -230,7 +230,6 @@ def solicitar_especialidad_medica(permitir_vacio: bool = False) -> str | None:
     if permitir_vacio:
         opciones.insert(0, "🔸 No cambiar especialidad")
 
-
     seleccion = selector_interactivo("🏥 Seleccione la especialidad médica", opciones)
 
     # Si permite dejar vacío
@@ -248,7 +247,7 @@ def solicitar_especialidad_medica(permitir_vacio: bool = False) -> str | None:
     return especialidad
 
 # =========================================================
-# 🔹 Especialidades del Medico
+# 🔹 Estado del Médico
 # =========================================================
 
 def estado_medico(permitir_vacio: bool = False) -> str | None:
@@ -465,49 +464,111 @@ def menu_leer_medicos(filepath: str):
 
 def menu_actualizar_medico(filepath: str):
     """
-        Está función permite actualizar los datos de un médico existente.   
+        Esta función permite actualizar los datos de un médico existente,
+        incluyendo nombres, especialidad, teléfono, estado y consultorio.
         
         Args:
             filepath (str): La ruta al archivo donde se almacenan los médicos.
         Returns:        
             none
-    
     """
+    limpiar()
     console.print(Panel.fit("[bold cyan]✏️🩺 Actualizar Datos de Médico[/bold cyan]"))
-    id_medico = IntPrompt.ask("Ingrese el documento del médico a actualizar")
+    
+    documento = Prompt.ask("[bold yellow]Ingrese el documento del médico a actualizar[/bold yellow]")
 
-    medico_actual = medico.buscar_medico_por_documento(filepath, str(id_medico))
+    medico_actual = medico.buscar_medico_por_documento(filepath, str(documento))
     if not medico_actual:
         console.print("\n[bold red]❌ No se encontró ningún médico con ese documento.[/bold red]")
         input("\nPresione Enter para continuar...")
         return
 
-    console.print("\nPresione Enter para no modificar un campo.")
+    # Mostrar información actual del médico
+    console.print("\n[bold cyan]📋 Información actual del médico:[/bold cyan]")
+    info_actual = Table(show_header=False, box=None)
+    info_actual.add_row("👤 Nombres:", f"[yellow]{medico_actual.get('nombres', 'N/A')}[/yellow]")
+    info_actual.add_row("👤 Apellidos:", f"[yellow]{medico_actual.get('apellidos', 'N/A')}[/yellow]")
+    info_actual.add_row("🏥 Especialidad:", f"[yellow]{medico_actual.get('especialidad', 'N/A')}[/yellow]")
+    info_actual.add_row("📞 Teléfono:", f"[yellow]{medico_actual.get('telefono', 'N/A')}[/yellow]")
+    info_actual.add_row("📌 Estado:", f"[yellow]{medico_actual.get('estado', 'N/A')}[/yellow]")
+    info_actual.add_row("🚪 Consultorio:", f"[yellow]{medico_actual.get('consultorio', 'N/A')}[/yellow]")
+    console.print(info_actual)
+    
+    console.print("\n[dim]💡 Presione Enter para no modificar un campo o seleccione la opción para cambiar.[/dim]\n")
+    
     datos_nuevos = {}
 
-    nombres = Prompt.ask(f"Nombres ({medico_actual['nombres']})", default=medico_actual['nombres'])
-    if nombres != medico_actual['nombres']:
-        datos_nuevos['nombres'] = nombres
+    # Actualizar nombres
+    console.print("[bold]¿Desea cambiar el nombre?[/bold]")
+    if Confirm.ask("Cambiar nombres", default=False):
+        nombres = validar_campos.validar_texto("Nuevos nombres").capitalize()
+        if nombres != medico_actual.get('nombres'):
+            datos_nuevos['nombres'] = nombres
 
-    especialidad = Prompt.ask(f"Especialidad ({medico_actual['especialidad']})", default=medico_actual['especialidad'])
-    if especialidad != medico_actual['especialidad']:
-        datos_nuevos['especialidad'] = especialidad
+    # Actualizar apellidos
+    console.print("\n[bold]¿Desea cambiar los apellidos?[/bold]")
+    if Confirm.ask("Cambiar apellidos", default=False):
+        apellidos = validar_campos.validar_texto("Nuevos apellidos").capitalize()
+        if apellidos != medico_actual.get('apellidos'):
+            datos_nuevos['apellidos'] = apellidos
 
-    telefono = IntPrompt.ask(f"Teléfono ({medico_actual['telefono']})", default=int(medico_actual['telefono']))
-    if telefono != int(medico_actual['telefono']):
-        datos_nuevos['telefono'] = telefono
+    # Actualizar especialidad con selector interactivo
+    console.print("\n[bold]¿Desea cambiar la especialidad?[/bold]")
+    if Confirm.ask("Cambiar especialidad", default=False):
+        nueva_especialidad = solicitar_especialidad_medica(permitir_vacio=True)
+        if nueva_especialidad and nueva_especialidad != medico_actual.get('especialidad'):
+            datos_nuevos['especialidad'] = nueva_especialidad
+
+    # Actualizar teléfono
+    console.print("\n[bold]¿Desea cambiar el teléfono?[/bold]")
+    if Confirm.ask("Cambiar teléfono", default=False):
+        nuevo_telefono = validar_campos.validar_telefono("Nuevo teléfono")
+        if nuevo_telefono != medico_actual.get('telefono'):
+            datos_nuevos['telefono'] = nuevo_telefono
+
+    # 🆕 Actualizar ESTADO con selector interactivo
+    console.print("\n[bold]¿Desea cambiar el estado del médico (Activo/Inactivo)?[/bold]")
+    if Confirm.ask("Cambiar estado", default=False):
+        nuevo_estado = estado_medico(permitir_vacio=True)
+        if nuevo_estado and nuevo_estado != medico_actual.get('estado'):
+            datos_nuevos['estado'] = nuevo_estado
+
+    # Actualizar consultorio
+    console.print("\n[bold]¿Desea cambiar el número de consultorio?[/bold]")
+    if Confirm.ask("Cambiar consultorio", default=False):
+        nuevo_consultorio = validar_campos.validar_numero("Nuevo número de consultorio")
+        if nuevo_consultorio != medico_actual.get('consultorio'):
+            datos_nuevos['consultorio'] = nuevo_consultorio
 
     if not datos_nuevos:
-        console.print("\n[yellow]No se modificó ningún dato.[/yellow]")
+        console.print("\n[yellow]⚠️ No se modificó ningún dato.[/yellow]")
         input("\nPresione Enter para continuar...")
         return
 
-    medico_actualizado = medico.actualizar_medico(filepath, str(id_medico), datos_nuevos)
-    if medico_actualizado:
-        console.print(Panel("✅ ¡Datos del médico actualizados con éxito!", border_style="green", title="Éxito"))
+    # Mostrar resumen de cambios
+    console.print("\n[bold cyan]📝 Resumen de cambios:[/bold cyan]")
+    for campo, valor in datos_nuevos.items():
+        console.print(f"  • {campo.capitalize()}: [green]{valor}[/green]")
+
+    if Confirm.ask("\n¿Confirma los cambios?", default=True):
+        medico_actualizado = medico.actualizar_medico(filepath, str(documento), datos_nuevos)
+        if medico_actualizado:
+            console.print(Panel(
+                "✅ ¡Datos del médico actualizados con éxito!", 
+                border_style="green", 
+                title="Éxito"
+            ))
+        else:
+            console.print(Panel(
+                "❌ Error al actualizar los datos.", 
+                border_style="red", 
+                title="Error"
+            ))
     else:
-        console.print(Panel("❌ Error al actualizar los datos.", border_style="red", title="Error"))
+        console.print("[yellow]Operación cancelada por el usuario.[/yellow]")
+    
     input("\nPresione Enter para continuar...")
+
     
 def menu_buscar_medico(filepath_base: str):
     """
@@ -534,7 +595,7 @@ def menu_buscar_medico(filepath_base: str):
     # Entrada de usuario
     console.print("[bold cyan]🔎 Buscar médico[/bold cyan]")
     documento = console.input(
-        "[cyan]Ingrese el documento o dar enter para buscar por especialidad buscar por especialidad: [/cyan]"
+        "[cyan]Ingrese el documento o dar enter para buscar por especialidad: [/cyan]"
         ).strip()
     especialidad = ""
     if not documento:
@@ -579,7 +640,7 @@ def menu_buscar_medico(filepath_base: str):
 
 def menu_eliminar_medico(filepath: str):
     """
-        Está función permite eliminar un médico existente.
+        Esta función permite eliminar un médico existente.
         
         Args:
             filepath (str): La ruta al archivo donde se almacenan los médicos.
@@ -587,7 +648,7 @@ def menu_eliminar_medico(filepath: str):
             none
     """
     console.print(Panel.fit("[bold cyan]🗑️❌ Eliminar Médico[/bold cyan]"))
-    documento = IntPrompt.ask("Ingrese el documento del médico a eliminar")
+    documento = Prompt.ask("[bold yellow]Ingrese el documento del médico a eliminar[/bold yellow]")
 
     medico_encontrado = medico.buscar_medico_por_documento(filepath, str(documento))
     if not medico_encontrado:
@@ -631,7 +692,7 @@ def main_vista_medicos():
         "➕🩺 Registrar un nuevo médico",
         "📄👨‍⚕️ Ver todos los médicos",
         "✏️🩹 Actualizar datos de un médico",
-        "🔎 Buscar medico",
+        "🔎 Buscar médico",
         "❌🗑️ Eliminar un médico",
         "⬅️🔙 Volver al menú principal"
     ]
