@@ -9,8 +9,8 @@ def test_crud_paciente_completo(tmp_path):
     filepath_json = tmp_path / "pacientes.json"
     filepath_csv = tmp_path / "pacientes.csv"
     
-    # ---------- CREAR PACIENTES ----------
-    pacientes = [
+    # CREAR PACIENTES de prueba para los testing
+     pacientes = [
         {"tipo_documento": "C.C", "documento": 101, "nombres": "María", "apellidos": "Gómez", "direccion": "Calle 10", "telefono": 3005551234},
         {"tipo_documento": "C.C", "documento": 102, "nombres": "Luis", "apellidos": "Torres", "direccion": "Calle 11", "telefono": 3017778899}
     ]
