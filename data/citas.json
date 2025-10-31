@@ -1,0 +1,11 @@
+[
+    {
+        "id": "1",
+        "documento_paciente": "1056928954",
+        "documento_medico": "123456789",
+        "fecha": "2025-11-02",
+        "hora": "13:00",
+        "motivo": "malestar",
+        "estado": "Cancelada"
+    }
+]

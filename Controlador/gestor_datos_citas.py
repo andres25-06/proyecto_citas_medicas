@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Módulo de Persistencia de Datos.
-
-Responsable de leer y escribir datos en archivos planos (CSV y JSON).
-No contiene lógica de negocio, solo operaciones de I/O.
-"""
 
 import csv
 import json
@@ -13,13 +7,20 @@ from typing import Any, Dict, List
 
 # Se define el orden de las columnas para los archivos.
 # Se añade 'tipo_documento' como nuevo campo.
-CAMPOS = ['id', 'documento_paciente', 'documento_medico', 'fecha','hora', 'motivo', 'estado']
+CAMPOS = [
+        'id',
+        'documento_paciente',
+        'documento_medico',
+        'fecha',
+        'hora',
+        'motivo',
+        'estado'
+        ]
 
 def inicializar_archivo(filepath: str) -> None:
     """
         Verifica si un archivo de datos existe. Si no, lo crea con las cabeceras.
         Esta función es clave para evitar errores en la primera ejecución del programa.
-        
         Args:
             filepath (str): La ruta completa al archivo de datos (e.g., 'data/.csv').
         Returns:
@@ -40,13 +41,13 @@ def inicializar_archivo(filepath: str) -> None:
 
 def cargar_datos(filepath: str) -> List[Dict[str, Any]]:
     """
-        Carga los datos desde un archivo (CSV o JSON) y los retorna como una lista de diccionarios.
-
+        Carga los datos desde un archivo (CSV o JSON)
+        y los retorna como una lista de diccionarios.
         Args:
             filepath (str): La ruta al archivo de datos.
-
         Returns:
-            List[Dict[str, Any]]: Una lista de diccionarios con los datos de los aprendices.
+            List[Dict[str, Any]]: Una lista de diccionarios con los
+            datos de los aprendices.
     """
     inicializar_archivo(filepath)
 
@@ -64,8 +65,8 @@ def cargar_datos(filepath: str) -> List[Dict[str, Any]]:
 
 def guardar_datos(filepath: str, datos: List[Dict[str, Any]]) -> None:
     """
-        Guarda una lista de diccionarios en un archivo (CSV o JSON), sobrescribiendo el contenido.
-
+        Guarda una lista de diccionarios en un archivo (CSV o JSON),
+        sobrescribiendo el contenido.
         Args:
             filepath (str): La ruta al archivo donde se guardarán los datos.
             datos (List[Dict[str, Any]]): La lista de aprendices a guardar.

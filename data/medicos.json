@@ -1,0 +1,13 @@
+[
+    {
+        "id": "1",
+        "tipo_documento": "C.C",
+        "documento": "1052312624",
+        "nombres": "Jimy",
+        "apellidos": "Angarita",
+        "especialidad": "Medicina General",
+        "telefono": "31115649",
+        "estado": "Activo",
+        "consultorio": 11
+    }
+]
