@@ -26,13 +26,12 @@ NOMBRE_ARCHIVO_JSON = 'pacientes.json'
 def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     limpiar()
     """
-        Solicitar al usuario que seleccione un tipo de documento usando el selector interactivo.
-        
+        Solicitar al usuario que seleccione un tipo de documento
+        usando el selector interactivo.
         Args:
             permitir_vacio (bool): Si es True, permite no cambiar el tipo de documento.
         Returns:
             str | None: El tipo de documento seleccionado o None si no se cambia.
-            
     """
     tipos = {
         '1': 'C.C',
@@ -62,7 +61,8 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     seleccion = selector_interactivo("📑 Seleccione el tipo de documento", opciones)
 
     if permitir_vacio and seleccion == 0:
-        console.print("[bold yellow]⚠ No se modificará el tipo de documento.[/bold yellow]")
+        console.print(
+            "[bold yellow]⚠ No se modificará el tipo de documento.[/bold yellow]")
         time.sleep(1)
         return None
 
@@ -76,7 +76,8 @@ def solicitar_tipo_documento(permitir_vacio: bool = False) -> str | None:
     codigo = str(indice_real + 1)
     tipo = tipos[codigo]
 
-    console.print(f"[bold green]✅ Tipo seleccionado:[/bold green] {descripciones[codigo]}")
+    console.print(
+        f"[bold green]✅ Tipo seleccionado:[/bold green] {descripciones[codigo]}")
     time.sleep(1)
     return tipo
 
@@ -86,30 +87,30 @@ def elegir_almacenamiento() -> str:
     """
         Esta función permite al usuario seleccionar el tipo de almacenamiento
         para los datos de pacientes (CSV o JSON) mediante un selector interactivo.
-        
         Args:
             None
         Returns:
             str: Ruta del archivo seleccionado para almacenamiento.
-        
     """
     limpiar()
-    """Seleccionar tipo de almacenamiento (CSV o JSON) usando el selector interactivo."""
     opciones = [
         "📄 CSV (Archivo de texto plano)",
         "🧾 JSON (Formato estructurado)",
         "🔙 Volver al menú principal"
     ]
 
-    seleccion = selector_interactivo("⚙️ Configuración de Almacenamiento", opciones)
+    seleccion = selector_interactivo(
+        "⚙️ Configuración de Almacenamiento", opciones)
 
     if seleccion == 0:
-        console.print("[bold green]✅ Modo de almacenamiento seleccionado: CSV[/bold green]")
+        console.print(
+            "[bold green]✅ Modo de almacenamiento seleccionado: CSV[/bold green]")
         time.sleep(1)
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_CSV)
 
     elif seleccion == 1:
-        console.print("[bold green]✅ Modo de almacenamiento seleccionado: JSON[/bold green]")
+        console.print(
+            "[bold green]✅ Modo de almacenamiento seleccionado: JSON[/bold green]")
         time.sleep(1)
         return os.path.join(DIRECTORIO_DATOS, NOMBRE_ARCHIVO_JSON)
 
@@ -123,12 +124,10 @@ def elegir_almacenamiento() -> str:
 def limpiar():
     """
         Limpia la consola dependiendo del sistema operativo.
-        
         Args:
             None
         Returns:
             None
-            
     """
     os.system("cls" if os.name == "nt" else "clear")
 
@@ -140,7 +139,6 @@ def selector_interactivo(titulo, opciones):
     """
         Muestra un menú interactivo en la consola donde el usuario puede
         navegar usando las flechas ↑ ↓ y seleccionar una opción con Enter.
-        
         Args:
             titulo (str): Título del menú.
             opciones (list): Lista de opciones para mostrar.
@@ -177,7 +175,6 @@ def selector_interactivo(titulo, opciones):
 def menu_crear_paciente(filepath: str):
     """
         Entradas para registrar un nuevo paciente y guardar en el archivo.
-        
         Args:
             filepath (str): Ruta del archivo donde se guardarán los datos.
         Returns:
@@ -205,9 +202,17 @@ def menu_crear_paciente(filepath: str):
     }
 
     # --- Validar campos obligatorios ---
-    campos_obligatorios = ["tipo_documento", "documento", "nombres", "apellidos", "telefono"]
-    if not entrada_datos.validar_datos_relacion_obligatorios(nuevo_paciente, campos_obligatorios, "paciente"):
-        console.print(Panel("⚠ Faltan datos obligatorios.", border_style="red", title="Error"))
+    campos_obligatorios = [
+        "tipo_documento",
+        "documento",
+        "nombres",
+        "apellidos",
+        "telefono"]
+    if not entrada_datos.validar_datos_relacion_obligatorios(
+        nuevo_paciente, campos_obligatorios, "paciente"):
+        console.print(Panel(
+            "⚠ Faltan datos obligatorios.",
+            border_style="red", title="Error"))
         input("\nPresione Enter para continuar...")
         return
 
@@ -219,11 +224,14 @@ def menu_crear_paciente(filepath: str):
     # --- Confirmación ---
     if paciente_creado:
         console.print(Panel(
-            f"✅ ¡Paciente registrado con éxito!\nID Asignado: [bold yellow]{paciente_creado['id']}[/bold yellow]",
+            f"✅ ¡Paciente registrado con éxito!\nID Asignado: [bold yellow]{
+                paciente_creado['id']}[/bold yellow]",
             border_style="green", title="Éxito"
         ))
     else:
-        console.print(Panel("⚠ No se pudo registrar el paciente.", border_style="red", title="Error"))
+        console.print(Panel(
+            "⚠ No se pudo registrar el paciente.",
+            border_style="red", title="Error"))
 
     input("\nPresione Enter para continuar...")
 
@@ -235,7 +243,6 @@ def menu_leer_pacientes(filepath: str):
             filepath (str): Ruta del archivo desde donde se leerán los datos.
         Returns:
             None
-    
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]👥 Lista de Pacientes[/bold cyan]"))
@@ -246,7 +253,11 @@ def menu_leer_pacientes(filepath: str):
         input("\nPresione Enter para continuar...")
         return
 
-    tabla = Table(title="Pacientes Registrados", border_style="blue", show_header=True, header_style="bold magenta")
+    tabla = Table(
+        title="Pacientes Registrados",
+        border_style="blue",
+        show_header=True,
+        header_style="bold magenta")
     tabla.add_column("ID", style="dim", width=5)
     tabla.add_column("Tipo Doc.", justify="center")
     tabla.add_column("Documento", justify="center")
@@ -269,12 +280,10 @@ def menu_actualizar_paciente(filepath: str):
 
     """
         Permite actualizar los datos de un paciente existente.
-        
         Args:
             filepath (str): Ruta del archivo donde se encuentran los datos.
         Returns:
             None
-            
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]✏ Actualizar Datos de Paciente[/bold cyan]"))
@@ -293,19 +302,27 @@ def menu_actualizar_paciente(filepath: str):
     if nuevo_tipo_doc:
         datos_nuevos['tipo_documento'] = nuevo_tipo_doc
 
-    nombres = Prompt.ask(f"Nombres ({paciente_actual['nombres']})", default=paciente_actual['nombres'])
+    nombres = Prompt.ask(
+        f"Nombres ({paciente_actual['nombres']})",
+        default=paciente_actual['nombres'])
     if nombres != paciente_actual['nombres']:
         datos_nuevos['nombres'] = nombres
 
-    apellidos = Prompt.ask(f"Apellidos ({paciente_actual['apellidos']})", default=paciente_actual['apellidos'])
+    apellidos = Prompt.ask(
+        f"Apellidos ({paciente_actual['apellidos']})",
+        default=paciente_actual['apellidos'])
     if apellidos != paciente_actual['apellidos']:
         datos_nuevos['apellidos'] = apellidos
 
-    direccion = Prompt.ask(f"Dirección ({paciente_actual['direccion']})", default=paciente_actual['direccion'])
+    direccion = Prompt.ask(
+        f"Dirección ({paciente_actual['direccion']})",
+        default=paciente_actual['direccion'])
     if direccion != paciente_actual['direccion']:
         datos_nuevos['direccion'] = direccion
 
-    telefono = IntPrompt.ask(f"Teléfono ({paciente_actual['telefono']})", default=int(paciente_actual['telefono']))
+    telefono = IntPrompt.ask(
+        f"Teléfono ({paciente_actual['telefono']})"
+        , default=int(paciente_actual['telefono']))
     if telefono != int(paciente_actual['telefono']):
         datos_nuevos['telefono'] = telefono
 
@@ -314,11 +331,18 @@ def menu_actualizar_paciente(filepath: str):
         input("\nPresione Enter para continuar...")
         return
 
-    paciente_actualizado = paciente.actualizar_paciente(filepath, str(documento), datos_nuevos)
+    paciente_actualizado = paciente.actualizar_paciente(
+        filepath, str(documento),
+        datos_nuevos)
     if paciente_actualizado:
-        console.print(Panel("✅ ¡Datos actualizados con éxito!", border_style="green", title="Éxito"))
+        console.print(Panel(
+            "✅ ¡Datos actualizados con éxito!",
+            border_style="green", title="Éxito"))
     else:
-        console.print(Panel("❌ Error al actualizar.", border_style="red", title="Error"))
+        console.print(Panel(
+            "❌ Error al actualizar.",
+            border_style="red",
+            title="Error"))
     input("\nPresione Enter para continuar...")
 
 
@@ -326,33 +350,38 @@ def menu_eliminar_paciente(filepath: str):
 
     """
         Permite eliminar un paciente existente.
-        
         Args:
             filepath (str): Ruta del archivo donde se encuentran los datos.
         Returns:
             None
-            
     """
     limpiar()
     console.print(Panel.fit("[bold cyan]🗑 Eliminar Paciente[/bold cyan]"))
     documento = IntPrompt.ask("Ingrese el Documento del paciente a eliminar")
 
-    paciente_encontrado = paciente.buscar_paciente_por_documento(filepath, str(documento))
+    paciente_encontrado = paciente.buscar_paciente_por_documento(
+        filepath, str(documento))
     if not paciente_encontrado:
         console.print("\n[bold red]❌ No se encontró el paciente.[/bold red]")
         input("\nPresione Enter para continuar...")
         return
 
     confirmacion = Confirm.ask(
-        f"¿Desea eliminar a [bold]{paciente_encontrado['nombres']} {paciente_encontrado['apellidos']}[/bold]?",
+        f"¿Desea eliminar a [bold]{paciente_encontrado[
+            'nombres']} {paciente_encontrado[
+                'apellidos']}[/bold]?",
         default=False
     )
 
     if confirmacion:
         if paciente.eliminar_paciente(filepath, str(documento)):
-            console.print(Panel("✅ ¡Paciente eliminado con éxito!", border_style="green", title="Éxito"))
+            console.print(Panel(
+                "✅ ¡Paciente eliminado con éxito!",
+                border_style="green", title="Éxito"))
         else:
-            console.print(Panel("❌ Error al eliminar.", border_style="red", title="Error"))
+            console.print(Panel(
+                "❌ Error al eliminar.",
+                border_style="red", title="Error"))
     else:
         console.print("\n[yellow]Operación cancelada.[/yellow]")
     input("\nPresione Enter para continuar...")
@@ -366,12 +395,10 @@ def main_vista_pacientes():
         Este es el menú principal del módulo de pacientes,
         el cual utiliza un selector interactivo para navegar
         entre las diferentes opciones disponibles.
-        
         Args:
             None
         Returns:
-            None    
-            
+            None
     """
     limpiar()
     archivo = elegir_almacenamiento()
@@ -386,7 +413,8 @@ def main_vista_pacientes():
     ]
 
     while True:
-        seleccion = selector_interactivo("MÓDULO DE PACIENTES\nUsa ↑ ↓ y Enter para seleccionar", opciones)
+        seleccion = selector_interactivo(
+            "MÓDULO DE PACIENTES\nUsa ↑ ↓ y Enter para seleccionar", opciones)
 
         if seleccion == 0:
             menu_crear_paciente(archivo)

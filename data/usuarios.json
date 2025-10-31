@@ -1,0 +1,9 @@
+[
+    {
+        "usuario": "admin",
+        "contrasena": "1234",
+        "rol": "superadmin",
+        "activo": true,
+        "correo": "admin@hospital.com"
+    }
+]
