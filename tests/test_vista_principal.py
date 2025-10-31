@@ -73,7 +73,7 @@ def test_mostrar_tabla_generica():
     # Obtener salida capturada
     output = buf.getvalue()
 
-    # Comprobar que la salida contiene el titulo esperado
+    # Comprobar que la salida sea la esperada
     assert titulo in output
 
 
@@ -119,7 +119,7 @@ def test_mostrar_citas_por_dia(tmp_path, monkeypatch):
     archivo.write_text(json.dumps(citas), encoding="utf-8")
 
     monkeypatch.setattr(vp, "limpiar", lambda: None)
-    # Parchear enriquecer_citas si quieres evitar carga archivos CSV reales
+    # Parchear enriquecer_citas para evitar carga archivos CSV reales
     monkeypatch.setattr(vp, "enriquecer_citas", lambda x, **kw: x)
     # Parchear mostrar_tabla_citas para no imprimir realmente
     monkeypatch.setattr(vp, "mostrar_tabla_citas", lambda *args, **kwargs: None)
