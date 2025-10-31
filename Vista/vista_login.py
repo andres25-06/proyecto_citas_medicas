@@ -598,7 +598,6 @@ def iniciar_sesion():
 
 # =====================================================================
 # FUNCIÓN PRINCIPAL DEL LOGIN
-<<<<<<< HEAD
 # -------------------------------------------------------------
 
 
@@ -613,19 +612,6 @@ def login():
         None si el usuario decide salir.
     """
     from Vista.vista_superadmin import panel_superadmin
-=======
-# =====================================================================
-try:
-    from Vista.vista_superadmin import panel_superadmin
-except ImportError:
-    def panel_superadmin(usuario):
-        limpiar()
-        console.print("[bold green]Panel de Superadmin cargado[/bold green]")
-        time.sleep(2)
-
-def login():
-    mostrar_splash_rapido()
->>>>>>> ab14d7dbe05628deb559eef5976329c88dcc9dc4
     asegurar_data()
     opciones = ["Iniciar sesión", "Registrarse", "Recuperar contraseña", "Ver Créditos", "Salir"]
     while True:
