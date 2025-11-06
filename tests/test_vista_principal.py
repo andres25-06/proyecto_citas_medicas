@@ -1,7 +1,4 @@
 # tests/test_vista_principal.py
-import os
-import json
-import tempfile
 from Vista import vista_principal
 
 

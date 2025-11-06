@@ -1,7 +1,6 @@
-import os
-import json
 import csv
-import tempfile
+import json
+
 from Vista import vista_cita
 
 # --- Pruebas de funciones auxiliares --- #

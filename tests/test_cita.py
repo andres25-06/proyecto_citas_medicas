@@ -1,5 +1,5 @@
+
 from Modelo import cita
-from rich.prompt import Prompt
 
 
 # TEST: CREAR CITA NUEVA

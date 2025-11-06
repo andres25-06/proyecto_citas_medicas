@@ -3,9 +3,9 @@ import builtins
 from unittest.mock import MagicMock, patch
 
 import pytest
+from rich.prompt import IntPrompt
 
 from Vista import vista_medico
-from rich.prompt import IntPrompt
 
 
 @pytest.fixture

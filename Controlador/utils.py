@@ -1,7 +1,6 @@
-import os
-import json
 import csv
-from typing import Any, Dict, List, Optional
+import json
+import os
 
 from Modelo import medico, paciente
 
