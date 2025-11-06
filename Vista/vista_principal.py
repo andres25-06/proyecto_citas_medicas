@@ -19,7 +19,7 @@ from rich.table import Table
 from rich.text import Text
 
 from Vista import navegacion
-from Vista.vista_cita import obtener_nombre_por_documento
+from Controlador.utils import obtener_nombre_por_documento
 from Vista.vista_estadisticas_medico import estadisticas_citas_por_medico
 
 # ---------------------------------

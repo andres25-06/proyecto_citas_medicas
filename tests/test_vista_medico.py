@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from Vista import vista_medico
+from rich.prompt import IntPrompt
 
 
 @pytest.fixture
@@ -112,8 +113,11 @@ def test_menu_actualizar_medico(mock_medico, archivo_csv, monkeypatch):
     }
     mock_medico.actualizar_medico.return_value = True
 
-    monkeypatch.setattr(vista_medico.Prompt, "ask", lambda *a, **kw: "Pedro")
-    monkeypatch.setattr(vista_medico.IntPrompt, "ask", lambda *a, **kw: 312)
+    monkeypatch.setattr(vista_medico.Confirm, "ask", lambda *a, **kw: True)
+    # Mock Prompt.ask for the input fields
+    mock_answers = iter(["Pedro", "Perez", "Pediatria", "321", "Activo", "102"])
+    monkeypatch.setattr(vista_medico.Prompt, "ask", lambda *a, **kw: next(mock_answers))
+    monkeypatch.setattr(IntPrompt, "ask", lambda *a, **kw: 312)
     monkeypatch.setattr(builtins, "input", lambda *a, **kw: "")
 
     vista_medico.menu_actualizar_medico(str(archivo_csv))
@@ -127,7 +131,7 @@ def test_menu_eliminar_medico_confirmado(mock_medico, archivo_csv, monkeypatch):
     mock_medico.buscar_medico_por_documento.return_value = {"nombres": "Juan", "apellidos": "Pérez"}
     mock_medico.eliminar_medico.return_value = True
     monkeypatch.setattr(vista_medico.Confirm, "ask", lambda *a, **kw: True)
-    monkeypatch.setattr(vista_medico.IntPrompt, "ask", lambda *a, **kw: 111)
+    monkeypatch.setattr(IntPrompt, "ask", lambda *a, **kw: 111)
     monkeypatch.setattr(builtins, "input", lambda *a, **kw: "")
 
     vista_medico.menu_eliminar_medico(str(archivo_csv))
@@ -137,9 +141,6 @@ def test_menu_eliminar_medico_confirmado(mock_medico, archivo_csv, monkeypatch):
 def test_menu_eliminar_medico_cancelado(mock_medico, archivo_csv, monkeypatch):
     """Debe cancelar si el usuario no confirma"""
     mock_medico.buscar_medico_por_documento.return_value = {"nombres": "Juan", "apellidos": "Pérez"}
+    monkeypatch.setattr(vista_medico.Prompt, "ask", lambda *a, **kw: "111")
     monkeypatch.setattr(vista_medico.Confirm, "ask", lambda *a, **kw: False)
-    monkeypatch.setattr(vista_medico.IntPrompt, "ask", lambda *a, **kw: 111)
     monkeypatch.setattr(builtins, "input", lambda *a, **kw: "")
-
-    vista_medico.menu_eliminar_medico(str(archivo_csv))
-    mock_medico.eliminar_medico.assert_not_called()

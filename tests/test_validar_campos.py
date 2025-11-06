@@ -1,71 +1,69 @@
-# # tests/test_validar_campos.py
-# import sys
-# import os
-# import tempfile
-# import json
-# import pytest
-# from unittest.mock import patch
+import io
+import builtins
+from Validaciones import validar_campos
 
-# # ---------------------------
-# # Permitir importar Validaciones.py desde la raíz
-# # ---------------------------
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-# import Validaciones as validar_campos
 
-# # ==============================
-# # TESTS validar_texto
-# # ==============================
-# @patch("rich.prompt.Prompt.ask", return_value="Sergio")
-# def test_validar_texto(mock_prompt):
-#     resultado = validar_campos.validar_texto("Nombre")
+# ===========================================================
+# VALIDAR TEXTO
+# ===========================================================
+def test_validar_texto_valido(monkeypatch):
+    # Simula que el usuario escribe "Hola"
+    monkeypatch.setattr(validar_campos.Prompt, "ask", lambda *a, **k: "Hola")
+    assert validar_campos.validar_texto("Nombre") == "Hola"
 
-# @patch("rich.prompt.Prompt.ask", side_effect=["", "ab", "Juan"])
-# def test_validar_texto_reintentos(mock_prompt):
-#     resultado = validar_campos.validar_texto("Nombre", 3, 10)
-#     assert resultado == "Juan"
 
-# # ==============================
-# # TESTS validar_numero
-# # ==============================
-# @patch("rich.prompt.Prompt.ask", return_value="25")
-# def test_validar_numero_valido(mock_prompt):
-#     resultado = validar_campos.validar_numero("Edad", 18, 99)
-#     assert resultado == 25
+def test_validar_texto_vacio(monkeypatch):
+    # Simula respuestas: "" (vacío) y luego "Correcto"
+    respuestas = iter(["", "Correcto"])
+    monkeypatch.setattr(validar_campos.Prompt, "ask", lambda *a, **k: next(respuestas))
+    assert validar_campos.validar_texto("Campo") == "Correcto"
 
-# @patch("rich.prompt.Prompt.ask", side_effect=["", "abc", "5", "20"])
-# def test_validar_numero_reintentos(mock_prompt):
-#     resultado = validar_campos.validar_numero("Edad", 10, 30)
-#     assert resultado == 20
 
-# # ==============================
-# # TESTS validar_telefono
-# # ==============================
-# @patch("rich.prompt.Prompt.ask", side_effect=["", "123", "3124567890"])
-# def test_validar_telefono(mock_prompt):
-#     resultado = validar_campos.validar_telefono("Teléfono")
-#     assert resultado == "3124567890"
+# ===========================================================
+# VALIDAR NÚMERO
+# ===========================================================
+def test_validar_numero_valido(monkeypatch):
+    monkeypatch.setattr(validar_campos.Prompt, "ask", lambda *a, **k: "25")
+    assert validar_campos.validar_numero("Edad") == 25
 
-# # ==============================
-# # TESTS validar_cedula
-# # ==============================
 
-# @pytest.fixture
-# def json_tempfile():
-#     with tempfile.NamedTemporaryFile(mode="w+", suffix=".json", delete=False) as f:
-#         # pre-carga con un registro duplicado
-#         json.dump([{"documento": "654321"}], f)
-#         f.flush()
-#         yield f.name
+def test_validar_numero_no_valido(monkeypatch):
+    # Primero "abc" (inválido), luego "10" (válido)
+    respuestas = iter(["abc", "10"])
+    monkeypatch.setattr(validar_campos.Prompt, "ask", lambda *a, **k: next(respuestas))
+    assert validar_campos.validar_numero("Edad") == 10
 
-# @patch("rich.prompt.Prompt.ask", side_effect=["", "abc", "123456", "654321"])
-# def test_validar_cedula(json_tempfile, mock_prompt):
-#     resultado = validar_campos.validar_cedula("Cédula", json_tempfile)
-#     assert resultado == "123456"  # el primer valor válido no duplicado
 
-# # ==============================
-# # TESTS validar_hora
-# # ==============================
-# @patch("builtins.input", side_effect=["hola", "25:99", "08:30"])
-# def test_validar_hora(mock_input):
-#     resultado = validar_campos.validar_hora("hora de cita")
-#     assert resultado == "08:30"
+# ===========================================================
+# VALIDAR TELÉFONO
+# ===========================================================
+def test_validar_telefono(monkeypatch):
+    monkeypatch.setattr(validar_campos.Prompt, "ask", lambda *a, **k: "3124567890")
+    assert validar_campos.validar_telefono("Teléfono") == "3124567890"
+
+
+# ===========================================================
+# VALIDAR CÉDULA (sin duplicado)
+# ===========================================================
+def test_validar_cedula_json(tmp_path, monkeypatch):
+    filepath = tmp_path / "personas.json"
+    filepath.write_text("[]", encoding="utf-8")
+
+    monkeypatch.setattr(validar_campos.Prompt, "ask", lambda *a, **k: "123456")
+    assert validar_campos.validar_cedula("Cédula", str(filepath)) == "123456"
+
+
+# ===========================================================
+# VALIDAR HORA (usa input())
+# ===========================================================
+def test_validar_hora_valida(monkeypatch):
+    # Simula input del usuario: "09:30"
+    monkeypatch.setattr(builtins, "input", lambda *a, **k: "09:30")
+    assert validar_campos.validar_hora("hora") == "09:30"
+
+
+def test_validar_hora_invalida(monkeypatch):
+    # Responde primero "20:00" (fuera de rango), luego "07:15"
+    respuestas = iter(["20:00", "07:15"])
+    monkeypatch.setattr(builtins, "input", lambda *a, **k: next(respuestas))
+    assert validar_campos.validar_hora("hora") == "07:15"

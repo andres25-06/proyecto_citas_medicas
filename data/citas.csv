@@ -1,0 +1,3 @@
+id,documento_paciente,documento_medico,fecha,hora,motivo,estado
+1,1052401012,1052312624,2025-11-07,10:00,dolor,Pendiente
+2,1056928954,1052312624,2025-11-07,10:00,gripa,Pendiente

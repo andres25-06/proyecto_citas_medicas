@@ -1,4 +1,5 @@
 from Modelo import cita
+from rich.prompt import Prompt
 
 
 # TEST: CREAR CITA NUEVA
@@ -86,9 +87,15 @@ def test_cargar_citas_json(tmp_path):
 
 
 # TEST: ELIMINAR CITA POR DOCUMENTO
-def test_eliminar_cita_por_documento(tmp_path):
+def test_eliminar_cita_por_documento(tmp_path, monkeypatch):
     filepath = tmp_path / "citas.json"
     cita.crear_cita(str(filepath), "20202", "30303", "2025-11-03", "14:00", "Vacunación", "Pendiente")
+
+    # Simular respuestas del usuario:
+    # 1 → selecciona la primera cita
+    # s → confirma la eliminación
+    respuestas = iter(["1", "s"])
+    monkeypatch.setattr(cita.Prompt, "ask", lambda *args, **kwargs: next(respuestas))
 
     eliminada = cita.eliminar_cita_por_documento(str(filepath), "20202")
     assert eliminada is True
